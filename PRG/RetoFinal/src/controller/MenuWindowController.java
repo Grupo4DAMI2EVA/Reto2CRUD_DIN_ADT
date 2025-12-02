@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package view;
+package controller;
 
 import static com.sun.org.apache.bcel.internal.Repository.instanceOf;
 import controller.Controller;
@@ -68,7 +68,7 @@ public class MenuWindowController implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
             javafx.scene.Parent root = fxmlLoader.load();
 
-            view.ModifyWindowController controllerWindow = fxmlLoader.getController();
+            controller.ModifyWindowController controllerWindow = fxmlLoader.getController();
             controllerWindow.setProfile(profile);
             controllerWindow.setCont(this.cont);
 
@@ -95,7 +95,7 @@ public class MenuWindowController implements Initializable {
             if (profile instanceof User) {
                 fxmlLoader = new FXMLLoader(getClass().getResource("/view/DeleteAccount.fxml"));
                 javafx.scene.Parent root = fxmlLoader.load();
-                view.DeleteAccountController controllerWindow = fxmlLoader.getController();
+                controller.DeleteAccountController controllerWindow = fxmlLoader.getController();
                 controllerWindow.setProfile(profile);
                 controllerWindow.setCont(cont);
 
@@ -108,7 +108,7 @@ public class MenuWindowController implements Initializable {
             } else if (profile instanceof Admin) {
                 fxmlLoader = new FXMLLoader(getClass().getResource("/view/DeleteAccountAdmin.fxml"));
                 javafx.scene.Parent root = fxmlLoader.load();
-                view.DeleteAccountAdminController controllerWindow = fxmlLoader.getController();
+                controller.DeleteAccountAdminController controllerWindow = fxmlLoader.getController();
                 controllerWindow.setProfile(profile);
                 controllerWindow.setCont(cont);
                 controllerWindow.setComboBoxUser();
