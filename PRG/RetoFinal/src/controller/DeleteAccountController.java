@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package view;
+package controller;
 
 import controller.Controller;
 import java.net.URL;
@@ -80,7 +80,7 @@ public class DeleteAccountController implements Initializable {
             javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
             javafx.scene.Parent root = fxmlLoader.load();
 
-            view.MenuWindowController controllerWindow = fxmlLoader.getController();
+            controller.MenuWindowController controllerWindow = fxmlLoader.getController();
             controllerWindow.setUsuario(profile);
             controllerWindow.setCont(this.cont);
             javafx.stage.Stage stage = new javafx.stage.Stage();
@@ -133,7 +133,7 @@ public class DeleteAccountController implements Initializable {
                         javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(getClass().getResource("/view/LogInWindow.fxml"));
                         javafx.scene.Parent root = fxmlLoader.load();
 
-                        view.LogInWindowController controllerWindow = fxmlLoader.getController();
+                        controller.LogInWindowController controllerWindow = fxmlLoader.getController();
                         javafx.stage.Stage stage = new javafx.stage.Stage();
                         stage.setScene(new javafx.scene.Scene(root));
                         stage.show();
