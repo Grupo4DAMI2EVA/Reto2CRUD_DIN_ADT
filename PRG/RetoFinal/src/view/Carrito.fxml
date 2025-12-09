@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.CarritoController">
+   
+    <children>
+        <!-- Título -->
+        <Label layoutX="210.0" layoutY="20.0" text="CARRITO DE COMPRAS">
+            <font>
+                <Font size="24.0" />
+            </font>
+        </Label>
+        
+        <!-- ListView para mostrar los items del carrito -->
+        <ListView fx:id="listViewCarrito" layoutX="50.0" layoutY="80.0" prefHeight="280.0" prefWidth="500.0" />
+        
+        <!-- Controles para modificar cantidad -->
+        <Label layoutX="350.0" layoutY="370.0" text="Ajustar cantidad:" />
+        
+        <!-- Botón - (disminuir) -->
+        <Button fx:id="buttonMenos" layoutX="350.0" layoutY="395.0" mnemonicParsing="false" onAction="#disminuirCantidad" prefHeight="30.0" prefWidth="40.0" style="-fx-background-color: #FF6B6B; -fx-border-color: #000000; -fx-font-size: 16px;" text="-" />
+        
+        <!-- Label que muestra la cantidad actual -->
+        <Label fx:id="labelCantidadActual" layoutX="400.0" layoutY="400.0" prefHeight="25.0" prefWidth="60.0" style="-fx-alignment: center; -fx-font-size: 16px; -fx-border-color: #CCCCCC; -fx-border-width: 1px;" text="0">
+            <font>
+                <Font size="16.0" />
+            </font>
+        </Label>
+        
+        <!-- Botón + (aumentar) -->
+        <Button fx:id="buttonMas" layoutX="470.0" layoutY="395.0" mnemonicParsing="false" onAction="#aumentarCantidad" prefHeight="30.0" prefWidth="40.0" style="-fx-background-color: #4CAF50; -fx-border-color: #000000; -fx-font-size: 16px;" text="+" />
+        
+        <!-- Íconos e información -->
+        <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="50.0" layoutY="380.0">
+            <image>
+                <Image url="@../images/shopping_cart_32dp_5084C1_FILL0_wght400_GRAD0_opsz40.png" />
+            </image>
+        </ImageView>
+        
+        <Label layoutX="40.0" layoutY="377.0" prefHeight="25.0" prefWidth="130.0" text="Total de items:">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
+        <Label fx:id="labelTotalItems" layoutX="170.0" layoutY="382.0" prefWidth="60.0" text="0">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
+        
+        <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="50.0" layoutY="420.0">
+            <image>
+                <Image url="@../images/attach_money_32dp_5084C1_FILL0_wght400_GRAD0_opsz40.png" />
+            </image>
+        </ImageView>
+        
+        <Label layoutX="39.0" layoutY="411.0" prefHeight="27.0" prefWidth="110.0" text="Total a pagar:">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
+        
+        <!-- Botones principales -->
+        <Button fx:id="buttonComprar" layoutX="316.0" layoutY="450.0" mnemonicParsing="false" onAction="#comprar" prefHeight="35.0" prefWidth="130.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000; -fx-font-size: 14px;" text="Realizar Compra" />
+        
+        <Button fx:id="buttonEliminar" layoutX="470.0" layoutY="449.0" mnemonicParsing="false" onAction="#eliminarItem" prefHeight="35.0" prefWidth="110.0" style="-fx-background-color: #FF9800; -fx-border-color: #000000; -fx-font-size: 14px;" text="Eliminar" />
+        
+        <!-- Información adicional -->
+        <Label layoutX="50.0" layoutY="43.0" prefHeight="35.0" prefWidth="130.0" text="Items en el carrito:">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
+        
+        <!-- Indicador de item seleccionado -->
+        <Label fx:id="labelItemSeleccionado" layoutX="149.0" layoutY="449.0" prefHeight="35.0" prefWidth="141.0" style="-fx-text-fill: #666666;" text="Selecciona un item">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
+      <Label fx:id="labelTotalItems1" layoutX="170.0" layoutY="416.0" prefWidth="60.0" text="0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>
