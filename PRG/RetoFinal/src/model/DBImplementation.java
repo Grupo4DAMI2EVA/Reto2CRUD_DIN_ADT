@@ -28,14 +28,14 @@ public class DBImplementation implements ClassDAO {
     private String passwordDB;
 
     // SQL statements
-    private final String SQLSINGUPPROFILE = "INSERT INTO PROFILE_ (USERNAME, PASSWORD_, EMAIL, NAME_, TELEPHONE, SURNAME) VALUES (?,?,?,?,?,?);";
+    private final String SQLSIGNUPPROFILE = "INSERT INTO PROFILE_ (USERNAME, PASSWORD_, EMAIL, NAME_, TELEPHONE, SURNAME) VALUES (?,?,?,?,?,?);";
     private final String SQLSIGNUPUSER = "INSERT INTO USER_ (USERNAME, GENDER, CARD_NUMBER) VALUES (?,?,?);";
 
-    private final String SLQDELETEPROFILE = "DELETE FROM PROFILE_ WHERE USERNAME = ? AND PASSWORD_ = ?;";
-    private final String SLQDELETEPROFILEADMIN = "DELETE p FROM PROFILE_ p JOIN USER_ u ON p.USERNAME = u.USERNAME JOIN ADMIN_ a ON p.USERNAME = a.USERNAME WHERE p.PASSWORD_ = ? AND u.username = ?;";
+    private final String SQLDELETEPROFILE = "DELETE FROM PROFILE_ WHERE USERNAME = ? AND PASSWORD_ = ?;";
+    private final String SQLDELETEPROFILEADMIN = "DELETE p FROM PROFILE_ p JOIN USER_ u ON p.USERNAME = u.USERNAME JOIN ADMIN_ a ON p.USERNAME = a.USERNAME WHERE p.PASSWORD_ = ? AND u.username = ?;";
 
-    private final String SLQLOGINUSER = "SELECT p.*, u.GENDER, u.CARD_NUMBER FROM PROFILE_ p JOIN USER_ u ON p.USERNAME= u.USERNAME WHERE u.USERNAME = ? AND p.PASSWORD_ = ?;";
-    private final String SLQLOGINADMIN = "SELECT p.*, a.CURRENT_ACCOUNT FROM PROFILE_ p JOIN ADMIN_ a ON p.USERNAME= a.USERNAME WHERE a.USERNAME = ? AND p.PASSWORD_ = ?;";
+    private final String SQL_LOGINUSER = "SELECT p.*, u.GENDER, u.CARD_NUMBER FROM PROFILE_ p JOIN USER_ u ON p.USERNAME= u.USERNAME WHERE u.USERNAME = ? AND p.PASSWORD_ = ?;";
+    private final String SQL_LOGINADMIN = "SELECT p.*, a.CURRENT_ACCOUNT FROM PROFILE_ p JOIN ADMIN_ a ON p.USERNAME= a.USERNAME WHERE a.USERNAME = ? AND p.PASSWORD_ = ?;";
 
     final String SQLMODIFYPROFILE = "UPDATE PROFILE_ P SET P.PASSWORD_ = ?, P.EMAIL = ?, P.NAME_ = ?, P.TELEPHONE = ?, P.SURNAME = ? WHERE USERNAME = ?;";
     final String SQLMODIFYUSER = "UPDATE USER_ U SET U.GENDER = ? WHERE USERNAME = ?";
@@ -65,12 +65,12 @@ public class DBImplementation implements ClassDAO {
         Connection con = null;
         try {
             con = ConnectionPool.getConnection();
-            stmt = con.prepareStatement(SLQLOGINUSER);
+            stmt = con.prepareStatement(SQL_LOGINUSER);
             stmt.setString(1, username);
             stmt.setString(2, password);
             ResultSet result = stmt.executeQuery();
             if (!(result.next())) {
-                stmt = con.prepareStatement(SLQLOGINADMIN);
+                stmt = con.prepareStatement(SQL_LOGINADMIN);
                 stmt.setString(1, username);
                 stmt.setString(2, password);
                 result = stmt.executeQuery();
@@ -128,7 +128,7 @@ public class DBImplementation implements ClassDAO {
         boolean success = false;
         try {
             Connection con = waitForConnection(connectionThread);
-            stmt = con.prepareStatement(SQLSINGUPPROFILE);
+            stmt = con.prepareStatement(SQLSIGNUPPROFILE);
             stmt.setString(1, username);
             stmt.setString(2, password);
             stmt.setString(3, email);
@@ -161,6 +161,9 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Deletes a standard user from the database.
+     * @param username
+     * @param password
+     * @return 
      */
     @Override
     public Boolean dropOutUser(String username, String password) {
@@ -196,7 +199,7 @@ public class DBImplementation implements ClassDAO {
             stmtUser.close();
             
             // eliminar de PROFILE_
-            stmt = con.prepareStatement(SLQDELETEPROFILE);
+            stmt = con.prepareStatement(SQLDELETEPROFILE);
             stmt.setString(1, username);
             stmt.setString(2, password);
             success = stmt.executeUpdate() > 0;
@@ -222,6 +225,10 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Deletes a user selected by admin from the database.
+     * @param usernameToDelete
+     * @param adminUsername
+     * @param adminPassword
+     * @return 
      */
     @Override
     public Boolean dropOutAdmin(String usernameToDelete, String adminUsername, String adminPassword) {
@@ -294,6 +301,14 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Modifies the information of a user in the database.
+     * @param password
+     * @param email
+     * @param name
+     * @param telephone
+     * @param surname
+     * @param username
+     * @param gender
+     * @return 
      */
     @Override
     public Boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender) {
