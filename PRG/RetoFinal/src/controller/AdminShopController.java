@@ -21,7 +21,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Profile;
 
-public class AdminWindowController implements Initializable {
+public class AdminShopController implements Initializable {
 
     private Label label_Username;
     @FXML
@@ -89,7 +89,7 @@ public class AdminWindowController implements Initializable {
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
         } catch (IOException ex) {
-            Logger.getLogger(AdminWindowController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

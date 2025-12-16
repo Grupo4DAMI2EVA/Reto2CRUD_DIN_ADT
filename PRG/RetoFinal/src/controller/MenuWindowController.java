@@ -19,8 +19,7 @@ import model.Profile;
 import model.User;
 
 /**
- * Controller for the main Menu window.
- * Handles navigation to modify, delete, and logout actions.
+ * Controller for the main Menu window. Handles navigation to modify, delete, and logout actions.
  */
 public class MenuWindowController implements Initializable {
 
@@ -78,8 +77,7 @@ public class MenuWindowController implements Initializable {
     }
 
     /**
-     * Opens the Delete Account window depending on profile type.
-     * Users open DeleteAccount; Admins open DeleteAccountAdmin.
+     * Opens the Delete Account window depending on profile type. Users open DeleteAccount; Admins open DeleteAccountAdmin.
      */
     @FXML
     private void delete() {

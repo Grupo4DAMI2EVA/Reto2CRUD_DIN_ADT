@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Videogame {
-    
+
     private int idVideogame;
     private String companyName;
     private Enum gameGenre;
@@ -28,7 +28,7 @@ public class Videogame {
         this.releaseDate = releaseDate;
         this.reviews = reviews;
     }
-    
+
     public int getIdVideogame() {
         return idVideogame;
     }

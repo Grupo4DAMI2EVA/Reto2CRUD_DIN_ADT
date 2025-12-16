@@ -1,6 +1,7 @@
 package model;
 
 public class Review {
+
     private int idUser;
     private int idVideogame;
     private double rating;
@@ -12,7 +13,7 @@ public class Review {
         this.rating = rating;
         this.comment = comment;
     }
-    
+
     public int getIdUser() {
         return idUser;
     }

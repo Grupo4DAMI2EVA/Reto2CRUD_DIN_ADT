@@ -1,7 +1,7 @@
 package model;
 
 public class Order {
-    
+
     private int idUser;
     private int idVideogame;
     private int idOrder;

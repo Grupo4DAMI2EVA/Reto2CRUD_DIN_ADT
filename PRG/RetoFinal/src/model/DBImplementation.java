@@ -10,10 +10,8 @@ import java.util.ResourceBundle;
 import threads.HiloConnection;
 
 /**
- * Implementation of ClassDAO using database operations.
- * Handles all database interactions for users and admins.
- * Provides login, signup, deletion, modification, and retrieval of usernames.
- * 
+ * Implementation of ClassDAO using database operations. Handles all database interactions for users and admins. Provides login, signup, deletion, modification, and retrieval of usernames.
+ *
  * Author: acer
  */
 public class DBImplementation implements ClassDAO {
@@ -106,8 +104,12 @@ public class DBImplementation implements ClassDAO {
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (con != null) con.close();
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
             } catch (SQLException e) {
                 System.out.println("Error closing database connection");
                 e.printStackTrace();
@@ -149,7 +151,9 @@ public class DBImplementation implements ClassDAO {
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
+                if (stmt != null) {
+                    stmt.close();
+                }
                 connectionThread.releaseConnection();
             } catch (SQLException e) {
                 System.out.println("Error closing DB connection after signup");
@@ -161,9 +165,10 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Deletes a standard user from the database.
+     *
      * @param username
      * @param password
-     * @return 
+     * @return
      */
     @Override
     public Boolean dropOutUser(String username, String password) {
@@ -173,13 +178,13 @@ public class DBImplementation implements ClassDAO {
         PreparedStatement stmtUser = null;
         try {
             Connection con = waitForConnection(connectionThread);
-            
+
             // verificar password
             String checkPassword = "SELECT PASSWORD_ FROM PROFILE_ WHERE USERNAME = ?";
             stmt = con.prepareStatement(checkPassword);
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
-            
+
             if (rs.next()) {
                 String dbPassword = rs.getString("PASSWORD_");
                 if (!dbPassword.equals(password)) {
@@ -190,14 +195,14 @@ public class DBImplementation implements ClassDAO {
             }
             rs.close();
             stmt.close();
-            
+
             // eliminar de USER_ primero
             String deleteUser = "DELETE FROM USER_ WHERE USERNAME = ?";
             stmtUser = con.prepareStatement(deleteUser);
             stmtUser.setString(1, username);
             stmtUser.executeUpdate();
             stmtUser.close();
-            
+
             // eliminar de PROFILE_
             stmt = con.prepareStatement(SQLDELETEPROFILE);
             stmt.setString(1, username);
@@ -225,10 +230,11 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Deletes a user selected by admin from the database.
+     *
      * @param usernameToDelete
      * @param adminUsername
      * @param adminPassword
-     * @return 
+     * @return
      */
     @Override
     public Boolean dropOutAdmin(String usernameToDelete, String adminUsername, String adminPassword) {
@@ -239,13 +245,13 @@ public class DBImplementation implements ClassDAO {
         PreparedStatement stmtDeleteAdmin = null;
         try {
             Connection con = waitForConnection(connectionThread);
-            
+
             // verificar password del admin logueado
             String checkAdminPassword = "SELECT PASSWORD_ FROM PROFILE_ WHERE USERNAME = ?";
             stmt = con.prepareStatement(checkAdminPassword);
             stmt.setString(1, adminUsername);
             ResultSet rs = stmt.executeQuery();
-            
+
             if (rs.next()) {
                 String dbPassword = rs.getString("PASSWORD_");
                 if (!dbPassword.equals(adminPassword)) {
@@ -256,21 +262,21 @@ public class DBImplementation implements ClassDAO {
             }
             rs.close();
             stmt.close();
-            
+
             // eliminar de USER_ si existe
             String deleteUser = "DELETE FROM USER_ WHERE USERNAME = ?";
             stmtDeleteUser = con.prepareStatement(deleteUser);
             stmtDeleteUser.setString(1, usernameToDelete);
             stmtDeleteUser.executeUpdate();
             stmtDeleteUser.close();
-            
+
             // eliminar de ADMIN_ si existe
             String deleteAdmin = "DELETE FROM ADMIN_ WHERE USERNAME = ?";
             stmtDeleteAdmin = con.prepareStatement(deleteAdmin);
             stmtDeleteAdmin.setString(1, usernameToDelete);
             stmtDeleteAdmin.executeUpdate();
             stmtDeleteAdmin.close();
-            
+
             // eliminar de PROFILE_
             String deleteProfile = "DELETE FROM PROFILE_ WHERE USERNAME = ?";
             stmt = con.prepareStatement(deleteProfile);
@@ -301,6 +307,7 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Modifies the information of a user in the database.
+     *
      * @param password
      * @param email
      * @param name
@@ -308,7 +315,7 @@ public class DBImplementation implements ClassDAO {
      * @param surname
      * @param username
      * @param gender
-     * @return 
+     * @return
      */
     @Override
     public Boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender) {
@@ -319,7 +326,7 @@ public class DBImplementation implements ClassDAO {
 
         try {
             Connection con = waitForConnection(connectionThread);
-            
+
             // actualizar PROFILE_
             stmt = con.prepareStatement(SQLMODIFYPROFILE);
             stmt.setString(1, password);
@@ -337,7 +344,7 @@ public class DBImplementation implements ClassDAO {
                 stmtUser.setString(2, username);
                 stmtUser.executeUpdate();
                 stmtUser.close();
-                
+
                 success = true;
             } else {
                 System.out.println("Usuario no encontrado en la base de datos");
@@ -385,8 +392,12 @@ public class DBImplementation implements ClassDAO {
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (con != null) con.close();
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
             } catch (SQLException e) {
                 System.out.println("Error closing DB connection after retrieving usernames");
                 e.printStackTrace();

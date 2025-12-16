@@ -20,8 +20,7 @@ import static org.testfx.matcher.base.NodeMatchers.isVisible;
 import static org.testfx.matcher.control.TextInputControlMatchers.hasText;
 
 /**
- * Integration test for LogInWindowController using TestFX. Covers initial
- * state, button logic, login flow, and SignUp window.
+ * Integration test for LogInWindowController using TestFX. Covers initial state, button logic, login flow, and SignUp window.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class LogInTest extends ApplicationTest {
@@ -51,9 +50,7 @@ public class LogInTest extends ApplicationTest {
     }
 
     /**
-     * Comprueba el flujo completo de login: 1. Introduce credenciales
-     * incorrectas → muestra error. 2. Corrige la contraseña → inicia sesión
-     * correctamente.
+     * Comprueba el flujo completo de login: 1. Introduce credenciales incorrectas → muestra error. 2. Corrige la contraseña → inicia sesión correctamente.
      */
     @Test
     public void test4_LoginFlow_IncorrectThenCorrect() {

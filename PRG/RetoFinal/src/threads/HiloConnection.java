@@ -7,9 +7,8 @@ import java.util.logging.Logger;
 import model.ConnectionPool;
 
 /**
- * Thread class to obtain a database connection asynchronously.
- * Useful to avoid blocking the main GUI thread.
- * 
+ * Thread class to obtain a database connection asynchronously. Useful to avoid blocking the main GUI thread.
+ *
  * Author: acer
  */
 public class HiloConnection extends Thread {
@@ -59,7 +58,9 @@ public class HiloConnection extends Thread {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    if (end) break;
+                    if (end) {
+                        break;
+                    }
                     Thread.currentThread().interrupt();
                 }
             }

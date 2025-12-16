@@ -7,62 +7,62 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 public class CarritoController {
-    
+
     @FXML
     private ListView<String> listViewCarrito;
-    
+
     @FXML
     private Label labelTotalItems;
-    
+
     @FXML
     private Label labelTotalPagar;
-    
+
     @FXML
     private Label labelCantidadActual;
-    
+
     @FXML
     private Label labelItemSeleccionado;
-    
+
     @FXML
     private Button buttonMas;
-    
+
     @FXML
     private Button buttonMenos;
-    
+
     @FXML
     private Button buttonComprar;
-    
+
     @FXML
     private Button buttonEliminar;
-    
+
     @FXML
     private Button buttonCancelar;
-    
+
     private Stage stage;
     private ObservableList<String> carritoData;
     private int indiceSeleccionado = -1;
     private int cantidadActual = 0;
-    
+
     @FXML
     private void initialize() {
         // Inicializar la lista de items del carrito
         carritoData = FXCollections.observableArrayList();
         listViewCarrito.setItems(carritoData);
-        
+
         // Cargar datos de ejemplo
         cargarDatosEjemplo();
-        
+
         // Actualizar totales
         actualizarTotales();
-        
+
         // Deshabilitar botones inicialmente
         actualizarEstadoBotones();
-        
+
         // Configurar selección de item
         listViewCarrito.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> mostrarDetalleItem(newValue));
+                (observable, oldValue, newValue) -> mostrarDetalleItem(newValue));
     }
-    
+
     private void cargarDatosEjemplo() {
         // Datos de ejemplo para probar
         carritoData.add("Usuario: 1 | Videojuego: FIFA 23 | Cantidad: 2 | Precio: $59.99");
@@ -70,11 +70,11 @@ public class CarritoController {
         carritoData.add("Usuario: 2 | Videojuego: Minecraft | Cantidad: 3 | Precio: $24.99");
         carritoData.add("Usuario: 3 | Videojuego: GTA V | Cantidad: 1 | Precio: $39.99");
     }
-    
+
     private void mostrarDetalleItem(String item) {
         if (item != null) {
             indiceSeleccionado = listViewCarrito.getSelectionModel().getSelectedIndex();
-            
+
             // Extraer información del item seleccionado
             String[] partes = item.split("\\|");
             if (partes.length >= 4) {
@@ -82,12 +82,12 @@ public class CarritoController {
                 String videojuego = partes[1].trim().split(":")[1].trim();
                 String cantidadStr = partes[2].trim().split(":")[1].trim();
                 String precio = partes[3].trim();
-                
+
                 // Actualizar información mostrada
                 labelItemSeleccionado.setText(videojuego);
                 cantidadActual = Integer.parseInt(cantidadStr);
                 labelCantidadActual.setText(String.valueOf(cantidadActual));
-                
+
                 // Habilitar botones
                 actualizarEstadoBotones();
             }
@@ -99,7 +99,7 @@ public class CarritoController {
             actualizarEstadoBotones();
         }
     }
-    
+
     @FXML
     private void aumentarCantidad() {
         if (indiceSeleccionado >= 0) {
@@ -107,7 +107,7 @@ public class CarritoController {
             actualizarItemCantidad();
         }
     }
-    
+
     @FXML
     private void disminuirCantidad() {
         if (indiceSeleccionado >= 0 && cantidadActual > 1) {
@@ -119,11 +119,11 @@ public class CarritoController {
             alert.setTitle("Eliminar item");
             alert.setHeaderText("¿Eliminar este item del carrito?");
             alert.setContentText("La cantidad llegaría a 0. ¿Deseas eliminarlo completamente?");
-            
+
             ButtonType buttonTypeSi = new ButtonType("Sí");
             ButtonType buttonTypeNo = new ButtonType("No");
             alert.getButtonTypes().setAll(buttonTypeSi, buttonTypeNo);
-            
+
             alert.showAndWait().ifPresent(response -> {
                 if (response == buttonTypeSi) {
                     eliminarItem();
@@ -131,19 +131,19 @@ public class CarritoController {
             });
         }
     }
-    
+
     private void actualizarItemCantidad() {
         if (indiceSeleccionado >= 0) {
             String itemOriginal = carritoData.get(indiceSeleccionado);
             String[] partes = itemOriginal.split("\\|");
-            
+
             if (partes.length >= 4) {
                 // Reconstruir el item con la nueva cantidad
-                String nuevoItem = partes[0].trim() + " | " + 
-                                  partes[1].trim() + " | " + 
-                                  "Cantidad: " + cantidadActual + " | " + 
-                                  partes[3].trim();
-                
+                String nuevoItem = partes[0].trim() + " | "
+                        + partes[1].trim() + " | "
+                        + "Cantidad: " + cantidadActual + " | "
+                        + partes[3].trim();
+
                 carritoData.set(indiceSeleccionado, nuevoItem);
                 listViewCarrito.refresh();
                 labelCantidadActual.setText(String.valueOf(cantidadActual));
@@ -152,21 +152,21 @@ public class CarritoController {
             }
         }
     }
-    
+
     private void actualizarEstadoBotones() {
         boolean hayItemSeleccionado = (indiceSeleccionado >= 0);
-        
+
         // Habilitar/deshabilitar botones + y -
         buttonMas.setDisable(!hayItemSeleccionado);
         buttonMenos.setDisable(!hayItemSeleccionado || cantidadActual <= 1);
-        
+
         // Habilitar/deshabilitar botón eliminar
         buttonEliminar.setDisable(!hayItemSeleccionado);
-        
+
         // Habilitar/deshabilitar botón comprar
         buttonComprar.setDisable(carritoData.isEmpty());
     }
-    
+
     @FXML
     private void comprar() {
         // Lógica para realizar la compra
@@ -174,16 +174,16 @@ public class CarritoController {
             mostrarAlerta("Carrito vacío", "No hay items en el carrito para comprar.");
             return;
         }
-        
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar Compra");
         alert.setHeaderText("¿Realizar compra?");
         alert.setContentText("Total a pagar: " + labelTotalPagar.getText());
-        
+
         ButtonType buttonTypeSi = new ButtonType("Sí");
         ButtonType buttonTypeNo = new ButtonType("No");
         alert.getButtonTypes().setAll(buttonTypeSi, buttonTypeNo);
-        
+
         alert.showAndWait().ifPresent(response -> {
             if (response == buttonTypeSi) {
                 Alert success = new Alert(Alert.AlertType.INFORMATION);
@@ -191,7 +191,7 @@ public class CarritoController {
                 success.setHeaderText("¡Compra exitosa!");
                 success.setContentText("Tu compra se ha realizado correctamente.");
                 success.showAndWait();
-                
+
                 // Limpiar carrito después de comprar
                 carritoData.clear();
                 actualizarTotales();
@@ -199,7 +199,7 @@ public class CarritoController {
             }
         });
     }
-    
+
     @FXML
     private void eliminarItem() {
         if (indiceSeleccionado >= 0) {
@@ -207,11 +207,11 @@ public class CarritoController {
             alert.setTitle("Confirmar Eliminación");
             alert.setHeaderText("¿Eliminar este item del carrito?");
             alert.setContentText("Esta acción no se puede deshacer.");
-            
+
             ButtonType buttonTypeSi = new ButtonType("Sí");
             ButtonType buttonTypeNo = new ButtonType("No");
             alert.getButtonTypes().setAll(buttonTypeSi, buttonTypeNo);
-            
+
             alert.showAndWait().ifPresent(response -> {
                 if (response == buttonTypeSi) {
                     carritoData.remove(indiceSeleccionado);
@@ -223,7 +223,7 @@ public class CarritoController {
             mostrarAlerta("Seleccionar item", "Por favor, seleccione un item para eliminar.");
         }
     }
-    
+
     private void limpiarSeleccion() {
         listViewCarrito.getSelectionModel().clearSelection();
         indiceSeleccionado = -1;
@@ -232,17 +232,17 @@ public class CarritoController {
         labelItemSeleccionado.setText("Selecciona un item");
         actualizarEstadoBotones();
     }
-    
+
     @FXML
     private void cancelar() {
         stage = (Stage) buttonEliminar.getScene().getWindow();
         stage.close();
     }
-    
+
     private void actualizarTotales() {
         int totalItems = 0;
         double totalPagar = 0.0;
-        
+
         for (String item : carritoData) {
             try {
                 String[] partes = item.split("\\|");
@@ -251,12 +251,12 @@ public class CarritoController {
                     String cantidadParte = partes[2].trim();
                     String cantidadStr = cantidadParte.split(":")[1].trim();
                     int cantidad = Integer.parseInt(cantidadStr);
-                    
+
                     // Extraer precio
                     String precioParte = partes[3].trim();
                     String precioStr = precioParte.split("\\$")[1].trim();
                     double precio = Double.parseDouble(precioStr);
-                    
+
                     totalItems += cantidad;
                     totalPagar += precio * cantidad;
                 }
@@ -264,12 +264,12 @@ public class CarritoController {
                 System.err.println("Error procesando item: " + item);
             }
         }
-        
+
         labelTotalItems.setText(String.valueOf(totalItems));
         labelTotalPagar.setText(String.format("$%.2f", totalPagar));
         actualizarEstadoBotones();
     }
-    
+
     private void mostrarAlerta(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(titulo);
@@ -277,15 +277,15 @@ public class CarritoController {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
-    
+
     // Método para agregar items desde otras partes de la aplicación
     public void agregarItemCarrito(String usuario, String videojuego, int cantidad, double precio) {
-        String item = String.format("Usuario: %s | Videojuego: %s | Cantidad: %d | Precio: $%.2f", 
-                                   usuario, videojuego, cantidad, precio);
+        String item = String.format("Usuario: %s | Videojuego: %s | Cantidad: %d | Precio: $%.2f",
+                usuario, videojuego, cantidad, precio);
         carritoData.add(item);
         actualizarTotales();
     }
-    
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }
