@@ -18,6 +18,13 @@ public abstract class Profile {
 
     /**
      * Constructs a profile with the specified attributes.
+     * @param username
+     * @param password
+     * @param email
+     * @param userCode
+     * @param name
+     * @param telephone
+     * @param surname
      */
     public Profile(String username, String password, String email, int userCode, String name, String telephone, String surname) {
         this.username = username;

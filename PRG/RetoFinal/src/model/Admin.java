@@ -1,10 +1,10 @@
 package model;
 
 /**
- * Represents an admin profile in the system.
- * Extends Profile and adds the currentAccount attribute.
+ * Represents an admin profile in the system. Extends Profile and adds the currentAccount attribute.
  */
 public class Admin extends Profile {
+
     private String currentAccount;
 
     public Admin(String currentAccount, String username, String password, String email, int userCode, String name, String telephone, String surname) {
@@ -16,8 +16,13 @@ public class Admin extends Profile {
         this.currentAccount = "";
     }
 
-    public String getCurrentAccount() { return currentAccount; }
-    public void setCurrentAccount(String currentAccount) { this.currentAccount = currentAccount; }
+    public String getCurrentAccount() {
+        return currentAccount;
+    }
+
+    public void setCurrentAccount(String currentAccount) {
+        this.currentAccount = currentAccount;
+    }
 
     @Override
     public void logIn() {

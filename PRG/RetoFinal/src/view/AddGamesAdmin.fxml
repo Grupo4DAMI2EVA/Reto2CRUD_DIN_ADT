@@ -23,7 +23,6 @@
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="textFieldPlatform" layoutX="96.0" layoutY="126.0" prefHeight="27.0" prefWidth="170.0" />
       <Label layoutX="20.0" layoutY="127.0" prefHeight="23.0" prefWidth="75.0" text="Platforms:">
          <font>
             <Font size="13.0" />
@@ -65,5 +64,6 @@
       <Spinner fx:id="spinnerStock" layoutX="96.0" layoutY="217.0" prefHeight="26.0" prefWidth="170.0" />
       <Spinner fx:id="spinnerPrice" layoutX="388.0" layoutY="124.0" prefHeight="26.0" prefWidth="170.0" />
       <ComboBox fx:id="comboBoxGenre" layoutX="387.0" layoutY="81.0" prefHeight="26.0" prefWidth="170.0" />
+      <ComboBox fx:id="comboBoxPlatforms" layoutX="96.0" layoutY="125.0" prefHeight="26.0" prefWidth="170.0" />
    </children>
 </AnchorPane>
