@@ -1,4 +1,4 @@
-package utilidades;
+package utilities;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

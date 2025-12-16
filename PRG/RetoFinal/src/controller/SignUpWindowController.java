@@ -5,7 +5,6 @@
  */
 package controller;
 
-import controller.Controller;
 import javafx.scene.control.ToggleGroup;
 
 import exception.passwordequalspassword;

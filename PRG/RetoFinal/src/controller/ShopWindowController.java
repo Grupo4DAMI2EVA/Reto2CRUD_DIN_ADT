@@ -17,8 +17,6 @@ import javafx.scene.control.TextField;
 
 /**
  * FXML Controller class
- *
- * @author 2dami
  */
 public class ShopWindowController implements Initializable {
 
@@ -71,6 +69,6 @@ public class ShopWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
-    
+    }
+
 }

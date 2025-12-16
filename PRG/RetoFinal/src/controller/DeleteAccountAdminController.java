@@ -5,15 +5,11 @@
  */
 package controller;
 
-import controller.Controller;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ToggleGroup;
-
-import exception.passwordequalspassword;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -23,7 +19,6 @@ import java.util.logging.Logger;
 import javafx.stage.Stage;
 import model.Profile;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 
 /**
  * FXML Controller class for deleting user accounts as an Admin.
