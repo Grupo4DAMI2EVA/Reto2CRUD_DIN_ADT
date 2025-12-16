@@ -1,59 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane id="AnchorPane" prefHeight="321.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/24.0.1" fx:controller="controller.AddGamesAdminController">
+<AnchorPane id="AnchorPane" prefHeight="321.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddGamesAdminController">
    <children>
-      <TextField fx:id="textFieldEmail" layoutX="96.0" layoutY="81.0" prefHeight="27.0" prefWidth="170.0" />
-      <Label fx:id="labelEmail" layoutX="31.0" layoutY="81.0" prefHeight="23.0" prefWidth="56.0" text="Name:">
+      <TextField fx:id="textFieldName" layoutX="96.0" layoutY="81.0" prefHeight="27.0" prefWidth="170.0" />
+      <Label layoutX="31.0" layoutY="82.0" prefHeight="23.0" prefWidth="56.0" text="Name:">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <Button fx:id="buttonSignUp" layoutX="253.0" layoutY="270.0" mnemonicParsing="false" onAction="#signup" prefHeight="30.0" prefWidth="105.0" style="-fx-background-color: A7C4E5; -fx-border-color: black;" text="Sign Up" />
-      <TextField fx:id="textFieldEmail1" layoutX="388.0" layoutY="81.0" prefHeight="27.0" prefWidth="170.0" />
-      <Label fx:id="labelEmail1" layoutX="322.0" layoutY="81.0" prefHeight="23.0" prefWidth="56.0" text="Genre:">
+      <Button fx:id="buttonAddGame" layoutX="253.0" layoutY="270.0" mnemonicParsing="false" onMouseClicked="#addGame" prefHeight="30.0" prefWidth="105.0" style="-fx-background-color: A7C4E5; -fx-border-color: black;" text="Add Game" />
+      <Label layoutX="323.0" layoutY="82.0" prefHeight="23.0" prefWidth="56.0" text="Genre:">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="textFieldEmail2" layoutX="96.0" layoutY="126.0" prefHeight="27.0" prefWidth="170.0" />
-      <Label fx:id="labelEmail2" layoutX="20.0" layoutY="126.0" prefHeight="23.0" prefWidth="75.0" text="Platforms:">
+      <TextField fx:id="textFieldPlatform" layoutX="96.0" layoutY="126.0" prefHeight="27.0" prefWidth="170.0" />
+      <Label layoutX="20.0" layoutY="127.0" prefHeight="23.0" prefWidth="75.0" text="Platforms:">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="textFieldEmail3" layoutX="388.0" layoutY="126.0" prefHeight="27.0" prefWidth="170.0" />
-      <Label fx:id="labelEmail3" layoutX="322.0" layoutY="126.0" prefHeight="23.0" prefWidth="56.0" text="Price:">
+      <Label layoutX="322.0" layoutY="126.0" prefHeight="23.0" prefWidth="56.0" text="Price:">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="textFieldEmail4" layoutX="96.0" layoutY="173.0" prefHeight="27.0" prefWidth="170.0" />
-      <Label fx:id="labelEmail4" layoutX="20.0" layoutY="173.0" prefHeight="23.0" prefWidth="75.0" text="Company:">
+      <TextField fx:id="textFieldCompany" layoutX="96.0" layoutY="173.0" prefHeight="27.0" prefWidth="170.0" />
+      <Label layoutX="20.0" layoutY="174.0" prefHeight="23.0" prefWidth="75.0" text="Company:">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="textFieldEmail5" layoutX="388.0" layoutY="173.0" prefHeight="27.0" prefWidth="170.0" />
-      <Label fx:id="labelEmail5" layoutX="322.0" layoutY="173.0" prefHeight="23.0" prefWidth="56.0" text="PEGI:">
+      <TextField fx:id="textFieldPEGI" layoutX="388.0" layoutY="173.0" prefHeight="27.0" prefWidth="170.0" />
+      <Label layoutX="322.0" layoutY="175.0" prefHeight="23.0" prefWidth="56.0" text="PEGI:">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="textFieldEmail6" layoutX="96.0" layoutY="218.0" prefHeight="27.0" prefWidth="170.0" />
-      <Label fx:id="labelEmail6" layoutX="30.0" layoutY="218.0" prefHeight="23.0" prefWidth="56.0" text="Stock:">
+      <Label layoutX="36.0" layoutY="220.0" prefHeight="23.0" prefWidth="56.0" text="Stock:">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <Label fx:id="labelEmail7" layoutX="287.0" layoutY="218.0" prefHeight="23.0" prefWidth="91.0" text="Release date:">
+      <Label layoutX="296.0" layoutY="222.0" prefHeight="23.0" prefWidth="91.0" text="Release date:">
          <font>
             <Font size="13.0" />
          </font>
@@ -63,6 +61,9 @@
             <Font name="CaskaydiaMono NFM Regular" size="21.0" />
          </font>
       </Label>
-      <DatePicker layoutX="388.0" layoutY="219.0" />
+      <DatePicker fx:id="datePickerReleaseDate" layoutX="388.0" layoutY="219.0" />
+      <Spinner fx:id="spinnerStock" layoutX="96.0" layoutY="217.0" prefHeight="26.0" prefWidth="170.0" />
+      <Spinner fx:id="spinnerPrice" layoutX="388.0" layoutY="124.0" prefHeight="26.0" prefWidth="170.0" />
+      <ComboBox fx:id="comboBoxGenre" layoutX="387.0" layoutY="81.0" prefHeight="26.0" prefWidth="170.0" />
    </children>
 </AnchorPane>

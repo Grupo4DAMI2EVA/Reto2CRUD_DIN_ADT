@@ -5,7 +5,6 @@
  */
 package controller;
 
-import controller.Controller;
 import exception.passwordequalspassword;
 import java.io.IOException;
 import java.net.URL;
@@ -17,9 +16,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
 import model.Profile;
 import model.User;
