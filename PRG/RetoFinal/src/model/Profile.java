@@ -1,18 +1,28 @@
 package model;
-
+import javax.persistence.*;
 /**
  * Abstract class representing a general profile in the system. Contains common attributes such as username, password, email, and personal information. All profile types (User, Admin) extend this class.
  *
  * @author acer
  */
+@MappedSuperclass
 public abstract class Profile {
-
+   @Id
+   @Column(name="username",nullable=false,length=50) 
     private String username;
+   @Column(name="password",nullable=false,length=50)
     private String password;
+   @Column(name="email",nullable=false,unique=true,length=50)
     private String email;
+    
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="user_code")
     private int userCode;
+    @Column(name="name",length=50)
     private String name;
+    @Column(name="telephone",nullable=false,length=50)
     private String telephone;
+    @Column(name="surname",nullable=false,length=50)
     private String surname;
 
     /**
