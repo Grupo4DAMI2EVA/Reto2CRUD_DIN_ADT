@@ -14,8 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 
 /**
- * Controller for the Delete Account window for regular Users.
- * This controller allows a user to delete their own account.
+ * Controller for the Delete Account window for regular Users. This controller allows a user to delete their own account.
  */
 public class DeleteAccountController implements Initializable {
 
@@ -41,6 +40,7 @@ public class DeleteAccountController implements Initializable {
 
     /**
      * Sets the Controller instance.
+     *
      * @param cont Controller object
      */
     public void setCont(Controller cont) {
@@ -49,6 +49,7 @@ public class DeleteAccountController implements Initializable {
 
     /**
      * Sets the current logged-in profile and updates the username label.
+     *
      * @param profile Profile object
      */
     public void setProfile(Profile profile) {
@@ -57,8 +58,7 @@ public class DeleteAccountController implements Initializable {
     }
 
     /**
-     * Handles cancel button action.
-     * Closes the current window and returns to MenuWindow.
+     * Handles cancel button action. Closes the current window and returns to MenuWindow.
      */
     @FXML
     private void cancel() {
@@ -81,8 +81,7 @@ public class DeleteAccountController implements Initializable {
     }
 
     /**
-     * Handles delete button action.
-     * Confirms deletion and calls the Controller to remove the user account.
+     * Handles delete button action. Confirms deletion and calls the Controller to remove the user account.
      */
     @FXML
     private void delete() {
@@ -107,14 +106,14 @@ public class DeleteAccountController implements Initializable {
                 user = LabelUsername.getText();
                 password = TextFieldPassword.getText();
                 Boolean success = cont.dropOutUser(user, password);
-                
+
                 if (success) {
                     javafx.scene.control.Alert successAlert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
                     successAlert.setTitle("Deleted account");
                     successAlert.setHeaderText(null);
                     successAlert.setContentText("Your account has been successfully deleted.");
                     successAlert.showAndWait();
-                    
+
                     try {
                         javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(getClass().getResource("/view/LogInWindow.fxml"));
                         javafx.scene.Parent root = fxmlLoader.load();

@@ -4,9 +4,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 /**
- * Custom exception thrown when a password validation fails.
- * Automatically shows a popup alert with the error message.
- * 
+ * Custom exception thrown when a password validation fails. Automatically shows a popup alert with the error message.
+ *
  * Author: acer
  */
 public class passwordequalspassword extends Exception {

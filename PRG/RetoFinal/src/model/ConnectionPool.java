@@ -5,9 +5,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * ConnectionPool class for managing database connections.
- * Uses Apache DBCP2 BasicDataSource to maintain a pool of reusable connections.
- * 
+ * ConnectionPool class for managing database connections. Uses Apache DBCP2 BasicDataSource to maintain a pool of reusable connections.
+ *
  * Author: acer
  */
 public class ConnectionPool {

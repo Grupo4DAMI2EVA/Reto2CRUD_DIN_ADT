@@ -86,7 +86,7 @@ public class DeleteAccountAdminController implements Initializable {
             error.showAndWait();
             return;
         }
-        
+
         if (ComboBoxUser.getValue() == null || ComboBoxUser.getValue().isEmpty()) {
             javafx.scene.control.Alert error = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
             error.setTitle("Error");
@@ -95,7 +95,7 @@ public class DeleteAccountAdminController implements Initializable {
             error.showAndWait();
             return;
         }
-        
+
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete account");
         alert.setHeaderText("Are you sure you want to delete this account?");
@@ -107,7 +107,7 @@ public class DeleteAccountAdminController implements Initializable {
                 String userToDelete = ComboBoxUser.getValue();
                 String adminPassword = TextFieldPassword.getText();
                 String adminUsername = profile.getUsername();
-                
+
                 Boolean success = cont.dropOutAdmin(userToDelete, adminUsername, adminPassword);
                 if (success) {
                     javafx.scene.control.Alert successAlert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
@@ -115,7 +115,7 @@ public class DeleteAccountAdminController implements Initializable {
                     successAlert.setHeaderText(null);
                     successAlert.setContentText("The account has been successfully deleted.");
                     successAlert.showAndWait();
-                    
+
                     try {
                         javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
                         javafx.scene.Parent root = fxmlLoader.load();

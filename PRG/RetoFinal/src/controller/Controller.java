@@ -5,9 +5,8 @@ import model.ClassDAO;
 import model.Profile;
 
 /**
- * Controller class that handles interaction between the GUI and the database.
- * Provides login, signup, deletion, modification, and data retrieval methods.
- * 
+ * Controller class that handles interaction between the GUI and the database. Provides login, signup, deletion, modification, and data retrieval methods.
+ *
  * Author: acer
  */
 public class Controller {

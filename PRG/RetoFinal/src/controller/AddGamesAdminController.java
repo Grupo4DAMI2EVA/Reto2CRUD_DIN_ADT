@@ -6,19 +6,20 @@ import javafx.fxml.*;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import model.*;
 
 public class AddGamesAdminController implements Initializable {
 
     @FXML
     private TextField textFieldName;
     @FXML
-    private TextField textFieldPlatform;
+    private ComboBox<Platform> comboBoxPlatforms;
     @FXML
     private TextField textFieldCompany;
     @FXML
     private Spinner<Integer> spinnerStock;
     @FXML
-    private ComboBox<?> comboBoxGenre;
+    private ComboBox<Genre> comboBoxGenre;
     @FXML
     private Spinner<Double> spinnerPrice;
     @FXML
@@ -37,16 +38,22 @@ public class AddGamesAdminController implements Initializable {
     @FXML
     private void addGame(MouseEvent event) {
         //DB stuff not ready yet
-        
+
         Alert success = new Alert(Alert.AlertType.INFORMATION);
         success.setTitle("Game added successfully!");
-        success.setHeaderText(textFieldName.getText()+" was added successfully.");
+        success.setHeaderText(textFieldName.getText() + " was added successfully.");
         //Game title in the content and header
-        success.setContentText("The game "+textFieldName.getText()+" was successfully added to the list of games in the store.");
+        success.setContentText("The game " + textFieldName.getText() + " was successfully added to the list of games in the store.");
         success.showAndWait();
 
-        Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
-        currentStage.close();
+        Alert choice = new Alert(Alert.AlertType.CONFIRMATION);
+        choice.setTitle("Add more?");
+        choice.setHeaderText("Do you want to add more games?");
+        choice.showAndWait();
+        if (choice.getResult().equals(ButtonType.CLOSE)) {
+            Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
+            currentStage.close();
+        }
     }
 
     @Override

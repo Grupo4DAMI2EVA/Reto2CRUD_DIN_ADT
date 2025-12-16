@@ -1,8 +1,7 @@
 package model;
 import javax.persistence.*;
 /**
- * Represents an admin profile in the system.
- * Extends Profile and adds the currentAccount attribute.
+ * Represents an admin profile in the system. Extends Profile and adds the currentAccount attribute.
  */
 @Entity
 @Table(name="ADMIN_")
@@ -20,8 +19,13 @@ public class Admin extends Profile {
         this.currentAccount = "";
     }
 
-    public String getCurrentAccount() { return currentAccount; }
-    public void setCurrentAccount(String currentAccount) { this.currentAccount = currentAccount; }
+    public String getCurrentAccount() {
+        return currentAccount;
+    }
+
+    public void setCurrentAccount(String currentAccount) {
+        this.currentAccount = currentAccount;
+    }
 
     @Override
     public void logIn() {

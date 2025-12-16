@@ -19,8 +19,7 @@ import static org.testfx.matcher.base.NodeMatchers.isVisible;
 import static org.testfx.matcher.control.TextInputControlMatchers.hasText;
 
 /**
- * Integration test for SignUp window starting from Login window. Usa la base de
- * datos real MySQL.
+ * Integration test for SignUp window starting from Login window. Usa la base de datos real MySQL.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SignUpTest extends ApplicationTest {
