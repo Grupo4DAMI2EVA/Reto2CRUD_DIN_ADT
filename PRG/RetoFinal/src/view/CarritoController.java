@@ -49,9 +49,6 @@ public class CarritoController {
         carritoData = FXCollections.observableArrayList();
         listViewCarrito.setItems(carritoData);
         
-        // Cargar datos de ejemplo
-        cargarDatosEjemplo();
-        
         // Actualizar totales
         actualizarTotales();
         
@@ -61,14 +58,6 @@ public class CarritoController {
         // Configurar selección de item
         listViewCarrito.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, newValue) -> mostrarDetalleItem(newValue));
-    }
-    
-    private void cargarDatosEjemplo() {
-        // Datos de ejemplo para probar
-        carritoData.add("Usuario: 1 | Videojuego: FIFA 23 | Cantidad: 2 | Precio: $59.99");
-        carritoData.add("Usuario: 1 | Videojuego: Call of Duty | Cantidad: 1 | Precio: $69.99");
-        carritoData.add("Usuario: 2 | Videojuego: Minecraft | Cantidad: 3 | Precio: $24.99");
-        carritoData.add("Usuario: 3 | Videojuego: GTA V | Cantidad: 1 | Precio: $39.99");
     }
     
     private void mostrarDetalleItem(String item) {
