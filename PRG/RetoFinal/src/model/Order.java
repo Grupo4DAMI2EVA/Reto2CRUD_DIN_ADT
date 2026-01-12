@@ -1,43 +1,63 @@
 package model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "Order_")
 public class Order {
 
-    private int idUser;
-    private int idVideogame;
-    private int idOrder;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_code")
+    private int orderCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_user", nullable = false, referencedColumnName = "user_code")  // CAMBIADO
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_videogame", nullable = false)
+    private Videogame videogame;
+
+    @Column(name = "price", nullable = false)
     private double price;
+
+    @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    public Order(int idUser, int idVideogame, int idOrder, double price, int quantity) {
-        this.idUser = idUser;
-        this.idVideogame = idVideogame;
-        this.idOrder = idOrder;
+    public Order() {
+    }
+
+    public Order(User user, Videogame videogame, double price, int quantity) {
+        this.user = user;
+        this.videogame = videogame;
         this.price = price;
         this.quantity = quantity;
     }
 
-    public int getIdUser() {
-        return idUser;
+    // Getters y setters
+    public int getOrderCode() {
+        return orderCode;
     }
 
-    public void setIdUser(int idUser) {
-        this.idUser = idUser;
+    public void setOrderCode(int orderCode) {
+        this.orderCode = orderCode;
     }
 
-    public int getIdVideogame() {
-        return idVideogame;
+    public User getUser() {
+        return user;
     }
 
-    public void setIdVideogame(int idVideogame) {
-        this.idVideogame = idVideogame;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public int getIdOrder() {
-        return idOrder;
+    public Videogame getVideogame() {
+        return videogame;
     }
 
-    public void setIdOrder(int idOrder) {
-        this.idOrder = idOrder;
+    public void setVideogame(Videogame videogame) {
+        this.videogame = videogame;
     }
 
     public double getPrice() {
@@ -58,6 +78,6 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order{" + "idUser=" + idUser + ", idVideogame=" + idVideogame + ", idOrder=" + idOrder + ", price=" + price + ", quantity=" + quantity + '}';
+        return "Order{" + "orderCode=" + orderCode + ", price=" + price + ", quantity=" + quantity + '}';
     }
 }
