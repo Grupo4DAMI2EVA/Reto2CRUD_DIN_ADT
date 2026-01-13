@@ -20,6 +20,6 @@
           </Menu>
         </menus>
       </MenuBar>
-      <TextArea editable="false" layoutY="27.0" prefHeight="437.0" prefWidth="700.0" promptText="Choose the window you need information of in the menu above." />
+      <TextArea fx:id="info" editable="false" layoutY="27.0" prefHeight="437.0" prefWidth="700.0" promptText="Choose the window you need information of in the menu above." />
    </children>
 </AnchorPane>

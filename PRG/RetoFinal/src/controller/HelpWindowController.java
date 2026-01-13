@@ -20,6 +20,8 @@ public class HelpWindowController implements Initializable {
     private MenuItem item3;
     @FXML
     private MenuItem item4;
+    @FXML
+    private TextArea info;
 
     private Profile profile;
     private Controller cont;
@@ -33,12 +35,38 @@ public class HelpWindowController implements Initializable {
         item2.setText("Add Game");
         item3.setText("Modify Game");
         item4.setText("Delete Game");
-        item4.setVisible(true); 
+        item4.setVisible(true);
         item4.setDisable(false);
     }
-    
-    public void changeHelpText() {
-        
+
+    public void changeHelpText1() {
+        if (profile instanceof Admin) {
+
+        } else {
+
+        }
+    }
+
+    public void changeHelpText2() {
+        if (profile instanceof Admin) {
+            info.setText("");
+        } else {
+            info.setText("");
+        }
+    }
+
+    public void changeHelpText3() {
+        if (profile instanceof Admin) {
+            info.setText("");
+        } else {
+            info.setText("");
+        }
+    }
+
+    public void changeHelpText4() {
+        if (profile instanceof Admin) {
+            info.setText("");
+        }
     }
 
     @Override
