@@ -26,7 +26,7 @@
         <property name="hibernate.format_sql">true</property>
         
         <!-- Actualizar el esquema de la base de datos -->
-        <property name="hibernate.hbm2ddl.auto">create</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
         
         <!-- Configuración de caché de segundo nivel -->
         <property name="hibernate.cache.use_second_level_cache">false</property>
