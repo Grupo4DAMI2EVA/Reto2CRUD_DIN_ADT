@@ -12,10 +12,10 @@
         <menus>
           <Menu fx:id="menu" mnemonicParsing="false" text="Windows">
             <items>
-              <MenuItem fx:id="item1" mnemonicParsing="false" text="Game Store" />
-                  <MenuItem fx:id="item2" mnemonicParsing="false" text="Your Cart" />
-                  <MenuItem fx:id="item3" mnemonicParsing="false" text="Review Game" />
-                  <MenuItem fx:id="item4" disable="true" mnemonicParsing="false" visible="false" />
+              <MenuItem fx:id="item1" mnemonicParsing="false" onAction="#changeHelpText1" text="Game Store" />
+                  <MenuItem fx:id="item2" mnemonicParsing="false" onAction="#changeHelpText2" text="Your Cart" />
+                  <MenuItem fx:id="item3" mnemonicParsing="false" onAction="#changeHelpText3" text="Review Game" />
+                  <MenuItem fx:id="item4" disable="true" mnemonicParsing="false" onAction="#changeHelpText4" visible="false" />
             </items>
           </Menu>
         </menus>

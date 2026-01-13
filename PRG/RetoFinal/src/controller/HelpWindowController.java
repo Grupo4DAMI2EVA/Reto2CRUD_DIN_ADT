@@ -38,24 +38,18 @@ public class HelpWindowController implements Initializable {
         item4.setVisible(true);
         item4.setDisable(false);
     }
-
-    public void changeHelpText1() {
+    
+    @FXML
+    private void changeHelpText1() {
         if (profile instanceof Admin) {
 
         } else {
 
         }
     }
-
-    public void changeHelpText2() {
-        if (profile instanceof Admin) {
-            info.setText("");
-        } else {
-            info.setText("");
-        }
-    }
-
-    public void changeHelpText3() {
+    
+    @FXML
+    private void changeHelpText2() {
         if (profile instanceof Admin) {
             info.setText("");
         } else {
@@ -63,7 +57,17 @@ public class HelpWindowController implements Initializable {
         }
     }
 
-    public void changeHelpText4() {
+    @FXML
+    private void changeHelpText3() {
+        if (profile instanceof Admin) {
+            info.setText("");
+        } else {
+            info.setText("");
+        }
+    }
+
+    @FXML
+    private void changeHelpText4() {
         if (profile instanceof Admin) {
             info.setText("");
         }
