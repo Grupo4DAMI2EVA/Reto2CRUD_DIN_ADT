@@ -1,118 +1,56 @@
 package model;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import java.util.List;
-import java.util.ResourceBundle;
-import threads.HiloConnection;
 
 /**
- * Implementation of ClassDAO using database operations. Handles all database interactions for users and admins. Provides login, signup, deletion, modification, and retrieval of usernames.
- *
+ * Implementation of ClassDAO using Hibernate ORM.
+ * Handles all database interactions for users and admins.
+ * 
  * Author: acer
  */
 public class DBImplementation implements ClassDAO {
 
-    private PreparedStatement stmt;
-
-    // Configuration for database connection
-    private ResourceBundle configFile;
-    private String driverDB;
-    private String urlDB;
-    private String userDB;
-    private String passwordDB;
-
-    // SQL statements
-    private final String SQLSIGNUPPROFILE = "INSERT INTO PROFILE_ (USERNAME, PASSWORD_, EMAIL, NAME_, TELEPHONE, SURNAME) VALUES (?,?,?,?,?,?);";
-    private final String SQLSIGNUPUSER = "INSERT INTO USER_ (USERNAME, GENDER, CARD_NUMBER) VALUES (?,?,?);";
-
-    private final String SQLDELETEPROFILE = "DELETE FROM PROFILE_ WHERE USERNAME = ? AND PASSWORD_ = ?;";
-    private final String SQLDELETEPROFILEADMIN = "DELETE p FROM PROFILE_ p JOIN USER_ u ON p.USERNAME = u.USERNAME JOIN ADMIN_ a ON p.USERNAME = a.USERNAME WHERE p.PASSWORD_ = ? AND u.username = ?;";
-
-    private final String SQL_LOGINUSER = "SELECT p.*, u.GENDER, u.CARD_NUMBER FROM PROFILE_ p JOIN USER_ u ON p.USERNAME= u.USERNAME WHERE u.USERNAME = ? AND p.PASSWORD_ = ?;";
-    private final String SQL_LOGINADMIN = "SELECT p.*, a.CURRENT_ACCOUNT FROM PROFILE_ p JOIN ADMIN_ a ON p.USERNAME= a.USERNAME WHERE a.USERNAME = ? AND p.PASSWORD_ = ?;";
-
-    final String SQLMODIFYPROFILE = "UPDATE PROFILE_ P SET P.PASSWORD_ = ?, P.EMAIL = ?, P.NAME_ = ?, P.TELEPHONE = ?, P.SURNAME = ? WHERE USERNAME = ?;";
-    final String SQLMODIFYUSER = "UPDATE USER_ U SET U.GENDER = ? WHERE USERNAME = ?";
-
-    private final String SLQSELECTNUSER = "SELECT u.USERNAME FROM USER_ u;";
-
-    /**
-     * Default constructor that loads DB configuration.
-     */
-    public DBImplementation() {
-        this.configFile = ResourceBundle.getBundle("model.configClass");
-        this.driverDB = this.configFile.getString("Driver");
-        this.urlDB = this.configFile.getString("Conn");
-        this.userDB = this.configFile.getString("DBUser");
-        this.passwordDB = this.configFile.getString("DBPass");
-    }
-
     /**
      * Logs in a user or admin from the database.
-     *
-     * @param username The username to log in
-     * @param password The password to validate
-     * @return Profile object (User or Admin) if found, null otherwise
      */
     @Override
     public Profile logIn(String username, String password) {
-        Connection con = null;
+        Session session = HibernateSession.getSessionFactory().openSession();
+        
         try {
-            con = ConnectionPool.getConnection();
-            stmt = con.prepareStatement(SQL_LOGINUSER);
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            ResultSet result = stmt.executeQuery();
-            if (!(result.next())) {
-                stmt = con.prepareStatement(SQL_LOGINADMIN);
-                stmt.setString(1, username);
-                stmt.setString(2, password);
-                result = stmt.executeQuery();
-                if (result.next()) {
-                    Admin profile_admin = new Admin();
-                    profile_admin.setUsername(result.getString("USERNAME"));
-                    profile_admin.setPassword(result.getString("PASSWORD_"));
-                    profile_admin.setEmail(result.getString("EMAIL"));
-                    profile_admin.setUserCode(result.getInt("USER_CODE"));
-                    profile_admin.setName(result.getString("NAME_"));
-                    profile_admin.setTelephone(result.getString("TELEPHONE"));
-                    profile_admin.setSurname(result.getString("SURNAME"));
-                    profile_admin.setCurrentAccount(result.getString("CURRENT_ACCOUNT"));
-                    return profile_admin;
-                } else {
-                    System.out.println("Usuario encontrado en la base de datos");
-                }
-            } else {
-                User profile_user = new User();
-                profile_user.setUsername(result.getString("USERNAME"));
-                profile_user.setPassword(result.getString("PASSWORD_"));
-                profile_user.setEmail(result.getString("EMAIL"));
-                profile_user.setUserCode(result.getInt("USER_CODE"));
-                profile_user.setName(result.getString("NAME_"));
-                profile_user.setTelephone(result.getString("TELEPHONE"));
-                profile_user.setSurname(result.getString("SURNAME"));
-                profile_user.setGender(result.getString("GENDER"));
-                profile_user.setCardNumber(result.getString("CARD_NUMBER"));
-                return profile_user;
+            // Primero intentamos buscar como User
+            String hqlUser = "FROM User u WHERE u.username = :username AND u.password = :password";
+            Query<User> queryUser = session.createQuery(hqlUser, User.class);
+            queryUser.setParameter("username", username);
+            queryUser.setParameter("password", password);
+            
+            User user = queryUser.uniqueResult();
+            if (user != null) {
+                return user;
             }
-        } catch (SQLException e) {
-            System.out.println("Database query error");
+            
+            // Si no es User, intentamos como Admin
+            String hqlAdmin = "FROM Admin a WHERE a.username = :username AND a.password = :password";
+            Query<Admin> queryAdmin = session.createQuery(hqlAdmin, Admin.class);
+            queryAdmin.setParameter("username", username);
+            queryAdmin.setParameter("password", password);
+            
+            Admin admin = queryAdmin.uniqueResult();
+            if (admin != null) {
+                return admin;
+            }
+            
+            System.out.println("Usuario no encontrado en la base de datos");
+            
+        } catch (Exception e) {
+            System.out.println("Database query error: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (con != null) {
-                    con.close();
-                }
-            } catch (SQLException e) {
-                System.out.println("Error closing database connection");
-                e.printStackTrace();
+            if (session != null && session.isOpen()) {
+                session.close();
             }
         }
         return null;
@@ -120,305 +58,320 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Signs up a new user in the database.
-     *
-     * @return true if signup was successful, false otherwise
      */
     @Override
-    public Boolean signUp(String gender, String cardNumber, String username, String password, String email, String name, String telephone, String surname) {
-        HiloConnection connectionThread = new HiloConnection(30);
-        connectionThread.start();
-        boolean success = false;
+    public Boolean signUp(String gender, String cardNumber, String username, 
+                         String password, String email, String name, 
+                         String telephone, String surname) {
+        
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
+        
         try {
-            Connection con = waitForConnection(connectionThread);
-            stmt = con.prepareStatement(SQLSIGNUPPROFILE);
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            stmt.setString(3, email);
-            stmt.setString(4, name);
-            stmt.setString(5, telephone);
-            stmt.setString(6, surname);
-            int rowsUpdated = stmt.executeUpdate();
-            if (rowsUpdated > 0) {
-                stmt = con.prepareStatement(SQLSIGNUPUSER);
-                stmt.setString(1, username);
-                stmt.setString(2, gender);
-                stmt.setString(3, cardNumber);
-                rowsUpdated = stmt.executeUpdate();
-                success = rowsUpdated > 0;
+            transaction = session.beginTransaction();
+            
+            // Verificar si el username ya existe
+            String checkHql = "SELECT COUNT(u) FROM User u WHERE u.username = :username";
+            Query<Long> checkQuery = session.createQuery(checkHql, Long.class);
+            checkQuery.setParameter("username", username);
+            Long count = checkQuery.uniqueResult();
+            
+            if (count > 0) {
+                System.out.println("Username ya existe");
+                return false;
             }
-        } catch (SQLException | InterruptedException e) {
-            System.out.println("Database error on signup");
+            
+            // Crear y configurar el User
+            User newUser = new User();
+            newUser.setUsername(username);
+            newUser.setPassword(password);
+            newUser.setEmail(email);
+            newUser.setName(name);
+            newUser.setTelephone(telephone);
+            newUser.setSurname(surname);
+            newUser.setGender(gender);
+            newUser.setCardNumber(cardNumber);
+            
+            // Guardar en la base de datos
+            session.save(newUser);
+            transaction.commit();
+            
+            System.out.println("Usuario registrado exitosamente: " + username);
+            return true;
+            
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on signup: " + e.getMessage());
             e.printStackTrace();
+            return false;
         } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                connectionThread.releaseConnection();
-            } catch (SQLException e) {
-                System.out.println("Error closing DB connection after signup");
-                e.printStackTrace();
+            if (session != null && session.isOpen()) {
+                session.close();
             }
         }
-        return success;
     }
 
     /**
      * Deletes a standard user from the database.
-     *
-     * @param username
-     * @param password
-     * @return
      */
     @Override
     public Boolean dropOutUser(String username, String password) {
-        HiloConnection connectionThread = new HiloConnection(30);
-        connectionThread.start();
-        boolean success = false;
-        PreparedStatement stmtUser = null;
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
+        
         try {
-            Connection con = waitForConnection(connectionThread);
-
-            // verificar password
-            String checkPassword = "SELECT PASSWORD_ FROM PROFILE_ WHERE USERNAME = ?";
-            stmt = con.prepareStatement(checkPassword);
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String dbPassword = rs.getString("PASSWORD_");
-                if (!dbPassword.equals(password)) {
-                    return false;
-                }
-            } else {
+            transaction = session.beginTransaction();
+            
+            // Verificar que el usuario existe y la contraseña es correcta
+            String hql = "FROM User u WHERE u.username = :username";
+            Query<User> query = session.createQuery(hql, User.class);
+            query.setParameter("username", username);
+            
+            User user = query.uniqueResult();
+            
+            if (user == null) {
+                System.out.println("Usuario no encontrado: " + username);
                 return false;
             }
-            rs.close();
-            stmt.close();
-
-            // eliminar de USER_ primero
-            String deleteUser = "DELETE FROM USER_ WHERE USERNAME = ?";
-            stmtUser = con.prepareStatement(deleteUser);
-            stmtUser.setString(1, username);
-            stmtUser.executeUpdate();
-            stmtUser.close();
-
-            // eliminar de PROFILE_
-            stmt = con.prepareStatement(SQLDELETEPROFILE);
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            success = stmt.executeUpdate() > 0;
-        } catch (SQLException | InterruptedException e) {
-            System.out.println("Database error on deleting user");
+            
+            if (!user.getPassword().equals(password)) {
+                System.out.println("Contraseña incorrecta para usuario: " + username);
+                return false;
+            }
+            
+            // Eliminar el usuario (se eliminarán automáticamente las relaciones por cascade)
+            session.delete(user);
+            transaction.commit();
+            
+            System.out.println("Usuario eliminado exitosamente: " + username);
+            return true;
+            
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on deleting user: " + e.getMessage());
             e.printStackTrace();
+            return false;
         } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (stmtUser != null) {
-                    stmtUser.close();
-                }
-                connectionThread.releaseConnection();
-            } catch (SQLException e) {
-                System.out.println("Error closing DB connection after deleting user");
-                e.printStackTrace();
+            if (session != null && session.isOpen()) {
+                session.close();
             }
         }
-        return success;
     }
 
     /**
      * Deletes a user selected by admin from the database.
-     *
-     * @param usernameToDelete
-     * @param adminUsername
-     * @param adminPassword
-     * @return
      */
     @Override
     public Boolean dropOutAdmin(String usernameToDelete, String adminUsername, String adminPassword) {
-        HiloConnection connectionThread = new HiloConnection(30);
-        connectionThread.start();
-        boolean success = false;
-        PreparedStatement stmtDeleteUser = null;
-        PreparedStatement stmtDeleteAdmin = null;
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
+        
         try {
-            Connection con = waitForConnection(connectionThread);
-
-            // verificar password del admin logueado
-            String checkAdminPassword = "SELECT PASSWORD_ FROM PROFILE_ WHERE USERNAME = ?";
-            stmt = con.prepareStatement(checkAdminPassword);
-            stmt.setString(1, adminUsername);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String dbPassword = rs.getString("PASSWORD_");
-                if (!dbPassword.equals(adminPassword)) {
-                    return false;
-                }
-            } else {
+            transaction = session.beginTransaction();
+            
+            // Verificar que el admin existe y la contraseña es correcta
+            String hqlAdmin = "FROM Admin a WHERE a.username = :username";
+            Query<Admin> queryAdmin = session.createQuery(hqlAdmin, Admin.class);
+            queryAdmin.setParameter("username", adminUsername);
+            
+            Admin admin = queryAdmin.uniqueResult();
+            
+            if (admin == null) {
+                System.out.println("Admin no encontrado: " + adminUsername);
                 return false;
             }
-            rs.close();
-            stmt.close();
-
-            // eliminar de USER_ si existe
-            String deleteUser = "DELETE FROM USER_ WHERE USERNAME = ?";
-            stmtDeleteUser = con.prepareStatement(deleteUser);
-            stmtDeleteUser.setString(1, usernameToDelete);
-            stmtDeleteUser.executeUpdate();
-            stmtDeleteUser.close();
-
-            // eliminar de ADMIN_ si existe
-            String deleteAdmin = "DELETE FROM ADMIN_ WHERE USERNAME = ?";
-            stmtDeleteAdmin = con.prepareStatement(deleteAdmin);
-            stmtDeleteAdmin.setString(1, usernameToDelete);
-            stmtDeleteAdmin.executeUpdate();
-            stmtDeleteAdmin.close();
-
-            // eliminar de PROFILE_
-            String deleteProfile = "DELETE FROM PROFILE_ WHERE USERNAME = ?";
-            stmt = con.prepareStatement(deleteProfile);
-            stmt.setString(1, usernameToDelete);
-            success = stmt.executeUpdate() > 0;
-        } catch (SQLException | InterruptedException e) {
-            System.out.println("Database error on deleting admin");
+            
+            if (!admin.getPassword().equals(adminPassword)) {
+                System.out.println("Contraseña incorrecta para admin: " + adminUsername);
+                return false;
+            }
+            
+            // Buscar el usuario a eliminar (puede ser User o Admin)
+            Profile profileToDelete = null;
+            
+            // Primero buscar si es User
+            String hqlUser = "FROM User u WHERE u.username = :username";
+            Query<User> queryUser = session.createQuery(hqlUser, User.class);
+            queryUser.setParameter("username", usernameToDelete);
+            User user = queryUser.uniqueResult();
+            
+            if (user != null) {
+                profileToDelete = user;
+            } else {
+                // Si no es User, buscar si es Admin (pero no el que está logueado)
+                String hqlOtherAdmin = "FROM Admin a WHERE a.username = :username";
+                Query<Admin> queryOtherAdmin = session.createQuery(hqlOtherAdmin, Admin.class);
+                queryOtherAdmin.setParameter("username", usernameToDelete);
+                Admin otherAdmin = queryOtherAdmin.uniqueResult();
+                
+                if (otherAdmin != null && !otherAdmin.getUsername().equals(adminUsername)) {
+                    profileToDelete = otherAdmin;
+                }
+            }
+            
+            if (profileToDelete == null) {
+                System.out.println("Usuario a eliminar no encontrado: " + usernameToDelete);
+                return false;
+            }
+            
+            // No permitir que un admin se elimine a sí mismo
+            if (profileToDelete.getUsername().equals(adminUsername)) {
+                System.out.println("Un admin no puede eliminarse a sí mismo");
+                return false;
+            }
+            
+            // Eliminar el perfil
+            session.delete(profileToDelete);
+            transaction.commit();
+            
+            System.out.println("Usuario eliminado por admin: " + usernameToDelete);
+            return true;
+            
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on deleting admin selection: " + e.getMessage());
             e.printStackTrace();
+            return false;
         } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (stmtDeleteUser != null) {
-                    stmtDeleteUser.close();
-                }
-                if (stmtDeleteAdmin != null) {
-                    stmtDeleteAdmin.close();
-                }
-                connectionThread.releaseConnection();
-            } catch (SQLException e) {
-                System.out.println("Error closing DB connection after deleting admin");
-                e.printStackTrace();
+            if (session != null && session.isOpen()) {
+                session.close();
             }
         }
-        return success;
     }
 
     /**
      * Modifies the information of a user in the database.
-     *
-     * @param password
-     * @param email
-     * @param name
-     * @param telephone
-     * @param surname
-     * @param username
-     * @param gender
-     * @return
      */
     @Override
-    public Boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender) {
-        HiloConnection connectionThread = new HiloConnection(30);
-        connectionThread.start();
-        boolean success = false;
-        PreparedStatement stmtUser = null;
-
+    public Boolean modificarUser(String password, String email, String name, 
+                                String telephone, String surname, String username, 
+                                String gender) {
+        
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
+        
         try {
-            Connection con = waitForConnection(connectionThread);
-
-            // actualizar PROFILE_
-            stmt = con.prepareStatement(SQLMODIFYPROFILE);
-            stmt.setString(1, password);
-            stmt.setString(2, email);
-            stmt.setString(3, name);
-            stmt.setString(4, telephone);
-            stmt.setString(5, surname);
-            stmt.setString(6, username);
-
-            int rowsUpdated = stmt.executeUpdate();
-            if (rowsUpdated > 0) {
-                // actualizar USER_ si existe
-                stmtUser = con.prepareStatement(SQLMODIFYUSER);
-                stmtUser.setString(1, gender);
-                stmtUser.setString(2, username);
-                stmtUser.executeUpdate();
-                stmtUser.close();
-
-                success = true;
-            } else {
-                System.out.println("Usuario no encontrado en la base de datos");
-                success = false;
+            transaction = session.beginTransaction();
+            
+            // Buscar el usuario
+            String hql = "FROM User u WHERE u.username = :username";
+            Query<User> query = session.createQuery(hql, User.class);
+            query.setParameter("username", username);
+            
+            User user = query.uniqueResult();
+            
+            if (user == null) {
+                System.out.println("Usuario no encontrado en la base de datos: " + username);
+                return false;
             }
-        } catch (SQLException | InterruptedException e) {
-            System.out.println("Database error on modifying user");
+            
+            // Actualizar los campos
+            user.setPassword(password);
+            user.setEmail(email);
+            user.setName(name);
+            user.setTelephone(telephone);
+            user.setSurname(surname);
+            user.setGender(gender);
+            
+            // Guardar cambios
+            session.update(user);
+            transaction.commit();
+            
+            System.out.println("Usuario modificado exitosamente: " + username);
+            return true;
+            
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on modifying user: " + e.getMessage());
             e.printStackTrace();
+            return false;
         } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (stmtUser != null) {
-                    stmtUser.close();
-                }
-                connectionThread.releaseConnection();
-
-            } catch (SQLException e) {
-                System.out.println("Error closing DB connection after modifying user");
-                e.printStackTrace();
+            if (session != null && session.isOpen()) {
+                session.close();
             }
         }
-        return success;
     }
 
     /**
      * Retrieves a list of usernames from the database.
-     *
-     * @return List of usernames
      */
     @Override
-    public List comboBoxInsert() {
-        List<String> listaUsuarios = new ArrayList<>();
-        Connection con = null;
+    public List<String> comboBoxInsert() {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        
         try {
-            con = ConnectionPool.getConnection();
-            stmt = con.prepareStatement(SLQSELECTNUSER);
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                listaUsuarios.add(result.getString("USERNAME"));
-            }
-        } catch (SQLException e) {
-            System.out.println("Database error on retrieving usernames");
+            // Usar SQL nativo para obtener solo los usernames
+            String sql = "SELECT DISTINCT username FROM PROFILE_";
+            Query<String> query = session.createNativeQuery(sql, String.class);
+            
+            List<String> result = query.getResultList();
+            System.out.println("Usernames encontrados: " + result.size());
+            
+            return result;
+            
+        } catch (Exception e) {
+            System.out.println("Database error on retrieving usernames: " + e.getMessage());
             e.printStackTrace();
+            return new java.util.ArrayList<>();
         } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (con != null) {
-                    con.close();
-                }
-            } catch (SQLException e) {
-                System.out.println("Error closing DB connection after retrieving usernames");
-                e.printStackTrace();
+            if (session != null && session.isOpen()) {
+                session.close();
             }
         }
-        return listaUsuarios;
     }
 
     /**
-     * Waits for a connection from a HiloConnection thread.
-     *
-     * @param thread The HiloConnection thread
-     * @return Connection object
-     * @throws InterruptedException if thread is interrupted
+     * Método adicional para verificar si un username existe
      */
-    private Connection waitForConnection(HiloConnection thread) throws InterruptedException {
-        int attempts = 0;
-        while (!thread.isReady() && attempts < 50) {
-            Thread.sleep(10);
-            attempts++;
+    public boolean userExists(String username) {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        
+        try {
+            String hql = "SELECT COUNT(p) FROM Profile p WHERE p.username = :username";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("username", username);
+            
+            Long count = query.uniqueResult();
+            return count > 0;
+            
+        } catch (Exception e) {
+            System.out.println("Error verificando existencia de usuario: " + e.getMessage());
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
         }
-        return thread.getConnection();
+    }
+
+    /**
+     * Método adicional para obtener un usuario por username
+     */
+    public User getUserByUsername(String username) {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        
+        try {
+            String hql = "FROM User u WHERE u.username = :username";
+            Query<User> query = session.createQuery(hql, User.class);
+            query.setParameter("username", username);
+            
+            return query.uniqueResult();
+            
+        } catch (Exception e) {
+            System.out.println("Error obteniendo usuario: " + e.getMessage());
+            return null;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
 }
