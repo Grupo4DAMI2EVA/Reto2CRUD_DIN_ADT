@@ -6,8 +6,26 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 public class Main extends Application {
+
+    private static void CreateTableHibernate()
+    {
+        try {
+        
+        SessionFactory  sessionFactory = model.HibernateSession.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.close();
+        
+        System.out.println("Tablas creadas/validadas");
+    } catch (Exception e) {
+        System.err.println("Error al crear tablas: " + e.getMessage());
+        // Decidir si continuar o salir
+        System.exit(1);  // Sale si no puede crear tablas
+    }
+    }
 
     /**
      * Starts the JavaFX application by loading the login window.
@@ -30,6 +48,11 @@ public class Main extends Application {
      * @param args command-line arguments (not used)
      */
     public static void main(String[] args) {
+        CreateTableHibernate();
+        
         launch(args);
+        
     }
+    
+    
 }
