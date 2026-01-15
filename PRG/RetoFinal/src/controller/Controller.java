@@ -3,6 +3,7 @@ package controller;
 import java.util.List;
 import model.ClassDAO;
 import model.Profile;
+import model.Videogame;
 
 /**
  * Controller class that handles interaction between the GUI and the database. Provides login, signup, deletion, modification, and data retrieval methods.
@@ -85,5 +86,21 @@ public class Controller {
      */
     public List comboBoxInsert() {
         return dao.comboBoxInsert();
+    }
+    
+    public boolean addGame(Videogame game) {
+        return dao.addGame(game);
+    }
+    
+    public boolean modifyGame(Videogame game) {
+        return dao.modifyGame(game);
+    }
+    
+    public boolean deleteGame(Videogame game) {
+        return dao.deleteGame(game);
+    }
+    
+    public boolean addToCart(Videogame game) {
+        return dao.addToCart(game);
     }
 }
