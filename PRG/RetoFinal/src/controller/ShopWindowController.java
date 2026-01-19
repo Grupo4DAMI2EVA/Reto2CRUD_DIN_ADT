@@ -1,4 +1,4 @@
-//package controller;
+package controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -49,8 +49,6 @@ public class ShopWindowController implements Initializable {
     private Label labelGameInfo;
     @FXML
     private Button buttonAddToCart;
-    @FXML
-    private Button buttonMyProfile;
     @FXML
     private Button buttonCart;
     @FXML
