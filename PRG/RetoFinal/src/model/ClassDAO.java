@@ -9,13 +9,21 @@ public interface ClassDAO {
 
     public Profile logIn(String username, String password);
 
-    public Boolean signUp(String gender, String cardNumber, String username, String password, String email, String name, String telephone, String surname);
+    public boolean signUp(String gender, String cardNumber, String username, String password, String email, String name, String telephone, String surname);
 
-    public Boolean dropOutUser(String username, String password);
+    public boolean dropOutUser(String username, String password);
 
-    public Boolean dropOutAdmin(String usernameToDelete, String adminUsername, String adminPassword);
+    public boolean dropOutAdmin(String usernameToDelete, String adminUsername, String adminPassword);
 
-    public Boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender);
+    public boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender);
 
-    List comboBoxInsert();
+    public List comboBoxInsert();
+    
+    public boolean addGame(Videogame game);
+    
+    public boolean modifyGame(Videogame game);
+    
+    public boolean deleteGame(Videogame game);
+    
+    public boolean addToCart(Videogame game);
 }

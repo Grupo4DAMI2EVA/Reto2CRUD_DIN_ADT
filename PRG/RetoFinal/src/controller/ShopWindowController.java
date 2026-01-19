@@ -2,17 +2,17 @@ package controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import model.Videogame;
 
-/**
- * FXML Controller class
- */
 public class ShopWindowController implements Initializable {
 
     @FXML
@@ -20,7 +20,7 @@ public class ShopWindowController implements Initializable {
     @FXML
     private Label labelBalance;
     @FXML
-    private TableView<?> tableViewGames;
+    private TableView<Videogame> tableViewGames;
     @FXML
     private TableColumn<?, ?> colTitle;
     @FXML
@@ -56,11 +56,31 @@ public class ShopWindowController implements Initializable {
     @FXML
     private Button buttonReview;
 
-    /**
-     * Initializes the controller class.
-     */
+    private Videogame selected;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        
+    }
+
+    @FXML
+    private void getSelectedTableItem() {
+        selected = tableViewGames.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            labelGameInfo.setText(selected.getName());
+        }
+    }
+    
+    @FXML
+    private void addToCart(ActionEvent event) {
+        if (selected == null) {
+            Alert success = new Alert(Alert.AlertType.INFORMATION);
+            success.setTitle("ERROR!");
+            success.setHeaderText("No selection!");
+            success.setContentText("Please select a game before attempting deletion of one.");
+            success.showAndWait();
+        } else {
+            // Add cart method here
+        }
     }
 }

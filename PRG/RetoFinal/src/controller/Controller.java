@@ -3,6 +3,7 @@ package controller;
 import java.util.List;
 import model.ClassDAO;
 import model.Profile;
+import model.Videogame;
 
 /**
  * Controller class that handles interaction between the GUI and the database. Provides login, signup, deletion, modification, and data retrieval methods.
@@ -35,7 +36,14 @@ public class Controller {
 
     /**
      * Signs up a new user.
-     *
+     * @param gender
+     * @param cardNumber
+     * @param password
+     * @param username
+     * @param email
+     * @param name
+     * @param telephone
+     * @param surname
      * @return true if signup succeeds, false otherwise
      */
     public Boolean signUp(String gender, String cardNumber, String username, String password, String email,
@@ -45,6 +53,9 @@ public class Controller {
 
     /**
      * Deletes a user account.
+     * @param username
+     * @param password
+     * @return 
      */
     public Boolean dropOutUser(String username, String password) {
         return dao.dropOutUser(username, password);
@@ -56,6 +67,14 @@ public class Controller {
 
     /**
      * Modifies user information.
+     * @param password
+     * @param email
+     * @param name
+     * @param telephone
+     * @param surname
+     * @param username
+     * @param gender
+     * @return 
      */
     public Boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender) {
         return dao.modificarUser(password, email, name, telephone, surname, username, gender);
@@ -63,8 +82,25 @@ public class Controller {
 
     /**
      * Retrieves a list of usernames for GUI combo boxes.
+     * @return 
      */
     public List comboBoxInsert() {
         return dao.comboBoxInsert();
+    }
+    
+    public boolean addGame(Videogame game) {
+        return dao.addGame(game);
+    }
+    
+    public boolean modifyGame(Videogame game) {
+        return dao.modifyGame(game);
+    }
+    
+    public boolean deleteGame(Videogame game) {
+        return dao.deleteGame(game);
+    }
+    
+    public boolean addToCart(Videogame game) {
+        return dao.addToCart(game);
     }
 }
