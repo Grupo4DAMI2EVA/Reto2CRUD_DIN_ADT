@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.*;
 import model.*;
@@ -56,10 +57,13 @@ public class AdminShopController implements Initializable {
     private Button buttonModify;
     @FXML
     private Button buttonDelete;
-
+    @FXML
+    private ImageView helpIcon;
+    
     private Profile profile;
     private Controller cont;
     private Videogame selected;
+    
 
     public void setUsuario(Profile profile) {
         this.profile = profile;
@@ -71,7 +75,7 @@ public class AdminShopController implements Initializable {
     }
 
     @FXML
-    private void addGame(MouseEvent event) {
+    private void addGame(ActionEvent event) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/AddGamesWindow.fxml"));
             Parent root = fxmlLoader.load();
@@ -113,12 +117,28 @@ public class AdminShopController implements Initializable {
     }
     
     @FXML
-    private void search() {
+    private void search(ActionEvent event) {
         // To be done
+    }
+    
+    @FXML
+    private void helpWindow(MouseEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/HelpWindow.fxml"));
+            Parent root = fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Help Window");
+            stage.setScene(new Scene(root));    
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
-    private void getSelectedTableItem() {
+    private void getSelectedTableItem(ActionEvent event) {
         selected = tableViewGames.getSelectionModel().getSelectedItem();
         if (selected != null) {
             labelGameInfo.setText(selected.getName());
@@ -126,7 +146,7 @@ public class AdminShopController implements Initializable {
     }
 
     @FXML
-    private void exit(MouseEvent event) {
+    private void exit(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
     }

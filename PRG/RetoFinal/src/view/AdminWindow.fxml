@@ -54,9 +54,9 @@
         <Button fx:id="buttonSearch" layoutX="720.0" layoutY="475.0" mnemonicParsing="false" onAction="#search" prefHeight="25.0" prefWidth="80.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000;" text="Search" />
         <Label layoutX="25.0" layoutY="520.0" prefHeight="25.0" prefWidth="150.0" style="-fx-font-weight: bold;" text="Selected game:" />
         <Label fx:id="labelGameInfo" layoutX="180.0" layoutY="520.0" prefHeight="25.0" prefWidth="400.0" style="-fx-text-fill: #5084C1;" text="Select a game" />
-        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="850.0" layoutY="15.0">
+        <ImageView fx:id="helpIcon" fitHeight="35.0" fitWidth="35.0" layoutX="850.0" layoutY="15.0" onMouseClicked="#helpWindow">
             <image>
-                <Image url="@../images/sports_esports_32dp_5084C1_FILL0_wght400_GRAD0_opsz40.png" />
+                <Image url="@../images/Help_icon.svg.png" />
             </image>
         </ImageView>
         <Button fx:id="buttonAdd" layoutX="25.0" layoutY="555.0" mnemonicParsing="false" onMouseClicked="#addGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Add Game" />
