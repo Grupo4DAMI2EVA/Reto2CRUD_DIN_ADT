@@ -26,4 +26,8 @@ public interface ClassDAO {
     public boolean deleteGame(Videogame game);
     
     public boolean addToCart(Videogame game);
+    
+    public List<Videogame> getAllGames();
+    
+    public List<Videogame> getGamesFiltered(String name, String genre, String platform);
 }

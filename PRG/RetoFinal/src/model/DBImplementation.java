@@ -1,12 +1,14 @@
 package model;
 
+import java.util.ArrayList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import java.util.List;
 
 /**
- * Implementation of ClassDAO using Hibernate ORM. Handles all database interactions for users and admins.
+ * Implementation of ClassDAO using Hibernate ORM. Handles all database
+ * interactions for users and admins.
  *
  * Author: acer
  */
@@ -14,9 +16,10 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Logs in a user or admin from the database.
+     *
      * @param username
      * @param password
-     * @return 
+     * @return
      */
     @Override
     public Profile logIn(String username, String password) {
@@ -177,10 +180,11 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Deletes a user selected by admin from the database.
+     *
      * @param usernameToDelete
      * @param adminUsername
      * @param adminPassword
-     * @return 
+     * @return
      */
     @Override
     public boolean dropOutAdmin(String usernameToDelete, String adminUsername, String adminPassword) {
@@ -264,6 +268,7 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Modifies the information of a user in the database.
+     *
      * @param password
      * @param email
      * @param name
@@ -271,7 +276,7 @@ public class DBImplementation implements ClassDAO {
      * @param username
      * @param gender
      * @param surname
-     * @return 
+     * @return
      */
     @Override
     public boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender) {
@@ -325,7 +330,8 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Retrieves a list of usernames from the database.
-     * @return 
+     *
+     * @return
      */
     @Override
     public List<String> comboBoxInsert() {
@@ -354,8 +360,9 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Método adicional para verificar si un username existe
+     *
      * @param username
-     * @return 
+     * @return
      */
     public boolean userExists(String username) {
         Session session = HibernateSession.getSessionFactory().openSession();
@@ -380,8 +387,9 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Método adicional para obtener un usuario por username
+     *
      * @param username
-     * @return 
+     * @return
      */
     public User getUserByUsername(String username) {
         Session session = HibernateSession.getSessionFactory().openSession();
@@ -406,28 +414,123 @@ public class DBImplementation implements ClassDAO {
     @Override
     public boolean addGame(Videogame game) {
         boolean success = false;
-        
+
         return success;
     }
 
     @Override
     public boolean modifyGame(Videogame game) {
         boolean success = false;
-        
+
         return success;
     }
 
     @Override
     public boolean deleteGame(Videogame game) {
         boolean success = false;
-        
+
         return success;
     }
 
     @Override
     public boolean addToCart(Videogame game) {
         boolean success = false;
-        
+
         return success;
+    }
+    
+    /**
+     * Retrieves all videogames from the database.
+     * @return List of all videogames
+     */
+    @Override
+    public List<Videogame> getAllGames() {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        List<Videogame> games = new ArrayList<>();
+        
+        try {
+            String hql = "FROM Videogame v ORDER BY v.name ASC";
+            Query<Videogame> query = session.createQuery(hql, Videogame.class);
+            
+            games = query.getResultList();
+            System.out.println("Total de juegos encontrados: " + games.size());
+            
+        } catch (Exception e) {
+            System.out.println("Database error on retrieving games: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
+        return games;
+    }
+
+    /**
+     * Retrieves videogames filtered by criteria
+     * @param name Game name or part of it (can be null or empty)
+     * @param genre Game genre (can be null or empty)
+     * @param platform Platform (can be null or empty)
+     * @return List of filtered videogames
+     */
+    public List<Videogame> getGamesFiltered(String name, String genre, String platform) {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        List<Videogame> games = new ArrayList<>();
+        
+        try {
+            StringBuilder hql = new StringBuilder("FROM Videogame v WHERE 1=1");
+            
+            // Construir la consulta dinámicamente basado en los filtros
+            if (name != null && !name.trim().isEmpty()) {
+                hql.append(" AND LOWER(v.name) LIKE LOWER(:name)");
+            }
+            if (genre != null && !genre.trim().isEmpty()) {
+                hql.append(" AND v.gameGenre = :genre");
+            }
+            if (platform != null && !platform.trim().isEmpty()) {
+                hql.append(" AND v.platforms = :platform");
+            }
+            
+            hql.append(" ORDER BY v.name ASC");
+            
+            Query<Videogame> query = session.createQuery(hql.toString(), Videogame.class);
+            
+            // Establecer parámetros si existen
+            if (name != null && !name.trim().isEmpty()) {
+                query.setParameter("name", "%" + name.trim() + "%");
+            }
+            if (genre != null && !genre.trim().isEmpty()) {
+                try {
+                    GameGenre genreEnum = GameGenre.valueOf(genre.trim().toUpperCase());
+                    query.setParameter("genre", genreEnum);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Género no válido: " + genre);
+                    // Si el género no es válido, retornar lista vacía o manejar según tu lógica
+                    return new ArrayList<>();
+                }
+            }
+            if (platform != null && !platform.trim().isEmpty()) {
+                try {
+                    Platform platformEnum = Platform.valueOf(platform.trim().toUpperCase());
+                    query.setParameter("platform", platformEnum);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Plataforma no válida: " + platform);
+                    // Si la plataforma no es válida, retornar lista vacía o manejar según tu lógica
+                    return new ArrayList<>();
+                }
+            }
+            
+            games = query.getResultList();
+            System.out.println("Juegos encontrados con filtros: " + games.size());
+            
+        } catch (Exception e) {
+            System.out.println("Database error on retrieving filtered games: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
+        return games;
     }
 }

@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Admin;
@@ -37,6 +38,8 @@ public class MenuWindowController implements Initializable {
 
     private Profile profile;
     private Controller cont;
+    @FXML
+    private Button Button_Store;
 
     public void setUsuario(Profile profile) {
         this.profile = profile;
@@ -127,5 +130,52 @@ public class MenuWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Initialization logic if needed
+    }
+
+     /**
+     * Opens the Shop/Store window.
+     * Users go to shopWindow, Admins go to AdminWindow
+     */
+    @FXML
+    private void StoreWindow(ActionEvent event) {
+        try {
+            if (profile instanceof Admin) {
+                // ADMIN: Va a la ventana de administrador de tienda
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/AdminWindow.fxml")); // Ajusta el nombre si es diferente
+                Parent root = fxmlLoader.load();
+                
+                AdminShopController controllerWindow = fxmlLoader.getController();
+                controllerWindow.setUsuario(profile);
+                controllerWindow.setCont(cont);
+                
+                // Crear y mostrar la nueva ventana
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Admin Game Store");
+                stage.show();
+                
+            } else {
+                // USER: Va a la ventana normal de tienda
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/StoreWindow.fxml")); // <-- CAMBIADO A shopWindow.fxml
+                Parent root = fxmlLoader.load();
+                
+                ShopWindowController controllerWindow = fxmlLoader.getController();
+                controllerWindow.setUsuario(profile);
+                controllerWindow.setCont(cont);
+                
+                // Crear y mostrar la nueva ventana
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Game Store");
+                stage.show();
+            }
+            
+            // Cerrar la ventana actual del menú
+            Stage currentStage = (Stage) Button_Store.getScene().getWindow();
+            currentStage.close();
+            
+        } catch (IOException ex) {
+            Logger.getLogger(MenuWindowController.class.getName()).log(Level.SEVERE, "Error al abrir la ventana de tienda", ex);
+        }
     }
 }
