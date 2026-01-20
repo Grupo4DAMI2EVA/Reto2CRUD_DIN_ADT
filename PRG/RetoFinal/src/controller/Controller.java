@@ -103,4 +103,14 @@ public class Controller {
     public boolean addToCart(Videogame game) {
         return dao.addToCart(game);
     }
+
+    public List<Videogame> getAllGames() {
+        return dao.getAllGames();
+    }
+
+    public List<Videogame> getGamesFiltered(String name, String genre, String platform) {
+        return dao.getGamesFiltered(name, genre, platform);
+    }
+
+    
 }

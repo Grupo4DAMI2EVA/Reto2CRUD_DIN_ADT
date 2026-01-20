@@ -60,13 +60,12 @@ public class ShopWindowController implements Initializable {
     private Videogame selected;
     private Profile profile;
     private Controller cont;
-    private DBImplementation db;
     private ObservableList<Videogame> gamesList;
 
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        db = new DBImplementation();
+  
         gamesList = FXCollections.observableArrayList();
         
          // Configurar las columnas de la tabla
@@ -108,7 +107,7 @@ public class ShopWindowController implements Initializable {
 
     private void loadAllGames() {
         gamesList.clear();
-        gamesList.addAll(db.getAllGames());
+        gamesList.addAll(cont.getAllGames());
         tableViewGames.setItems(gamesList);
     }
 
@@ -126,7 +125,7 @@ public class ShopWindowController implements Initializable {
         String platform = textFieldPlatform.getText();
         
         gamesList.clear();
-        gamesList.addAll(db.getGamesFiltered(name, genre, platform));
+        gamesList.addAll(cont.getGamesFiltered(name, genre, platform));
         tableViewGames.setItems(gamesList);
     }
 
