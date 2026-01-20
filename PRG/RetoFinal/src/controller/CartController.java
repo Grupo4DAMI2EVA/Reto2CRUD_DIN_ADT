@@ -7,7 +7,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.util.logging.*;
 
-public class CarritoController {
+public class CartController {
 
     // Logger para esta clase
     private static final Logger logger = Logger.getLogger(CarritoController.class.getName());
