@@ -4,17 +4,23 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
+import javafx.collections.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
-import javafx.scene.Node;
+import javafx.scene.*;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.*;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.cell.PropertyValueFactory;
+import model.DBImplementation;
+import model.Profile;
+import model.Videogame;
 
 public class ShopWindowController implements Initializable {
 
@@ -60,20 +66,78 @@ public class ShopWindowController implements Initializable {
     private Button buttonReview;
 
     private Videogame selected;
+    private Profile profile;
+    private Controller cont;
+    private DBImplementation db;
+    private ObservableList<Videogame> gamesList;
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        db = new DBImplementation();
+        gamesList = FXCollections.observableArrayList();
         
+         // Configurar las columnas de la tabla
+        configureTableColumns();
+        
+        // Cargar todos los juegos inicialmente
+        loadAllGames();
+        
+        // Configurar listener para selección de fila
+        tableViewGames.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> getSelectedTableItem()
+        );
     }
 
-    @FXML
+    public void setUsuario(Profile profile) {
+        this.profile = profile;
+        labelWelcome.setText("Welcome, " + profile.getUsername() + "!");
+        
+    }
+    
+    public void setCont(Controller cont) {
+        this.cont = cont;
+    }
+
+    public Controller getCont() {
+        return cont;
+    }
+    
+     private void configureTableColumns() {
+        colTitle.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colGenre.setCellValueFactory(new PropertyValueFactory<>("gameGenre"));
+        colPlatform.setCellValueFactory(new PropertyValueFactory<>("platforms"));
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+        colPegi.setCellValueFactory(new PropertyValueFactory<>("pegi"));
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
+        colCompanyName.setCellValueFactory(new PropertyValueFactory<>("companyName"));
+        colReleaseDate.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
+    }
+
+    private void loadAllGames() {
+        gamesList.clear();
+        gamesList.addAll(db.getAllGames());
+        tableViewGames.setItems(gamesList);
+    }
+
     private void getSelectedTableItem() {
         selected = tableViewGames.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            labelGameInfo.setText(selected.getName());
+            labelGameInfo.setText(selected.getName() + " - " + selected.getPrice() + "€ - Stock: " + selected.getStock());
         }
     }
     
+    @FXML
+    private void searchGames(ActionEvent event) {
+        String name = textFieldSearch.getText();
+        String genre = textFieldGenre.getText();
+        String platform = textFieldPlatform.getText();
+        
+        gamesList.clear();
+        gamesList.addAll(db.getGamesFiltered(name, genre, platform));
+        tableViewGames.setItems(gamesList);
+    }
+
     @FXML
     private void addToCart(ActionEvent event) {
         if (selected == null) {
@@ -85,8 +149,7 @@ public class ShopWindowController implements Initializable {
         } else {
             // Add cart method here
         }
-    }
-    
+    }    
     @FXML
     private void openCart(ActionEvent event) {
         try {
@@ -101,5 +164,30 @@ public class ShopWindowController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void refreshGamesList() {
+        String name = textFieldSearch.getText();
+        String genre = textFieldGenre.getText();
+        String platform = textFieldPlatform.getText();
+        
+        // Si hay filtros aplicados, mantenerlos
+        if (!name.isEmpty() || !genre.isEmpty() || !platform.isEmpty()) {
+            searchGames(null);
+        } else {
+            loadAllGames();
+        }
+    }
+
+    @FXML
+    private void handleCartButton(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleExitButton(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleReviewButton(ActionEvent event) {
     }
 }
