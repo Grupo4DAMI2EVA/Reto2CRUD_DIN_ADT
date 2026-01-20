@@ -9,543 +9,525 @@ import java.util.logging.*;
 
 public class CartController {
 
-    // Logger para esta clase
-    private static final Logger logger = Logger.getLogger(CarritoController.class.getName());
+    private static final Logger logger = Logger.getLogger(CartController.class.getName());
+    private static boolean loggerInitialized = false;
     
     @FXML
-    private ListView<String> listViewCarrito;
-
+    private ListView<String> listViewCart;
     @FXML
     private Label labelTotalItems;
-
     @FXML
-    private Label labelTotalPagar;
-
+    private Label labelTotalPrice;
     @FXML
-    private Label labelCantidadActual;
-
+    private Label labelCurrentQuantity;
     @FXML
-    private Label labelItemSeleccionado;
-
+    private Label labelSelectedItem;
     @FXML
-    private Button buttonMas;
-
+    private Button buttonPlus;
     @FXML
-    private Button buttonMenos;
-
+    private Button buttonMinus;
     @FXML
-    private Button buttonComprar;
-
+    private Button buttonBuy;
     @FXML
-    private Button buttonEliminar;
-
+    private Button buttonDelete;
     @FXML
-    private Button buttonCancelar;
+    private Button buttonCancel;
 
     private Stage stage;
-    private ObservableList<String> carritoData;
-    private int indiceSeleccionado = -1;
-    private int cantidadActual = 0;
+    private ObservableList<String> cartData;
+    private int selectedIndex = -1;
+    private int currentQuantity = 0;
 
-    // Inicializar el logger al cargar la clase
     static {
-        inicializarLogger();
+        initializeLogger();
     }
     
-    private static void inicializarLogger() {
+    private static synchronized void initializeLogger() {
+        if (loggerInitialized) {
+            return;
+        }
+        
         try {
-            // Crear carpeta logs si no existe
-            java.io.File carpetaLogs = new java.io.File("logs");
-            if (!carpetaLogs.exists()) {
-                carpetaLogs.mkdirs();
+            java.io.File logsFolder = new java.io.File("logs");
+            if (!logsFolder.exists()) {
+                logsFolder.mkdirs();
             }
             
-            // Configurar FileHandler para escribir en archivo
-            FileHandler fileHandler = new FileHandler("logs/carrito_errores.log", true);
+            Handler fileHandler = new FileHandler("logs/cart.log", true);
             
-            // Formato personalizado
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
                 public String format(LogRecord record) {
-                    return String.format("[%1$tF %1$tT] [%2$s] %3$s %n",
-                            new java.util.Date(record.getMillis()),
-                            record.getLevel(),
-                            record.getMessage());
+                    if (record.getLevel() == Level.INFO || record.getLevel() == Level.SEVERE) {
+                        return String.format("[%1$tF %1$tT] [%2$s] %3$s %n",
+                                new java.util.Date(record.getMillis()),
+                                record.getLevel(),
+                                record.getMessage());
+                    }
+                    return "";
                 }
             });
             
-            // Añadir el manejador al logger
+            fileHandler.setLevel(Level.INFO);
             logger.addHandler(fileHandler);
-            
-            // Solo registrar WARNING y SEVERE
-            logger.setLevel(Level.WARNING);
-            
-            // No mostrar en consola
+            logger.setLevel(Level.INFO);
             logger.setUseParentHandlers(false);
             
-            logger.info("Logger de CarritoController inicializado correctamente");
+            loggerInitialized = true;
+            logger.info("CartController logger initialized");
             
         } catch (Exception e) {
-            System.err.println("ERROR al inicializar logger: " + e.getMessage());
+            System.err.println("ERROR initializing logger: " + e.getMessage());
+            loggerInitialized = true;
         }
     }
 
     @FXML
     private void initialize() {
         try {
-            logger.info("Inicializando CarritoController...");
+            logger.info("Initializing CartController");
             
-            // Inicializar la lista de items del carrito
-            carritoData = FXCollections.observableArrayList();
-            listViewCarrito.setItems(carritoData);
+            cartData = FXCollections.observableArrayList();
+            listViewCart.setItems(cartData);
 
-            // Cargar datos de ejemplo
-            cargarDatosEjemplo();
+            loadExampleData();
+            updateTotals();
+            updateButtonStates();
 
-            // Actualizar totales
-            actualizarTotales();
-
-            // Deshabilitar botones inicialmente
-            actualizarEstadoBotones();
-
-            // Configurar selección de item
-            listViewCarrito.getSelectionModel().selectedItemProperty().addListener(
-                    (observable, oldValue, newValue) -> mostrarDetalleItem(newValue));
+            listViewCart.getSelectionModel().selectedItemProperty().addListener(
+                    (observable, oldValue, newValue) -> showItemDetails(newValue));
             
-            logger.info("CarritoController inicializado correctamente");
+            logger.info("CartController initialized successfully");
             
         } catch (Exception e) {
-            logger.severe("Error al inicializar CarritoController: " + e.getMessage());
-            mostrarAlerta("Error de Inicialización", 
-                "No se pudo inicializar el carrito. Por favor, reinicie la aplicación.");
+            logger.severe("Error initializing CartController: " + e.getMessage());
+            showAlert("Initialization Error", 
+                "Could not initialize the cart. Please restart the application.");
         }
     }
 
-    private void cargarDatosEjemplo() {
+    private void loadExampleData() {
         try {
-            logger.info("Cargando datos de ejemplo al carrito");
+            logger.info("Loading example data to cart");
             
-            // Datos de ejemplo para probar
-            carritoData.add("Usuario: 1 | Videojuego: FIFA 23 | Cantidad: 2 | Precio: $59.99");
-            carritoData.add("Usuario: 1 | Videojuego: Call of Duty | Cantidad: 1 | Precio: $69.99");
-            carritoData.add("Usuario: 2 | Videojuego: Minecraft | Cantidad: 3 | Precio: $24.99");
-            carritoData.add("Usuario: 3 | Videojuego: GTA V | Cantidad: 1 | Precio: $39.99");
+            cartData.add("User: 1 | Game: FIFA 23 | Quantity: 2 | Price: $59.99");
+            cartData.add("User: 1 | Game: Call of Duty | Quantity: 1 | Price: $69.99");
+            cartData.add("User: 2 | Game: Minecraft | Quantity: 3 | Price: $24.99");
+            cartData.add("User: 3 | Game: GTA V | Quantity: 1 | Price: $39.99");
             
-            logger.info("Datos de ejemplo cargados: " + carritoData.size() + " items");
+            logger.info("Example data loaded: " + cartData.size() + " items");
             
         } catch (Exception e) {
-            logger.warning("Error al cargar datos de ejemplo: " + e.getMessage());
+            logger.severe("Error loading example data: " + e.getMessage());
         }
     }
 
-    private void mostrarDetalleItem(String item) {
+    // Manual version without split - EASIER TO UNDERSTAND
+    private void showItemDetails(String item) {
         try {
             if (item != null) {
-                indiceSeleccionado = listViewCarrito.getSelectionModel().getSelectedIndex();
-                logger.info("Item seleccionado - Índice: " + indiceSeleccionado + ", Item: " + item);
-
-                // Extraer información del item seleccionado
-                String[] partes = item.split("\\|");
-                if (partes.length >= 4) {
-                    String usuario = partes[0].trim().split(":")[1].trim();
-                    String videojuego = partes[1].trim().split(":")[1].trim();
-                    String cantidadStr = partes[2].trim().split(":")[1].trim();
-                    String precio = partes[3].trim();
-
-                    // Actualizar información mostrada
-                    labelItemSeleccionado.setText(videojuego);
-                    cantidadActual = Integer.parseInt(cantidadStr);
-                    labelCantidadActual.setText(String.valueOf(cantidadActual));
-
-                    logger.fine("Detalles extraídos - Usuario: " + usuario + 
-                              ", Videojuego: " + videojuego + 
-                              ", Cantidad: " + cantidadActual);
-                } else {
-                    logger.warning("Formato de item inválido: " + item);
+                selectedIndex = listViewCart.getSelectionModel().getSelectedIndex();
+                logger.info("Item selected - Index: " + selectedIndex);
+                
+                // Find the first |
+                int pos1 = item.indexOf("|");
+                if (pos1 == -1) {
+                    logger.severe("Invalid item format - no | found");
+                    return;
+                }
+                String part1 = item.substring(0, pos1).trim(); // "User: 1"
+                
+                // Find the second |
+                int pos2 = item.indexOf("|", pos1 + 1);
+                if (pos2 == -1) {
+                    logger.severe("Invalid item format - second | not found");
+                    return;
+                }
+                String part2 = item.substring(pos1 + 1, pos2).trim(); // "Game: FIFA 23"
+                
+                // Find the third |
+                int pos3 = item.indexOf("|", pos2 + 1);
+                if (pos3 == -1) {
+                    logger.severe("Invalid item format - third | not found");
+                    return;
+                }
+                String part3 = item.substring(pos2 + 1, pos3).trim(); // "Quantity: 2"
+                
+                // What remains after the third |
+                String part4 = item.substring(pos3 + 1).trim(); // "Price: $59.99"
+                
+                // Now extract the game name from part2
+                int colonPos = part2.indexOf(":");
+                if (colonPos != -1) {
+                    String gameName = part2.substring(colonPos + 1).trim();
+                    labelSelectedItem.setText(gameName);
                 }
                 
-                // Habilitar botones
-                actualizarEstadoBotones();
+                // Extract quantity from part3
+                colonPos = part3.indexOf(":");
+                if (colonPos != -1) {
+                    String quantityStr = part3.substring(colonPos + 1).trim();
+                    currentQuantity = Integer.parseInt(quantityStr);
+                    labelCurrentQuantity.setText(String.valueOf(currentQuantity));
+                    
+                    logger.info("Details extracted - Quantity: " + currentQuantity);
+                }
+                
+                updateButtonStates();
                 
             } else {
-                // Si no hay item seleccionado
-                logger.fine("No hay item seleccionado");
-                indiceSeleccionado = -1;
-                labelItemSeleccionado.setText("Selecciona un item");
-                labelCantidadActual.setText("0");
-                actualizarEstadoBotones();
+                selectedIndex = -1;
+                labelSelectedItem.setText("Select an item");
+                labelCurrentQuantity.setText("0");
+                updateButtonStates();
             }
             
         } catch (NumberFormatException e) {
-            logger.severe("Error de formato al extraer cantidad del item: " + item + 
-                         " - Error: " + e.getMessage());
-            mostrarAlerta("Error de Formato", "El formato del item seleccionado es incorrecto.");
-            
-        } catch (ArrayIndexOutOfBoundsException e) {
-            logger.severe("Error al procesar item: formato inesperado - " + item);
-            mostrarAlerta("Error de Formato", "No se pudo procesar el item seleccionado.");
+            logger.severe("Format error extracting quantity from item: " + e.getMessage());
+            showAlert("Format Error", "The format of the selected item is incorrect.");
             
         } catch (Exception e) {
-            logger.severe("Error inesperado en mostrarDetalleItem: " + e.getMessage());
+            logger.severe("Error in showItemDetails: " + e.getMessage());
+            showAlert("Error", "Could not process the selected item.");
         }
     }
 
     @FXML
-    private void aumentarCantidad() {
+    private void increaseQuantity() {
         try {
-            if (indiceSeleccionado >= 0) {
-                logger.info("Aumentando cantidad - Índice: " + indiceSeleccionado + 
-                          ", Cantidad actual: " + cantidadActual);
+            if (selectedIndex >= 0) {
+                logger.info("Increasing quantity - Index: " + selectedIndex);
                 
-                cantidadActual++;
-                actualizarItemCantidad();
+                currentQuantity++;
+                updateItemQuantity();
                 
-                logger.fine("Cantidad aumentada a: " + cantidadActual);
+                logger.info("Quantity increased to: " + currentQuantity);
             } else {
-                logger.warning("Intento de aumentar cantidad sin item seleccionado");
+                logger.severe("Attempt to increase quantity without selected item");
             }
         } catch (Exception e) {
-            logger.severe("Error en aumentarCantidad: " + e.getMessage());
+            logger.severe("Error in increaseQuantity: " + e.getMessage());
         }
     }
 
     @FXML
-    private void disminuirCantidad() {
+    private void decreaseQuantity() {
         try {
-            if (indiceSeleccionado >= 0 && cantidadActual > 1) {
-                logger.info("Disminuyendo cantidad - Índice: " + indiceSeleccionado + 
-                          ", Cantidad actual: " + cantidadActual);
+            if (selectedIndex >= 0 && currentQuantity > 1) {
+                logger.info("Decreasing quantity - Index: " + selectedIndex);
                 
-                cantidadActual--;
-                actualizarItemCantidad();
+                currentQuantity--;
+                updateItemQuantity();
                 
-                logger.fine("Cantidad disminuida a: " + cantidadActual);
+                logger.info("Quantity decreased to: " + currentQuantity);
                 
-            } else if (cantidadActual == 1) {
-                // Si la cantidad es 1, preguntar si eliminar
-                logger.info("Cantidad en 1 - Preguntando si eliminar item");
+            } else if (currentQuantity == 1) {
+                logger.info("Quantity at 1 - Asking if delete item");
                 
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Eliminar item");
-                alert.setHeaderText("¿Eliminar este item del carrito?");
-                alert.setContentText("La cantidad llegaría a 0. ¿Deseas eliminarlo completamente?");
+                alert.setTitle("Delete item");
+                alert.setHeaderText("Delete this item from cart?");
+                alert.setContentText("Quantity would reach 0. Do you want to delete it completely?");
 
-                ButtonType buttonTypeSi = new ButtonType("Sí");
+                ButtonType buttonTypeYes = new ButtonType("Yes");
                 ButtonType buttonTypeNo = new ButtonType("No");
-                alert.getButtonTypes().setAll(buttonTypeSi, buttonTypeNo);
+                alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
 
                 alert.showAndWait().ifPresent(response -> {
-                    if (response == buttonTypeSi) {
-                        logger.info("Usuario confirmó eliminar item");
-                        eliminarItem();
-                    } else {
-                        logger.fine("Usuario canceló eliminación");
+                    if (response == buttonTypeYes) {
+                        logger.info("User confirmed delete item");
+                        deleteItem();
                     }
                 });
             } else {
-                logger.warning("Intento de disminuir cantidad sin item seleccionado o cantidad inválida");
+                logger.severe("Attempt to decrease quantity without selected item");
             }
         } catch (Exception e) {
-            logger.severe("Error en disminuirCantidad: " + e.getMessage());
+            logger.severe("Error in decreaseQuantity: " + e.getMessage());
         }
     }
 
-    private void actualizarItemCantidad() {
+    private void updateItemQuantity() {
         try {
-            if (indiceSeleccionado >= 0) {
-                String itemOriginal = carritoData.get(indiceSeleccionado);
-                logger.fine("Actualizando cantidad - Item original: " + itemOriginal);
+            if (selectedIndex >= 0) {
+                String originalItem = cartData.get(selectedIndex);
                 
-                String[] partes = itemOriginal.split("\\|");
-
-                if (partes.length >= 4) {
-                    // Reconstruir el item con la nueva cantidad
-                    String nuevoItem = partes[0].trim() + " | "
-                            + partes[1].trim() + " | "
-                            + "Cantidad: " + cantidadActual + " | "
-                            + partes[3].trim();
-
-                    carritoData.set(indiceSeleccionado, nuevoItem);
-                    listViewCarrito.refresh();
-                    labelCantidadActual.setText(String.valueOf(cantidadActual));
-                    actualizarTotales();
-                    actualizarEstadoBotones();
+                // Manual split for the item
+                int pos1 = originalItem.indexOf("|");
+                int pos2 = originalItem.indexOf("|", pos1 + 1);
+                int pos3 = originalItem.indexOf("|", pos2 + 1);
+                
+                if (pos1 != -1 && pos2 != -1 && pos3 != -1) {
+                    String part1 = originalItem.substring(0, pos1).trim();
+                    String part2 = originalItem.substring(pos1 + 1, pos2).trim();
+                    String part4 = originalItem.substring(pos3 + 1).trim();
                     
-                    logger.info("Cantidad actualizada - Nuevo item: " + nuevoItem);
+                    // Build new item with updated quantity
+                    String newItem = part1 + " | " + part2 + " | Quantity: " + 
+                                    currentQuantity + " | " + part4;
+
+                    cartData.set(selectedIndex, newItem);
+                    listViewCart.refresh();
+                    labelCurrentQuantity.setText(String.valueOf(currentQuantity));
+                    updateTotals();
+                    updateButtonStates();
+                    
+                    logger.info("Quantity updated - New quantity: " + currentQuantity);
                 } else {
-                    logger.warning("Formato de item inválido al actualizar cantidad: " + itemOriginal);
+                    logger.severe("Invalid item format when updating quantity");
                 }
             } else {
-                logger.warning("Intento de actualizar cantidad sin item seleccionado");
+                logger.severe("Attempt to update quantity without selected item");
             }
         } catch (Exception e) {
-            logger.severe("Error en actualizarItemCantidad: " + e.getMessage());
-            mostrarAlerta("Error", "No se pudo actualizar la cantidad del item.");
+            logger.severe("Error in updateItemQuantity: " + e.getMessage());
+            showAlert("Error", "Could not update item quantity.");
         }
     }
 
-    private void actualizarEstadoBotones() {
+    private void updateButtonStates() {
         try {
-            boolean hayItemSeleccionado = (indiceSeleccionado >= 0);
+            boolean hasItemSelected = (selectedIndex >= 0);
 
-            // Habilitar/deshabilitar botones + y -
-            buttonMas.setDisable(!hayItemSeleccionado);
-            buttonMenos.setDisable(!hayItemSeleccionado || cantidadActual <= 1);
-
-            // Habilitar/deshabilitar botón eliminar
-            buttonEliminar.setDisable(!hayItemSeleccionado);
-
-            // Habilitar/deshabilitar botón comprar
-            buttonComprar.setDisable(carritoData.isEmpty());
-            
-            logger.fine("Estado de botones actualizado - " +
-                       "Hay selección: " + hayItemSeleccionado + 
-                       ", Carrito vacío: " + carritoData.isEmpty());
+            buttonPlus.setDisable(!hasItemSelected);
+            buttonMinus.setDisable(!hasItemSelected || currentQuantity <= 1);
+            buttonDelete.setDisable(!hasItemSelected);
+            buttonBuy.setDisable(cartData.isEmpty());
             
         } catch (Exception e) {
-            logger.severe("Error en actualizarEstadoBotones: " + e.getMessage());
+            logger.severe("Error in updateButtonStates: " + e.getMessage());
         }
     }
 
     @FXML
-    private void comprar() {
+    private void buy() {
         try {
-            // Lógica para realizar la compra
-            if (carritoData.isEmpty()) {
-                logger.warning("Intento de comprar con carrito vacío");
-                mostrarAlerta("Carrito vacío", "No hay items en el carrito para comprar.");
+            if (cartData.isEmpty()) {
+                logger.severe("Attempt to buy with empty cart");
+                showAlert("Empty Cart", "There are no items in the cart to buy.");
                 return;
             }
 
-            logger.info("Iniciando proceso de compra - Items: " + carritoData.size() + 
-                       ", Total: " + labelTotalPagar.getText());
+            logger.info("Starting purchase process - Items: " + cartData.size());
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmar Compra");
-            alert.setHeaderText("¿Realizar compra?");
-            alert.setContentText("Total a pagar: " + labelTotalPagar.getText());
+            alert.setTitle("Confirm Purchase");
+            alert.setHeaderText("Make purchase?");
+            alert.setContentText("Total to pay: " + labelTotalPrice.getText());
 
-            ButtonType buttonTypeSi = new ButtonType("Sí");
+            ButtonType buttonTypeYes = new ButtonType("Yes");
             ButtonType buttonTypeNo = new ButtonType("No");
-            alert.getButtonTypes().setAll(buttonTypeSi, buttonTypeNo);
+            alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
 
             alert.showAndWait().ifPresent(response -> {
-                if (response == buttonTypeSi) {
-                    logger.info("Usuario confirmó la compra");
+                if (response == buttonTypeYes) {
+                    logger.info("User confirmed purchase - Total: " + labelTotalPrice.getText());
                     
                     Alert success = new Alert(Alert.AlertType.INFORMATION);
-                    success.setTitle("Compra Realizada");
-                    success.setHeaderText("¡Compra exitosa!");
-                    success.setContentText("Tu compra se ha realizado correctamente.");
+                    success.setTitle("Purchase Completed");
+                    success.setHeaderText("Purchase successful!");
+                    success.setContentText("Your purchase has been completed successfully.");
                     success.showAndWait();
 
-                    // Limpiar carrito después de comprar
-                    logger.info("Limpiando carrito después de compra exitosa");
-                    carritoData.clear();
-                    actualizarTotales();
-                    limpiarSeleccion();
+                    logger.info("Clearing cart after purchase");
+                    cartData.clear();
+                    updateTotals();
+                    clearSelection();
                     
-                    logger.info("Compra completada exitosamente");
+                    logger.info("Purchase completed successfully");
                     
                 } else {
-                    logger.fine("Usuario canceló la compra");
+                    logger.info("User canceled purchase");
                 }
             });
             
         } catch (Exception e) {
-            logger.severe("Error en comprar: " + e.getMessage());
-            mostrarAlerta("Error en Compra", 
-                "Ocurrió un error al procesar la compra. Por favor, intente nuevamente.");
+            logger.severe("Error in buy: " + e.getMessage());
+            showAlert("Purchase Error", 
+                "An error occurred processing the purchase. Please try again.");
         }
     }
 
     @FXML
-    private void eliminarItem() {
+    private void deleteItem() {
         try {
-            if (indiceSeleccionado >= 0) {
-                String itemAEliminar = carritoData.get(indiceSeleccionado);
-                logger.info("Solicitando eliminar item: " + itemAEliminar);
+            if (selectedIndex >= 0) {
+                String itemToDelete = cartData.get(selectedIndex);
+                logger.info("Requesting to delete item: " + itemToDelete);
 
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Confirmar Eliminación");
-                alert.setHeaderText("¿Eliminar este item del carrito?");
-                alert.setContentText("Esta acción no se puede deshacer.");
+                alert.setTitle("Confirm Deletion");
+                alert.setHeaderText("Delete this item from cart?");
+                alert.setContentText("This action cannot be undone.");
 
-                ButtonType buttonTypeSi = new ButtonType("Sí");
+                ButtonType buttonTypeYes = new ButtonType("Yes");
                 ButtonType buttonTypeNo = new ButtonType("No");
-                alert.getButtonTypes().setAll(buttonTypeSi, buttonTypeNo);
+                alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
 
                 alert.showAndWait().ifPresent(response -> {
-                    if (response == buttonTypeSi) {
-                        logger.info("Usuario confirmó eliminar el item");
-                        carritoData.remove(indiceSeleccionado);
-                        actualizarTotales();
-                        limpiarSeleccion();
+                    if (response == buttonTypeYes) {
+                        logger.info("User confirmed to delete the item");
+                        cartData.remove(selectedIndex);
+                        updateTotals();
+                        clearSelection();
                         
-                        logger.info("Item eliminado exitosamente");
-                    } else {
-                        logger.fine("Usuario canceló la eliminación");
+                        logger.info("Item deleted successfully");
                     }
                 });
             } else {
-                logger.warning("Intento de eliminar sin item seleccionado");
-                mostrarAlerta("Seleccionar item", "Por favor, seleccione un item para eliminar.");
+                logger.severe("Attempt to delete without selected item");
+                showAlert("Select Item", "Please select an item to delete.");
             }
         } catch (Exception e) {
-            logger.severe("Error en eliminarItem: " + e.getMessage());
-            mostrarAlerta("Error", "No se pudo eliminar el item del carrito.");
+            logger.severe("Error in deleteItem: " + e.getMessage());
+            showAlert("Error", "Could not delete item from cart.");
         }
     }
 
-    private void limpiarSeleccion() {
+    private void clearSelection() {
         try {
-            logger.fine("Limpiando selección");
-            
-            listViewCarrito.getSelectionModel().clearSelection();
-            indiceSeleccionado = -1;
-            cantidadActual = 0;
-            labelCantidadActual.setText("0");
-            labelItemSeleccionado.setText("Selecciona un item");
-            actualizarEstadoBotones();
+            listViewCart.getSelectionModel().clearSelection();
+            selectedIndex = -1;
+            currentQuantity = 0;
+            labelCurrentQuantity.setText("0");
+            labelSelectedItem.setText("Select an item");
+            updateButtonStates();
             
         } catch (Exception e) {
-            logger.severe("Error en limpiarSeleccion: " + e.getMessage());
+            logger.severe("Error in clearSelection: " + e.getMessage());
         }
     }
 
     @FXML
-    private void cancelar() {
+    private void cancel() {
         try {
-            logger.info("Cerrando ventana del carrito");
+            logger.info("Closing cart window");
             
-            stage = (Stage) buttonEliminar.getScene().getWindow();
+            stage = (Stage) buttonDelete.getScene().getWindow();
             stage.close();
             
-            logger.info("Ventana del carrito cerrada");
+            logger.info("Cart window closed");
             
         } catch (Exception e) {
-            logger.severe("Error al cerrar ventana del carrito: " + e.getMessage());
-            mostrarAlerta("Error", "No se pudo cerrar la ventana.");
+            logger.severe("Error closing cart window: " + e.getMessage());
+            showAlert("Error", "Could not close the window.");
         }
     }
 
-    private void actualizarTotales() {
+    private void updateTotals() {
         try {
             int totalItems = 0;
-            double totalPagar = 0.0;
-            
-            logger.fine("Calculando totales...");
+            double totalPrice = 0.0;
 
-            for (String item : carritoData) {
+            for (String item : cartData) {
                 try {
-                    String[] partes = item.split("\\|");
-                    if (partes.length >= 4) {
-                        // Extraer cantidad
-                        String cantidadParte = partes[2].trim();
-                        String cantidadStr = cantidadParte.split(":")[1].trim();
-                        int cantidad = Integer.parseInt(cantidadStr);
-
-                        // Extraer precio
-                        String precioParte = partes[3].trim();
-                        String precioStr = precioParte.split("\\$")[1].trim();
-                        double precio = Double.parseDouble(precioStr);
-
-                        totalItems += cantidad;
-                        totalPagar += precio * cantidad;
+                    // Manual split for each item
+                    int pos1 = item.indexOf("|");
+                    int pos2 = item.indexOf("|", pos1 + 1);
+                    int pos3 = item.indexOf("|", pos2 + 1);
+                    
+                    if (pos1 != -1 && pos2 != -1 && pos3 != -1) {
+                        String part3 = item.substring(pos2 + 1, pos3).trim(); // "Quantity: 2"
+                        String part4 = item.substring(pos3 + 1).trim(); // "Price: $59.99"
+                        
+                        // Extract quantity
+                        int colonPos = part3.indexOf(":");
+                        if (colonPos != -1) {
+                            String quantityStr = part3.substring(colonPos + 1).trim();
+                            int quantity = Integer.parseInt(quantityStr);
+                            
+                            // Extract price
+                            colonPos = part4.indexOf("$");
+                            if (colonPos != -1) {
+                                String priceStr = part4.substring(colonPos + 1).trim();
+                                double price = Double.parseDouble(priceStr);
+                                
+                                totalItems += quantity;
+                                totalPrice += price * quantity;
+                            }
+                        }
                     }
-                } catch (NumberFormatException e) {
-                    logger.warning("Error de formato en item (ignorado): " + item + 
-                                 " - Error: " + e.getMessage());
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    logger.warning("Formato inesperado en item (ignorado): " + item);
                 } catch (Exception e) {
-                    logger.warning("Error procesando item (ignorado): " + item + 
-                                 " - Error: " + e.getMessage());
+                    logger.severe("Error processing item: " + item);
                 }
             }
 
             labelTotalItems.setText(String.valueOf(totalItems));
-            labelTotalPagar.setText(String.format("$%.2f", totalPagar));
-            actualizarEstadoBotones();
+            labelTotalPrice.setText(String.format("$%.2f", totalPrice));
+            updateButtonStates();
             
-            logger.info("Totales actualizados - Items: " + totalItems + 
-                       ", Total a pagar: $" + String.format("%.2f", totalPagar));
+            logger.info("Totals updated - Items: " + totalItems + ", Total: $" + String.format("%.2f", totalPrice));
             
         } catch (Exception e) {
-            logger.severe("Error en actualizarTotales: " + e.getMessage());
-            mostrarAlerta("Error de Cálculo", 
-                "No se pudieron calcular los totales. Por favor, verifique los items.");
+            logger.severe("Error in updateTotals: " + e.getMessage());
+            showAlert("Calculation Error", 
+                "Could not calculate totals. Please check the items.");
         }
     }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
+    private void showAlert(String title, String message) {
         try {
-            logger.warning("Mostrando alerta: " + titulo + " - " + mensaje);
+            logger.info("Showing alert: " + title + " - " + message);
             
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle(titulo);
+            alert.setTitle(title);
             alert.setHeaderText(null);
-            alert.setContentText(mensaje);
+            alert.setContentText(message);
             alert.showAndWait();
             
         } catch (Exception e) {
-            logger.severe("Error al mostrar alerta '" + titulo + "': " + e.getMessage());
+            logger.severe("Error showing alert: " + e.getMessage());
         }
     }
 
-    // Método para agregar items desde otras partes de la aplicación
-    public void agregarItemCarrito(String usuario, String videojuego, int cantidad, double precio) {
+    public void addItemToCart(String user, String game, int quantity, double price) {
         try {
-            if (usuario == null || usuario.trim().isEmpty()) {
-                throw new IllegalArgumentException("Usuario no puede ser nulo o vacío");
+            if (user == null || user.trim().isEmpty()) {
+                throw new IllegalArgumentException("User cannot be null or empty");
             }
-            if (videojuego == null || videojuego.trim().isEmpty()) {
-                throw new IllegalArgumentException("Videojuego no puede ser nulo o vacío");
+            if (game == null || game.trim().isEmpty()) {
+                throw new IllegalArgumentException("Game cannot be null or empty");
             }
-            if (cantidad <= 0) {
-                throw new IllegalArgumentException("Cantidad debe ser mayor a 0");
+            if (quantity <= 0) {
+                throw new IllegalArgumentException("Quantity must be greater than 0");
             }
-            if (precio <= 0) {
-                throw new IllegalArgumentException("Precio debe ser mayor a 0");
+            if (price <= 0) {
+                throw new IllegalArgumentException("Price must be greater than 0");
             }
 
-            String item = String.format("Usuario: %s | Videojuego: %s | Cantidad: %d | Precio: $%.2f",
-                    usuario, videojuego, cantidad, precio);
+            String item = String.format("User: %s | Game: %s | Quantity: %d | Price: $%.2f",
+                    user, game, quantity, price);
             
-            carritoData.add(item);
-            actualizarTotales();
+            cartData.add(item);
+            updateTotals();
             
-            logger.info("Item agregado al carrito - Usuario: " + usuario + 
-                       ", Videojuego: " + videojuego + 
-                       ", Cantidad: " + cantidad + 
-                       ", Precio: $" + precio);
+            logger.info("Item added - User: " + user + ", Game: " + game + 
+                       ", Quantity: " + quantity + ", Price: $" + price);
             
         } catch (IllegalArgumentException e) {
-            logger.severe("Error de validación al agregar item: " + e.getMessage());
-            throw e; // Relanzar para que lo maneje quien llama
+            logger.severe("Validation error adding item: " + e.getMessage());
+            throw e;
             
         } catch (Exception e) {
-            logger.severe("Error inesperado al agregar item al carrito: " + e.getMessage());
-            mostrarAlerta("Error", "No se pudo agregar el item al carrito.");
+            logger.severe("Error adding item to cart: " + e.getMessage());
+            showAlert("Error", "Could not add item to cart.");
         }
     }
 
     public void setStage(Stage stage) {
         try {
             this.stage = stage;
-            logger.fine("Stage configurado en CarritoController");
         } catch (Exception e) {
-            logger.severe("Error al configurar stage: " + e.getMessage());
+            logger.severe("Error setting stage: " + e.getMessage());
         }
     }
     
-    // Método para obtener el estado actual del carrito (útil para debugging)
-    public String obtenerEstadoCarrito() {
-        StringBuilder estado = new StringBuilder();
-        estado.append("Carrito - Items: ").append(carritoData.size()).append("\n");
-        for (int i = 0; i < carritoData.size(); i++) {
-            estado.append("  ").append(i).append(": ").append(carritoData.get(i)).append("\n");
+    public String getCartStatus() {
+        StringBuilder status = new StringBuilder();
+        status.append("Cart - Items: ").append(cartData.size()).append("\n");
+        for (int i = 0; i < cartData.size(); i++) {
+            status.append("  ").append(i).append(": ").append(cartData.get(i)).append("\n");
         }
-        return estado.toString();
+        return status.toString();
     }
 }

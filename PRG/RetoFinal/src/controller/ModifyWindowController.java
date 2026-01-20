@@ -201,4 +201,8 @@ public class ModifyWindowController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // Initialization logic (if needed) can be added here
     }
+
+    void setController(Controller cont) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
