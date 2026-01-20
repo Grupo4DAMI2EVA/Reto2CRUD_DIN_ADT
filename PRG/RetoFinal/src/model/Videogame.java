@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "VIDEOGAME_")
-public class Videogame {
+public class Videogame implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

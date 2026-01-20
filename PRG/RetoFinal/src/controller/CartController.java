@@ -192,10 +192,8 @@ public class CartController {
                 success.setContentText("Tu compra se ha realizado correctamente.");
                 success.showAndWait();
 
-                // Limpiar carrito después de comprar
-                carritoData.clear();
-                actualizarTotales();
-                limpiarSeleccion();
+                Stage currentStage = (Stage) buttonCancelar.getScene().getWindow();
+                currentStage.close();
             }
         });
     }

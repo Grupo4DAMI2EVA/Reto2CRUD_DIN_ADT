@@ -280,7 +280,6 @@ public class DBImplementation implements ClassDAO {
      */
     @Override
     public boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender) {
-
         Session session = HibernateSession.getSessionFactory().openSession();
         Transaction transaction = null;
 
