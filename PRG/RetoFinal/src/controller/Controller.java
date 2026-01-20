@@ -1,9 +1,7 @@
 package controller;
 
 import java.util.List;
-import model.ClassDAO;
-import model.Profile;
-import model.Videogame;
+import model.*;
 
 /**
  * Controller class that handles interaction between the GUI and the database. Provides login, signup, deletion, modification, and data retrieval methods.
@@ -12,16 +10,7 @@ import model.Videogame;
  */
 public class Controller {
 
-    private ClassDAO dao;
-
-    /**
-     * Constructor for Controller.
-     *
-     * @param dao The DAO implementation to handle database operations
-     */
-    public Controller(ClassDAO dao) {
-        this.dao = dao;
-    }
+    ClassDAO dao = new DBImplementation();
 
     /**
      * Attempts to log in a user or admin.
@@ -46,7 +35,7 @@ public class Controller {
      * @param surname
      * @return true if signup succeeds, false otherwise
      */
-    public Boolean signUp(String gender, String cardNumber, String username, String password, String email,
+    public boolean signUp(String gender, String cardNumber, String username, String password, String email,
             String name, String telephone, String surname) {
         return dao.signUp(gender, cardNumber, username, password, email, name, telephone, surname);
     }
@@ -57,11 +46,11 @@ public class Controller {
      * @param password
      * @return 
      */
-    public Boolean dropOutUser(String username, String password) {
+    public boolean dropOutUser(String username, String password) {
         return dao.dropOutUser(username, password);
     }
 
-    public Boolean dropOutAdmin(String usernameToDelete, String adminUsername, String adminPassword) {
+    public boolean dropOutAdmin(String usernameToDelete, String adminUsername, String adminPassword) {
         return dao.dropOutAdmin(usernameToDelete, adminUsername, adminPassword);
     }
 
@@ -76,7 +65,7 @@ public class Controller {
      * @param gender
      * @return 
      */
-    public Boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender) {
+    public boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender) {
         return dao.modificarUser(password, email, name, telephone, surname, username, gender);
     }
 
@@ -86,6 +75,14 @@ public class Controller {
      */
     public List comboBoxInsert() {
         return dao.comboBoxInsert();
+    }
+    
+    public boolean userExists(String username) {
+        return dao.userExists(username);
+    }
+    
+    public User getUserByUsername(String username) {
+        return dao.getUserByUsername(username);
     }
     
     public boolean addGame(Videogame game) {
@@ -103,14 +100,12 @@ public class Controller {
     public boolean addToCart(Videogame game) {
         return dao.addToCart(game);
     }
-
+    
     public List<Videogame> getAllGames() {
         return dao.getAllGames();
     }
-
+    
     public List<Videogame> getGamesFiltered(String name, String genre, String platform) {
         return dao.getGamesFiltered(name, genre, platform);
     }
-
-    
 }

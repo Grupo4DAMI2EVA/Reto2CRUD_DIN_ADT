@@ -62,30 +62,28 @@ public class ShopWindowController implements Initializable {
     private Controller cont;
     private ObservableList<Videogame> gamesList;
 
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-  
+        cont = new Controller();
         gamesList = FXCollections.observableArrayList();
-        
-         // Configurar las columnas de la tabla
+
+        // Configurar las columnas de la tabla
         configureTableColumns();
-        
+
         // Cargar todos los juegos inicialmente
         loadAllGames();
-        
+
         // Configurar listener para selección de fila
         tableViewGames.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> getSelectedTableItem()
+                (observable, oldValue, newValue) -> getSelectedTableItem()
         );
     }
 
     public void setUsuario(Profile profile) {
         this.profile = profile;
-        labelWelcome.setText("Welcome, " + profile.getUsername() + "!");
-        
+        labelWelcome.setText("Welcome, " + this.profile.getUsername() + "!");
     }
-    
+
     public void setCont(Controller cont) {
         this.cont = cont;
     }
@@ -93,8 +91,8 @@ public class ShopWindowController implements Initializable {
     public Controller getCont() {
         return cont;
     }
-    
-     private void configureTableColumns() {
+
+    private void configureTableColumns() {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("name"));
         colGenre.setCellValueFactory(new PropertyValueFactory<>("gameGenre"));
         colPlatform.setCellValueFactory(new PropertyValueFactory<>("platforms"));
@@ -117,13 +115,13 @@ public class ShopWindowController implements Initializable {
             labelGameInfo.setText(selected.getName() + " - " + selected.getPrice() + "€ - Stock: " + selected.getStock());
         }
     }
-    
+
     @FXML
     private void searchGames(ActionEvent event) {
         String name = textFieldSearch.getText();
         String genre = textFieldGenre.getText();
         String platform = textFieldPlatform.getText();
-        
+
         gamesList.clear();
         gamesList.addAll(cont.getGamesFiltered(name, genre, platform));
         tableViewGames.setItems(gamesList);
@@ -135,17 +133,22 @@ public class ShopWindowController implements Initializable {
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("ERROR!");
             success.setHeaderText("No selection!");
-            success.setContentText("Please select a game before attempting deletion of one.");
+            success.setContentText("Please select a game before attempting add it to your cart.");
             success.showAndWait();
         } else {
             // Add cart method here
         }
-    }    
+    }
+
     @FXML
     private void openCart(ActionEvent event) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/CartWindow.fxml"));
-            Parent root = fxmlLoader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CartWindow.fxml"));
+            Parent root = loader.load();
+            CartController cartC = loader.getController();
+            cartC.cargarDatosEjemplo();
+            cartC.actualizarTotales();
+            cartC.actualizarEstadoBotones();
             Stage stage = new Stage();
             stage.setTitle("Your Cart");
             stage.setScene(new Scene(root));
@@ -161,17 +164,13 @@ public class ShopWindowController implements Initializable {
         String name = textFieldSearch.getText();
         String genre = textFieldGenre.getText();
         String platform = textFieldPlatform.getText();
-        
+
         // Si hay filtros aplicados, mantenerlos
         if (!name.isEmpty() || !genre.isEmpty() || !platform.isEmpty()) {
             searchGames(null);
         } else {
             loadAllGames();
         }
-    }
-
-    @FXML
-    private void handleCartButton(ActionEvent event) {
     }
 
     @FXML

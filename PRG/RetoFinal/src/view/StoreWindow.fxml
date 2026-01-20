@@ -35,9 +35,6 @@
                 <TableColumn id="colCompany" fx:id="colCompanyName" prefWidth="119.0" text="Company" />
                 <TableColumn id="colReleaseDate" fx:id="colReleaseDate" prefWidth="107.0" text="ReleaseDate" />
             </columns>
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-            </columnResizePolicy>
          <contextMenu>
             <ContextMenu>
               <items>
@@ -72,7 +69,7 @@
         </ImageView>
         
         <!-- Añadir onAction a los demás botones -->
-        <Button fx:id="buttonCart" layoutX="24.0" layoutY="555.0" mnemonicParsing="false" onAction="#handleCartButton" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Cart" />
+        <Button fx:id="buttonCart" layoutX="24.0" layoutY="555.0" mnemonicParsing="false" onAction="#openCart" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Cart" />
         <Button fx:id="buttonExit" layoutX="755.0" layoutY="555.0" mnemonicParsing="false" onAction="#handleExitButton" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: F08080; -fx-border-color: #000000;" text="Exit" />
         <Button fx:id="buttonReview" layoutX="156.0" layoutY="555.0" mnemonicParsing="false" onAction="#handleReviewButton" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Review" />
     </children>
