@@ -35,9 +35,6 @@ public class CartController {
     @FXML
     private Button buttonEliminar;
 
-    @FXML
-    private Button buttonCancelar;
-
     private Stage stage;
     private ObservableList<String> carritoData;
     private int indiceSeleccionado = -1;
@@ -49,21 +46,12 @@ public class CartController {
         carritoData = FXCollections.observableArrayList();
         listViewCarrito.setItems(carritoData);
 
-        // Cargar datos de ejemplo
-        cargarDatosEjemplo();
-
-        // Actualizar totales
-        actualizarTotales();
-
-        // Deshabilitar botones inicialmente
-        actualizarEstadoBotones();
-
         // Configurar selección de item
         listViewCarrito.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> mostrarDetalleItem(newValue));
     }
 
-    private void cargarDatosEjemplo() {
+    public void cargarDatosEjemplo() {
         // Datos de ejemplo para probar
         carritoData.add("Usuario: 1 | Videojuego: FIFA 23 | Cantidad: 2 | Precio: $59.99");
         carritoData.add("Usuario: 1 | Videojuego: Call of Duty | Cantidad: 1 | Precio: $69.99");
@@ -153,7 +141,7 @@ public class CartController {
         }
     }
 
-    private void actualizarEstadoBotones() {
+    public void actualizarEstadoBotones() {
         boolean hayItemSeleccionado = (indiceSeleccionado >= 0);
 
         // Habilitar/deshabilitar botones + y -
@@ -192,7 +180,7 @@ public class CartController {
                 success.setContentText("Tu compra se ha realizado correctamente.");
                 success.showAndWait();
 
-                Stage currentStage = (Stage) buttonCancelar.getScene().getWindow();
+                Stage currentStage = (Stage) buttonComprar.getScene().getWindow();
                 currentStage.close();
             }
         });
@@ -237,7 +225,7 @@ public class CartController {
         stage.close();
     }
 
-    private void actualizarTotales() {
+    public void actualizarTotales() {
         int totalItems = 0;
         double totalPagar = 0.0;
 

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.CarritoController">
+<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CartController">
    
     <children>
         <!-- Título -->
@@ -85,7 +85,7 @@
                 <Font size="15.0" />
             </font>
         </Label>
-        <Label fx:id="labelTotalItems1" layoutX="170.0" layoutY="416.0" prefWidth="60.0" text="0">
+        <Label fx:id="labelTotalPagar" layoutX="170.0" layoutY="416.0" prefWidth="60.0" text="0">
             <font>
                 <Font size="15.0" />
             </font>
