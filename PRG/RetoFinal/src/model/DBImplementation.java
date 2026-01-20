@@ -14,9 +14,10 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Logs in a user or admin from the database.
+     *
      * @param username
      * @param password
-     * @return 
+     * @return
      */
     @Override
     public Profile logIn(String username, String password) {
@@ -177,10 +178,11 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Deletes a user selected by admin from the database.
+     *
      * @param usernameToDelete
      * @param adminUsername
      * @param adminPassword
-     * @return 
+     * @return
      */
     @Override
     public boolean dropOutAdmin(String usernameToDelete, String adminUsername, String adminPassword) {
@@ -264,6 +266,7 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Modifies the information of a user in the database.
+     *
      * @param password
      * @param email
      * @param name
@@ -271,11 +274,10 @@ public class DBImplementation implements ClassDAO {
      * @param username
      * @param gender
      * @param surname
-     * @return 
+     * @return
      */
     @Override
     public boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender) {
-
         Session session = HibernateSession.getSessionFactory().openSession();
         Transaction transaction = null;
 
@@ -325,7 +327,8 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Retrieves a list of usernames from the database.
-     * @return 
+     *
+     * @return
      */
     @Override
     public List<String> comboBoxInsert() {
@@ -354,8 +357,9 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Método adicional para verificar si un username existe
+     *
      * @param username
-     * @return 
+     * @return
      */
     public boolean userExists(String username) {
         Session session = HibernateSession.getSessionFactory().openSession();
@@ -380,8 +384,9 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Método adicional para obtener un usuario por username
+     *
      * @param username
-     * @return 
+     * @return
      */
     public User getUserByUsername(String username) {
         Session session = HibernateSession.getSessionFactory().openSession();
@@ -406,28 +411,28 @@ public class DBImplementation implements ClassDAO {
     @Override
     public boolean addGame(Videogame game) {
         boolean success = false;
-        
+
         return success;
     }
 
     @Override
     public boolean modifyGame(Videogame game) {
         boolean success = false;
-        
+
         return success;
     }
 
     @Override
     public boolean deleteGame(Videogame game) {
         boolean success = false;
-        
+
         return success;
     }
 
     @Override
     public boolean addToCart(Videogame game) {
         boolean success = false;
-        
+
         return success;
     }
 }

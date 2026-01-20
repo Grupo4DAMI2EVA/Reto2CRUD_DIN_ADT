@@ -1,17 +1,20 @@
-//package controller;
+package controller;
 
+import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import model.Videogame;
+import javafx.fxml.*;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import model.*;
 
 public class ShopWindowController implements Initializable {
 
@@ -22,21 +25,21 @@ public class ShopWindowController implements Initializable {
     @FXML
     private TableView<Videogame> tableViewGames;
     @FXML
-    private TableColumn<?, ?> colTitle;
+    private TableColumn<Videogame, String> colTitle;
     @FXML
-    private TableColumn<?, ?> colGenre;
+    private TableColumn<Videogame, GameGenre> colGenre;
     @FXML
-    private TableColumn<?, ?> colPlatform;
+    private TableColumn<Videogame, Platform> colPlatform;
     @FXML
-    private TableColumn<?, ?> colPrice;
+    private TableColumn<Videogame, Integer> colPrice;
     @FXML
-    private TableColumn<?, ?> colPegi;
+    private TableColumn<Videogame, String> colPegi;
     @FXML
-    private TableColumn<?, ?> colStock;
+    private TableColumn<Videogame, PEGI> colStock;
     @FXML
-    private TableColumn<?, ?> colCompanyName;
+    private TableColumn<Videogame, String> colCompanyName;
     @FXML
-    private TableColumn<?, ?> colReleaseDate;
+    private TableColumn<Videogame, LocalDate> colReleaseDate;
     @FXML
     private TextField textFieldSearch;
     @FXML
@@ -81,6 +84,22 @@ public class ShopWindowController implements Initializable {
             success.showAndWait();
         } else {
             // Add cart method here
+        }
+    }
+    
+    @FXML
+    private void openCart(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/CartWindow.fxml"));
+            Parent root = fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Your Cart");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

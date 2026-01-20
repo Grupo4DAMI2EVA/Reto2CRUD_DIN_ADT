@@ -1,6 +1,7 @@
 package controller;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 import javafx.fxml.*;
 import javafx.scene.control.*;
@@ -19,7 +20,7 @@ public class AddGamesAdminController implements Initializable {
     @FXML
     private Spinner<Integer> spinnerStock;
     @FXML
-    private ComboBox<Genre> comboBoxGenre;
+    private ComboBox<GameGenre> comboBoxGenre;
     @FXML
     private Spinner<Double> spinnerPrice;
     @FXML
@@ -37,7 +38,7 @@ public class AddGamesAdminController implements Initializable {
 
     @FXML
     private void addGame(MouseEvent event) {
-        //DB stuff not ready yet
+        //DB stuff and checks not ready yet
 
         Alert success = new Alert(Alert.AlertType.INFORMATION);
         success.setTitle("Game added successfully!");
@@ -53,6 +54,15 @@ public class AddGamesAdminController implements Initializable {
         if (choice.getResult().equals(ButtonType.CLOSE)) {
             Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
             currentStage.close();
+        } else {
+            textFieldName.clear();
+            comboBoxPlatforms.valueProperty().set(null);
+            textFieldCompany.clear();
+            spinnerStock.getValueFactory().setValue(0);
+            comboBoxGenre.valueProperty().set(null);
+            spinnerPrice.getValueFactory().setValue(0.0);
+            textFieldPEGI.clear();
+            datePickerReleaseDate.setValue(LocalDate.now());
         }
     }
 

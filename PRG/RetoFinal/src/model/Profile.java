@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import javax.persistence.*;
 
 /**
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)  // Herencia con JOINED
 @Table(name = "PROFILE_")
-public abstract class Profile {
+public abstract class Profile implements Serializable {
    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
