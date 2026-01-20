@@ -19,6 +19,10 @@ public interface ClassDAO {
 
     public List comboBoxInsert();
     
+    public boolean userExists(String username);
+    
+    public User getUserByUsername(String username);
+    
     public boolean addGame(Videogame game);
     
     public boolean modifyGame(Videogame game);

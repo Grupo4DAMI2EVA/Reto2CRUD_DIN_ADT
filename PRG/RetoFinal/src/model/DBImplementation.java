@@ -363,6 +363,7 @@ public class DBImplementation implements ClassDAO {
      * @param username
      * @return
      */
+    @Override
     public boolean userExists(String username) {
         Session session = HibernateSession.getSessionFactory().openSession();
 
@@ -390,6 +391,7 @@ public class DBImplementation implements ClassDAO {
      * @param username
      * @return
      */
+    @Override
     public User getUserByUsername(String username) {
         Session session = HibernateSession.getSessionFactory().openSession();
 
@@ -472,6 +474,7 @@ public class DBImplementation implements ClassDAO {
      * @param platform Platform (can be null or empty)
      * @return List of filtered videogames
      */
+    @Override
     public List<Videogame> getGamesFiltered(String name, String genre, String platform) {
         Session session = HibernateSession.getSessionFactory().openSession();
         List<Videogame> games = new ArrayList<>();

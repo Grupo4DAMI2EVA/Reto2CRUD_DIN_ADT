@@ -60,13 +60,12 @@ public class ShopWindowController implements Initializable {
     private Videogame selected;
     private Profile profile;
     private Controller cont;
-    private DBImplementation db;
     private ObservableList<Videogame> gamesList;
 
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        db = new DBImplementation();
+        cont = new Controller();
         gamesList = FXCollections.observableArrayList();
         
          // Configurar las columnas de la tabla
@@ -83,8 +82,7 @@ public class ShopWindowController implements Initializable {
 
     public void setUsuario(Profile profile) {
         this.profile = profile;
-        labelWelcome.setText("Welcome, " + profile.getUsername() + "!");
-        
+        labelWelcome.setText("Welcome, " + this.profile.getUsername() + "!");
     }
     
     public void setCont(Controller cont) {
@@ -108,7 +106,7 @@ public class ShopWindowController implements Initializable {
 
     private void loadAllGames() {
         gamesList.clear();
-        gamesList.addAll(db.getAllGames());
+        gamesList.addAll(cont.getAllGames());
         tableViewGames.setItems(gamesList);
     }
 
@@ -126,7 +124,7 @@ public class ShopWindowController implements Initializable {
         String platform = textFieldPlatform.getText();
         
         gamesList.clear();
-        gamesList.addAll(db.getGamesFiltered(name, genre, platform));
+        gamesList.addAll(cont.getGamesFiltered(name, genre, platform));
         tableViewGames.setItems(gamesList);
     }
 
@@ -136,7 +134,7 @@ public class ShopWindowController implements Initializable {
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("ERROR!");
             success.setHeaderText("No selection!");
-            success.setContentText("Please select a game before attempting deletion of one.");
+            success.setContentText("Please select a game before attempting add it to your cart.");
             success.showAndWait();
         } else {
             // Add cart method here
@@ -169,10 +167,6 @@ public class ShopWindowController implements Initializable {
         } else {
             loadAllGames();
         }
-    }
-
-    @FXML
-    private void handleCartButton(ActionEvent event) {
     }
 
     @FXML
