@@ -9,18 +9,10 @@ import javafx.collections.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
 import javafx.scene.*;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import model.*;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.stage.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import model.DBImplementation;
-import model.Profile;
-import model.Videogame;
+import model.*;
 
 public class ShopWindowController implements Initializable {
 
