@@ -149,6 +149,7 @@ public class ShopWindowController implements Initializable {
             cartC.cargarDatosEjemplo();
             cartC.actualizarTotales();
             cartC.actualizarEstadoBotones();
+            cartC.setup();
             Stage stage = new Stage();
             stage.setTitle("Your Cart");
             stage.setScene(new Scene(root));

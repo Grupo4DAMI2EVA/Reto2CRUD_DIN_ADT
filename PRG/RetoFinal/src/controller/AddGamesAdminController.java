@@ -1,6 +1,7 @@
 package controller;
 
 import java.net.URL;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 import javafx.fxml.*;
@@ -24,7 +25,7 @@ public class AddGamesAdminController implements Initializable {
     @FXML
     private Spinner<Double> spinnerPrice;
     @FXML
-    private TextField textFieldPEGI;
+    private ComboBox<PEGI> comboBoxPEGI;
     @FXML
     private DatePicker datePickerReleaseDate;
     @FXML
@@ -38,35 +39,43 @@ public class AddGamesAdminController implements Initializable {
 
     @FXML
     private void addGame(MouseEvent event) {
-        //DB stuff and checks not ready yet
+        if (cont.addGame(textFieldCompany.getText(), comboBoxGenre.getValue(), textFieldName.getText(),
+                comboBoxPlatforms.getValue(), comboBoxPEGI.getValue(), spinnerPrice.getValue(), spinnerStock.getValue(), Date.valueOf(datePickerReleaseDate.getValue()))) {
+            Alert success = new Alert(Alert.AlertType.INFORMATION);
+            success.setTitle("Game added successfully!");
+            success.setHeaderText(textFieldName.getText() + " was added successfully.");
+            //Game title in the content and header
+            success.setContentText("The game " + textFieldName.getText() + " was successfully added to the list of games in the store.");
+            success.showAndWait();
 
-        Alert success = new Alert(Alert.AlertType.INFORMATION);
-        success.setTitle("Game added successfully!");
-        success.setHeaderText(textFieldName.getText() + " was added successfully.");
-        //Game title in the content and header
-        success.setContentText("The game " + textFieldName.getText() + " was successfully added to the list of games in the store.");
-        success.showAndWait();
-
-        Alert choice = new Alert(Alert.AlertType.CONFIRMATION);
-        choice.setTitle("Add more?");
-        choice.setHeaderText("Do you want to add more games?");
-        choice.showAndWait();
-        if (choice.getResult().equals(ButtonType.CLOSE)) {
-            Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
-            currentStage.close();
+            Alert choice = new Alert(Alert.AlertType.CONFIRMATION);
+            choice.setTitle("Add more?");
+            choice.setHeaderText("Do you want to add more games?");
+            choice.showAndWait();
+            if (choice.getResult().equals(ButtonType.CLOSE)) {
+                Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
+                currentStage.close();
+            } else {
+                textFieldName.clear();
+                comboBoxPlatforms.valueProperty().set(null);
+                textFieldCompany.clear();
+                spinnerStock.getValueFactory().setValue(0);
+                comboBoxGenre.valueProperty().set(null);
+                spinnerPrice.getValueFactory().setValue(0.0);
+                comboBoxPEGI.valueProperty().set(null);
+                datePickerReleaseDate.setValue(LocalDate.now());
+            }
         } else {
-            textFieldName.clear();
-            comboBoxPlatforms.valueProperty().set(null);
-            textFieldCompany.clear();
-            spinnerStock.getValueFactory().setValue(0);
-            comboBoxGenre.valueProperty().set(null);
-            spinnerPrice.getValueFactory().setValue(0.0);
-            textFieldPEGI.clear();
-            datePickerReleaseDate.setValue(LocalDate.now());
+            Alert error = new Alert(Alert.AlertType.ERROR);
+            error.setTitle("ERROR");
+            error.setContentText("There was an error while attempting to add the game. Check the fields to see if anything's wrong.");
+            error.showAndWait();
         }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        comboBoxGenre.getItems().addAll(GameGenre.values());
+        comboBoxPlatforms.getItems().addAll(Platform.values());
     }
 }

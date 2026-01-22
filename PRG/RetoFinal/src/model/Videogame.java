@@ -28,9 +28,10 @@ public class Videogame implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "platform")
     private Platform platforms;
-
+    
+    @Enumerated(EnumType.STRING)
     @Column(name = "pegi")
-    private int pegi;
+    private PEGI pegi;
 
     @Column(name = "price")
     private double price;
@@ -51,7 +52,7 @@ public class Videogame implements Serializable {
     public Videogame() {
     }
 
-    public Videogame(String companyName, GameGenre gameGenre, String name, Platform platforms, int pegi, double price, int stock, Date releaseDate) {
+    public Videogame(String companyName, GameGenre gameGenre, String name, Platform platforms, PEGI pegi, double price, int stock, Date releaseDate) {
         this.companyName = companyName;
         this.gameGenre = gameGenre;
         this.name = name;
@@ -103,11 +104,11 @@ public class Videogame implements Serializable {
         this.platforms = platforms;
     }
 
-    public int getPegi() {
+    public PEGI getPegi() {
         return pegi;
     }
 
-    public void setPegi(int pegi) {
+    public void setPegi(PEGI pegi) {
         this.pegi = pegi;
     }
 

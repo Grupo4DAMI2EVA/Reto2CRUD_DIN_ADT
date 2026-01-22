@@ -40,8 +40,11 @@ public class CartController {
     private int indiceSeleccionado = -1;
     private int cantidadActual = 0;
 
-    @FXML
     private void initialize() {
+        
+    }
+    
+    public void setup() {
         // Inicializar la lista de items del carrito
         carritoData = FXCollections.observableArrayList();
         listViewCarrito.setItems(carritoData);
