@@ -1,5 +1,6 @@
 package model;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,20 +19,20 @@ public interface ClassDAO {
     public boolean modificarUser(String password, String email, String name, String telephone, String surname, String username, String gender);
 
     public List comboBoxInsert();
-    
+
     public boolean userExists(String username);
-    
+
     public User getUserByUsername(String username);
-    
-    public boolean addGame(Videogame game);
-    
+
+    public boolean addGame(String companyName, GameGenre gameGenre, String name, Platform platforms, PEGI pegi, double price, int stock, Date releaseDate);
+
     public boolean modifyGame(Videogame game);
-    
+
     public boolean deleteGame(Videogame game);
-    
+
     public boolean addToCart(Videogame game);
-    
+
     public List<Videogame> getAllGames();
-    
+
     public List<Videogame> getGamesFiltered(String name, String genre, String platform);
 }

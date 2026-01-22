@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
@@ -413,10 +414,46 @@ public class DBImplementation implements ClassDAO {
     }
 
     @Override
-    public boolean addGame(Videogame game) {
-        boolean success = false;
+    public boolean addGame(String companyName, GameGenre gameGenre, String name, Platform platforms, PEGI pegi, double price, int stock, Date releaseDate) {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
 
-        return success;
+        try {
+            transaction = session.beginTransaction();
+
+            // Verificar si el username ya existe
+            String checkHql = "SELECT COUNT(u) FROM VIDEOGAME_ v WHERE v.name = :name";
+            Query<Long> checkQuery = session.createQuery(checkHql, Long.class);
+            checkQuery.setParameter("name", name);
+            Long count = checkQuery.uniqueResult();
+
+            if (count > 0) {
+                System.out.println("Game already exists");
+                return false;
+            }
+
+            // Crear y configurar el User
+            Videogame videogame = new Videogame(companyName, gameGenre, name, platforms, pegi, price, stock, releaseDate);
+
+            // Guardar en la base de datos
+            session.save(videogame);
+            transaction.commit();
+
+            System.out.println("Game added correctly: " + videogame);
+            return true;
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on signup: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package controller;
 
+import java.util.Date;
 import java.util.List;
 import model.*;
 
@@ -85,8 +86,8 @@ public class Controller {
         return dao.getUserByUsername(username);
     }
     
-    public boolean addGame(Videogame game) {
-        return dao.addGame(game);
+    public boolean addGame(String companyName, GameGenre gameGenre, String name, Platform platforms, PEGI pegi, double price, int stock, Date releaseDate) {
+        return dao.addGame(companyName, gameGenre, name, platforms, pegi, price, stock, releaseDate);
     }
     
     public boolean modifyGame(Videogame game) {
