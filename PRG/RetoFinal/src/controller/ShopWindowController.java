@@ -41,9 +41,9 @@ public class ShopWindowController implements Initializable {
     @FXML
     private TextField textFieldSearch;
     @FXML
-    private TextField textFieldGenre;
+    private ComboBox<GameGenre> comboBoxGenre;
     @FXML
-    private TextField textFieldPlatform;
+    private ComboBox<Platform> comboBoxPlatform;
     @FXML
     private Button buttonSearch;
     @FXML
@@ -69,6 +69,16 @@ public class ShopWindowController implements Initializable {
 
         // Configurar las columnas de la tabla
         configureTableColumns();
+
+        // Inicializar ComboBoxes
+        comboBoxGenre.getItems().addAll(GameGenre.values());
+        comboBoxPlatform.getItems().addAll(Platform.values());
+        
+        // Agregar opción "All" a los ComboBoxes
+        comboBoxGenre.getItems().add(0, null);
+        comboBoxPlatform.getItems().add(0, null);
+        comboBoxGenre.setValue(null);
+        comboBoxPlatform.setValue(null);
 
         // Cargar todos los juegos inicialmente
         loadAllGames();
@@ -119,8 +129,8 @@ public class ShopWindowController implements Initializable {
     @FXML
     private void searchGames(ActionEvent event) {
         String name = textFieldSearch.getText();
-        String genre = textFieldGenre.getText();
-        String platform = textFieldPlatform.getText();
+        String genre = comboBoxGenre.getValue() != null ? comboBoxGenre.getValue().name() : "";
+        String platform = comboBoxPlatform.getValue() != null ? comboBoxPlatform.getValue().name() : "";
 
         gamesList.clear();
         gamesList.addAll(cont.getGamesFiltered(name, genre, platform));
@@ -163,8 +173,8 @@ public class ShopWindowController implements Initializable {
 
     private void refreshGamesList() {
         String name = textFieldSearch.getText();
-        String genre = textFieldGenre.getText();
-        String platform = textFieldPlatform.getText();
+        String genre = comboBoxGenre.getValue() != null ? comboBoxGenre.getValue().name() : "";
+        String platform = comboBoxPlatform.getValue() != null ? comboBoxPlatform.getValue().name() : "";
 
         // Si hay filtros aplicados, mantenerlos
         if (!name.isEmpty() || !genre.isEmpty() || !platform.isEmpty()) {
