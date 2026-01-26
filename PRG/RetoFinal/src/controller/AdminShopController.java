@@ -57,13 +57,12 @@ public class AdminShopController implements Initializable {
     private Button buttonModify;
     @FXML
     private Button buttonDelete;
-    @FXML
-    private ImageView helpIcon;
-    
+
     private Profile profile;
     private Controller cont;
     private Videogame selected;
-    
+    @FXML
+    private MenuItem menuHelp;
 
     public void setUsuario(Profile profile) {
         this.profile = profile;
@@ -74,7 +73,6 @@ public class AdminShopController implements Initializable {
         this.cont = cont;
     }
 
-    @FXML
     private void addGame(ActionEvent event) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/AddGamesWindow.fxml"));
@@ -99,7 +97,26 @@ public class AdminShopController implements Initializable {
             success.setContentText("Please select a game before attempting a modification.");
             success.showAndWait();
         } else {
-            // Modify method here
+            if (selected == null) {
+            Alert success = new Alert(Alert.AlertType.INFORMATION);
+            success.setTitle("ERROR!");
+            success.setHeaderText("No selection!");
+            success.setContentText("Please select a game before attempting deletion of one.");
+            success.showAndWait();
+        } else {
+            if (cont.modifyGame(selected)) {
+                Alert success = new Alert(Alert.AlertType.INFORMATION);
+                success.setTitle("Modify successful!");
+                success.setContentText("The game " + selected.getName() + " was modified correctly.");
+                success.showAndWait();
+            } else {
+                Alert success = new Alert(Alert.AlertType.INFORMATION);
+                success.setTitle("ERROR!");
+                success.setHeaderText("An issue occurred");
+                success.setContentText("The game was failed to be modified. Check the fields and try again.");
+                success.showAndWait();
+            }
+        }
         }
     }
 
@@ -112,23 +129,35 @@ public class AdminShopController implements Initializable {
             success.setContentText("Please select a game before attempting deletion of one.");
             success.showAndWait();
         } else {
-            // Delete controller method here
+            if (cont.deleteGame(selected)) {
+                Alert success = new Alert(Alert.AlertType.INFORMATION);
+                success.setTitle("Delte successful!");
+                success.setContentText("The game " + selected.getName() + " was deleted.");
+                success.showAndWait();
+                selected = null;
+            } else {
+                Alert success = new Alert(Alert.AlertType.INFORMATION);
+                success.setTitle("ERROR!");
+                success.setHeaderText("An issue occurred");
+                success.setContentText("The game was failed to be modified. Check the fields and try again.");
+                success.showAndWait();
+            }
         }
     }
-    
+
     @FXML
     private void search(ActionEvent event) {
         // To be done
     }
-    
+
     @FXML
-    private void helpWindow(MouseEvent event) {
+    private void helpWindow(ActionEvent event) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/HelpWindow.fxml"));
             Parent root = fxmlLoader.load();
             Stage stage = new Stage();
             stage.setTitle("Help Window");
-            stage.setScene(new Scene(root));    
+            stage.setScene(new Scene(root));
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
@@ -137,7 +166,6 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    @FXML
     private void getSelectedTableItem(ActionEvent event) {
         selected = tableViewGames.getSelectionModel().getSelectedItem();
         if (selected != null) {
@@ -145,14 +173,28 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    @FXML
-    private void exit(ActionEvent event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.close();
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        ImageView helpIcon = new ImageView("../images/Help_icon.png");
+        menuHelp.setGraphic(helpIcon);
+    }
 
+    @FXML
+    private void exit(MouseEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
+            Parent root = fxmlLoader.load();
+            MenuWindowController controllerWindow = fxmlLoader.getController();
+            controllerWindow.setUsuario(profile);
+            controllerWindow.setCont(cont);
+            Stage stage = new Stage();
+            stage.setTitle("Main Window");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

@@ -72,10 +72,14 @@ public class AddGamesAdminController implements Initializable {
             error.showAndWait();
         }
     }
+    
+    private void setupCBoxes() {
+        comboBoxGenre.getItems().addAll(GameGenre.values());
+        comboBoxPlatforms.getItems().addAll(Platform.values());
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        comboBoxGenre.getItems().addAll(GameGenre.values());
-        comboBoxPlatforms.getItems().addAll(Platform.values());
+        setupCBoxes();
     }
 }
