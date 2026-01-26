@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -57,11 +58,14 @@
                 <Font size="13.0" />
             </font>
         </Label>
-        <RadioButton fx:id="rButtonM" layoutX="110.0" layoutY="389.0" mnemonicParsing="false" text="Man" />
-        <RadioButton fx:id="rButtonW" layoutX="11.0" layoutY="389.0" mnemonicParsing="false" text="Woman" />
-        <RadioButton fx:id="rButtonO" layoutX="185.0" layoutY="389.0" mnemonicParsing="false" text="Other" />
-        <Button fx:id="buttonSignUp" onAction="#signup" layoutX="80.0" layoutY="427.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="105.0" style="-fx-background-color: A7C4E5; -fx-border-color: black;" text="Sign Up" />
-        <Button fx:id="buttonLogIn" onAction="#login" layoutX="151.0" layoutY="457.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="52.0" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: black; -fx-cursor: hand; -fx-text-fill: blue;" text="Log In" />
+        <RadioButton fx:id="rButtonM" layoutX="110.0" layoutY="389.0" mnemonicParsing="false" text="Man">
+         <toggleGroup>
+            <ToggleGroup fx:id="RadioButtonGroup" />
+         </toggleGroup></RadioButton>
+        <RadioButton fx:id="rButtonW" layoutX="11.0" layoutY="389.0" mnemonicParsing="false" text="Woman" toggleGroup="$RadioButtonGroup" />
+        <RadioButton fx:id="rButtonO" layoutX="185.0" layoutY="389.0" mnemonicParsing="false" text="Other" toggleGroup="$RadioButtonGroup" />
+        <Button fx:id="buttonSignUp" layoutX="80.0" layoutY="427.0" mnemonicParsing="false" onAction="#signup" prefHeight="30.0" prefWidth="105.0" style="-fx-background-color: A7C4E5; -fx-border-color: black;" text="Sign Up" />
+        <Button fx:id="buttonLogIn" layoutX="151.0" layoutY="457.0" mnemonicParsing="false" onAction="#login" prefHeight="30.0" prefWidth="52.0" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: black; -fx-cursor: hand; -fx-text-fill: blue;" text="Log In" />
         <Label alignment="CENTER" prefHeight="40.0" prefWidth="270.0" text="Sign Up">
             <font>
                 <Font name="CaskaydiaMono NFM Regular" size="21.0" />

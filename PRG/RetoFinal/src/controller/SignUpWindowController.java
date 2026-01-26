@@ -21,17 +21,18 @@ public class SignUpWindowController implements Initializable {
     private static final Logger logger = Logger.getLogger(SignUpWindowController.class.getName());
     private static boolean loggerInitialized = false;
     
+    // USANDO LOS NOMBRES ORIGINALES DE TU FXML
     @FXML
     private TextField textFieldEmail, textFieldName, textFieldSurname, textFieldTelephone;
     @FXML
-    private TextField textFieldCardNumber, textFieldPassword, textFieldConfirmPassword, textFieldUsername;
+    private TextField textFieldCardN, textFieldPassword, textFieldCPassword, textFieldUsername; // NOMBRES ORIGINALES
     @FXML
-    private RadioButton radioButtonMale, radioButtonFemale, radioButtonOther;
+    private RadioButton rButtonM, rButtonW, rButtonO; // NOMBRES ORIGINALES
     @FXML
     private Button buttonSignUp, buttonLogIn;
 
     private Controller cont;
-    private ToggleGroup genderGroup;
+    private ToggleGroup grupOp; // Nombre original
 
     static {
         initializeLogger();
@@ -48,7 +49,7 @@ public class SignUpWindowController implements Initializable {
                 logsFolder.mkdirs();
             }
             
-            Handler fileHandler = new FileHandler("logs/signup.log", true);
+            Handler fileHandler = new FileHandler("logs/signup_working.log", true);
             
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
@@ -69,31 +70,31 @@ public class SignUpWindowController implements Initializable {
             logger.setUseParentHandlers(false);
             
             loggerInitialized = true;
-            logger.info("SignUpWindowController logger initialized");
+            logger.info("SignUpWindowController logger initialized - USING ORIGINAL NAMES");
             
         } catch (Exception e) {
-            System.err.println("ERROR initializing logger: " + e.getMessage());
+            System.err.println("ERROR initializing logger: " + e.toString());
             loggerInitialized = true;
         }
     }
 
     public void setController(Controller cont) {
         try {
+            logger.info("setController called");
             this.cont = cont;
-            logger.info("Main controller set for SignUpWindowController");
         } catch (Exception e) {
-            logger.severe("Error setting main controller: " + e.getMessage());
+            logger.severe("Error in setController: " + e.toString());
         }
     }
 
     @FXML
     private void login() {
         try {
-            logger.info("Navigating to login window");
+            logger.info("Opening login window");
             
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/LogInWindow.fxml"));
             Parent root = fxmlLoader.load();
-            LogInWindowController controllerWindow = fxmlLoader.getController();
+            
             Stage stage = new Stage();
             stage.setTitle("Login");
             stage.setScene(new Scene(root));
@@ -102,242 +103,132 @@ public class SignUpWindowController implements Initializable {
             Stage currentStage = (Stage) buttonLogIn.getScene().getWindow();
             currentStage.close();
             
-            logger.info("Successfully navigated to login window");
-            
         } catch (Exception e) {
-            logger.severe("Error navigating to login window: " + e.getMessage());
-            showAlert("Error", "Could not open the login window.");
+            logger.severe("Error opening login window: " + e.toString());
+            showAlert("Error", "Could not open login window");
         }
     }
 
     @FXML
     private void signup() {
         try {
-            logger.info("Starting signup process");
+            logger.info("=== SIGNUP STARTED ===");
             
+            // Verificar campos
+            logger.info("Field check:");
+            logger.info("  textFieldCardN: " + (textFieldCardN == null ? "NULL" : "OK"));
+            logger.info("  textFieldCPassword: " + (textFieldCPassword == null ? "NULL" : "OK"));
+            logger.info("  rButtonM: " + (rButtonM == null ? "NULL" : "OK"));
+            logger.info("  rButtonW: " + (rButtonW == null ? "NULL" : "OK"));
+            logger.info("  rButtonO: " + (rButtonO == null ? "NULL" : "OK"));
+            
+            // Obtener datos
             String email = textFieldEmail.getText();
             String name = textFieldName.getText();
             String surname = textFieldSurname.getText();
             String telephone = textFieldTelephone.getText();
-            String cardNumber = textFieldCardNumber.getText();
+            String cardNumber = textFieldCardN != null ? textFieldCardN.getText() : "";
             String password = textFieldPassword.getText();
-            String confirmPassword = textFieldConfirmPassword.getText();
+            String confirmPassword = textFieldCPassword != null ? textFieldCPassword.getText() : "";
             String username = textFieldUsername.getText();
             
-            logger.info("Signup attempt - Username: " + username + ", Email: " + email);
+            logger.info("Data collected:");
+            logger.info("  Username: " + username);
+            logger.info("  Email: " + email);
+            logger.info("  Card: " + cardNumber);
+            logger.info("  Password: " + (password.isEmpty() ? "EMPTY" : "SET"));
+            logger.info("  Confirm: " + (confirmPassword.isEmpty() ? "EMPTY" : "SET"));
             
-            if (!validateForm(email, name, surname, telephone, cardNumber, password, confirmPassword, username)) {
-                logger.warning("Form validation failed");
+            // Validar datos requeridos
+            if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                showAlert("Error", "Please fill in all required fields");
                 return;
             }
-
-            String gender = null;
-            if (radioButtonMale.isSelected()) {
-                gender = "Male";
-            } else if (radioButtonFemale.isSelected()) {
-                gender = "Female";
-            } else if (radioButtonOther.isSelected()) {
-                gender = "Other";
-            }
-
+            
+            // Obtener género
+            String gender = getGender();
+            logger.info("Gender: " + gender);
+            
+            // Validar contraseñas
             if (!password.equals(confirmPassword)) {
-                logger.severe("Password mismatch during signup");
-                showAlert("Password Error", "Passwords do not match. Please enter the same password in both fields.");
+                showAlert("Password Error", "Passwords do not match");
                 return;
             }
-
-            logger.info("Creating user account with gender: " + gender);
             
-            if (cont.signUp(gender, cardNumber, username, password, email, name, telephone, surname)) {
-                logger.info("Signup successful for username: " + username);
-                
-                Profile profile = cont.logIn(username, password);
-                if (profile != null) {
-                    logger.info("Auto-login successful after signup");
-                    
-                    try {
-                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
-                        Parent root = fxmlLoader.load();
-                        MenuWindowController controllerWindow = fxmlLoader.getController();
-                        controllerWindow.setUser(profile);
-                        controllerWindow.setController(this.cont);
-                        Stage stage = new Stage();
-                        stage.setScene(new Scene(root));
-                        stage.show();
-                        
-                        Stage currentStage = (Stage) buttonSignUp.getScene().getWindow();
-                        currentStage.close();
-                        
-                        logger.info("Successfully navigated to menu window after signup");
-                        
-                    } catch (Exception e) {
-                        logger.severe("Error navigating to menu after signup: " + e.getMessage());
-                        showAlert("Error", "Account created but could not open the menu.");
-                    }
-                } else {
-                    logger.severe("Auto-login failed after successful signup for: " + username);
-                    showAlert("Error", "Account created but automatic login failed. Please login manually.");
-                }
+            // Validar controlador
+            if (cont == null) {
+                logger.severe("Controller is null");
+                showAlert("System Error", "Application not properly initialized");
+                return;
+            }
+            
+            // Intentar crear cuenta
+            logger.info("Calling cont.signUp()...");
+            boolean success = cont.signUp(gender, cardNumber, username, password, email, name, telephone, surname);
+            
+            if (success) {
+                logger.info("=== SIGNUP SUCCESSFUL ===");
+                showAlert("Success", "Account created successfully!");
+                login(); // Volver al login
             } else {
-                logger.warning("Signup failed for username: " + username);
-                showAlert("Signup Failed", "Could not create account. The username may already be taken.");
+                logger.warning("=== SIGNUP FAILED ===");
+                showAlert("Error", "Could not create account. Username may already exist.");
             }
             
         } catch (Exception e) {
-            logger.severe("Error in signup process: " + e.getMessage());
-            showAlert("Signup Error", "An error occurred during signup. Please try again.");
+            logger.severe("Error in signup: " + e.toString());
+            showAlert("Error", "An error occurred: " + e.getMessage());
         }
     }
-
-    private boolean validateForm(String email, String name, String surname, String telephone, 
-                                String cardNumber, String password, String confirmPassword, String username) {
-        try {
-            logger.info("Validating signup form data");
-            
-            if (username == null || username.trim().isEmpty()) {
-                logger.warning("Validation failed: username empty");
-                showAlert("Validation Error", "Username cannot be empty.");
-                return false;
-            }
-            
-            if (email == null || email.trim().isEmpty()) {
-                logger.warning("Validation failed: email empty");
-                showAlert("Validation Error", "Email cannot be empty.");
-                return false;
-            }
-            
-            if (!email.contains("@") || !email.contains(".")) {
-                logger.warning("Validation failed: invalid email format");
-                showAlert("Validation Error", "Please enter a valid email address.");
-                return false;
-            }
-            
-            if (name == null || name.trim().isEmpty()) {
-                logger.warning("Validation failed: name empty");
-                showAlert("Validation Error", "Name cannot be empty.");
-                return false;
-            }
-            
-            if (surname == null || surname.trim().isEmpty()) {
-                logger.warning("Validation failed: surname empty");
-                showAlert("Validation Error", "Surname cannot be empty.");
-                return false;
-            }
-            
-            if (password == null || password.trim().isEmpty()) {
-                logger.warning("Validation failed: password empty");
-                showAlert("Validation Error", "Password cannot be empty.");
-                return false;
-            }
-            
-            if (password.length() < 6) {
-                logger.warning("Validation failed: password too short");
-                showAlert("Validation Error", "Password must be at least 6 characters long.");
-                return false;
-            }
-            
-            if (cardNumber == null || cardNumber.trim().isEmpty()) {
-                logger.warning("Validation failed: card number empty");
-                showAlert("Validation Error", "Card number cannot be empty.");
-                return false;
-            }
-            
-            if (!cardNumber.matches("\\d+")) {
-                logger.warning("Validation failed: invalid card number format");
-                showAlert("Validation Error", "Card number must contain only numbers.");
-                return false;
-            }
-            
-            if (!radioButtonMale.isSelected() && !radioButtonFemale.isSelected() && !radioButtonOther.isSelected()) {
-                logger.warning("Validation failed: no gender selected");
-                showAlert("Validation Error", "Please select a gender.");
-                return false;
-            }
-            
-            logger.info("Form validation successful");
-            return true;
-            
-        } catch (Exception e) {
-            logger.severe("Error during form validation: " + e.getMessage());
-            showAlert("Validation Error", "An error occurred while validating the form.");
-            return false;
+    
+    private String getGender() {
+        if (rButtonM == null || rButtonW == null || rButtonO == null) {
+            return "Other";
+        }
+        
+        if (rButtonM.isSelected()) {
+            return "Male";
+        } else if (rButtonW.isSelected()) {
+            return "Female";
+        } else if (rButtonO.isSelected()) {
+            return "Other";
+        } else {
+            return "Other"; // Default
         }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            logger.info("Initializing SignUpWindowController");
+            logger.info("Initializing with original names");
             
-            genderGroup = new ToggleGroup();
-            radioButtonMale.setToggleGroup(genderGroup);
-            radioButtonFemale.setToggleGroup(genderGroup);
-            radioButtonOther.setToggleGroup(genderGroup);
+            // Configurar ToggleGroup con nombres originales
+            grupOp = new ToggleGroup();
             
-            clearForm();
+            if (rButtonM != null) rButtonM.setToggleGroup(grupOp);
+            if (rButtonW != null) rButtonW.setToggleGroup(grupOp);
+            if (rButtonO != null) rButtonO.setToggleGroup(grupOp);
             
-            logger.info("SignUpWindowController initialized successfully");
+            logger.info("ToggleGroup configured");
+            logger.info("Initialize completed successfully");
             
         } catch (Exception e) {
-            logger.severe("Error initializing SignUpWindowController: " + e.getMessage());
+            logger.severe("Error in initialize: " + e.toString());
         }
     }
 
     private void showAlert(String title, String message) {
         try {
-            logger.info("Showing alert: " + title + " - " + message);
-            
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.showAndWait();
             
-        } catch (Exception e) {
-            logger.severe("Error showing alert: " + e.getMessage());
-        }
-    }
-
-    public void clearForm() {
-        try {
-            logger.info("Clearing signup form");
-            
-            textFieldEmail.clear();
-            textFieldName.clear();
-            textFieldSurname.clear();
-            textFieldTelephone.clear();
-            textFieldCardNumber.clear();
-            textFieldPassword.clear();
-            textFieldConfirmPassword.clear();
-            textFieldUsername.clear();
-            genderGroup.selectToggle(null);
-            textFieldUsername.requestFocus();
-            
-            logger.info("Signup form cleared");
+            logger.info("Alert: " + title + " - " + message);
             
         } catch (Exception e) {
-            logger.severe("Error clearing form: " + e.getMessage());
-        }
-    }
-
-    public void setDefaultValues() {
-        try {
-            logger.info("Setting default values for testing");
-            
-            textFieldUsername.setText("testuser");
-            textFieldEmail.setText("test@example.com");
-            textFieldName.setText("Test");
-            textFieldSurname.setText("User");
-            textFieldTelephone.setText("123456789");
-            textFieldCardNumber.setText("1234567890123456");
-            textFieldPassword.setText("password123");
-            textFieldConfirmPassword.setText("password123");
-            radioButtonMale.setSelected(true);
-            
-            logger.info("Default values set");
-            
-        } catch (Exception e) {
-            logger.severe("Error setting default values: " + e.getMessage());
+            logger.severe("Error showing alert: " + e.toString());
         }
     }
 }
