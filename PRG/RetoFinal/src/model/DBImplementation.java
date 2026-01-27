@@ -421,8 +421,8 @@ public class DBImplementation implements ClassDAO {
         try {
             transaction = session.beginTransaction();
 
-            // Verificar si el username ya existe
-            String checkHql = "SELECT COUNT(u) FROM VIDEOGAME_ v WHERE v.name = :name";
+            // Verificar si el juego ya existe
+            String checkHql = "SELECT COUNT(v) FROM Videogame v WHERE v.name = :name";
             Query<Long> checkQuery = session.createQuery(checkHql, Long.class);
             checkQuery.setParameter("name", name);
             Long count = checkQuery.uniqueResult();
@@ -432,7 +432,7 @@ public class DBImplementation implements ClassDAO {
                 return false;
             }
 
-            // Crear y configurar el User
+            // Crear y configurar el Videogame
             Videogame videogame = new Videogame(companyName, gameGenre, name, platforms, pegi, price, stock, releaseDate);
 
             // Guardar en la base de datos
@@ -571,5 +571,67 @@ public class DBImplementation implements ClassDAO {
             }
         }
         return games;
+    }
+
+    /**
+     * Creates a new admin in the database with validation.
+     *
+     * @param username
+     * @param password
+     * @param email
+     * @param name
+     * @param telephone
+     * @param surname
+     * @param currentAccount
+     * @return true if admin was created successfully, false otherwise
+     */
+    @Override
+    public boolean createAdmin(String username, String password, String email, String name, String telephone, String surname, String currentAccount) {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Verificar si el username ya existe
+            String checkHql = "SELECT COUNT(p) FROM Profile p WHERE p.username = :username";
+            Query<Long> checkQuery = session.createQuery(checkHql, Long.class);
+            checkQuery.setParameter("username", username);
+            Long count = checkQuery.uniqueResult();
+
+            if (count > 0) {
+                System.out.println("Username ya existe: " + username);
+                return false;
+            }
+
+            // Crear y configurar el Admin
+            Admin newAdmin = new Admin();
+            newAdmin.setUsername(username);
+            newAdmin.setPassword(password);
+            newAdmin.setEmail(email);
+            newAdmin.setName(name);
+            newAdmin.setTelephone(telephone);
+            newAdmin.setSurname(surname);
+            newAdmin.setCurrentAccount(currentAccount);
+
+            // Guardar en la base de datos
+            session.save(newAdmin);
+            transaction.commit();
+
+            System.out.println("Admin registrado exitosamente: " + username);
+            return true;
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on creating admin: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
 }

@@ -5,10 +5,12 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.logging.*;
+import javafx.collections.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.*;
@@ -16,7 +18,6 @@ import model.*;
 
 public class AdminShopController implements Initializable {
 
-    private Label label_Username;
     @FXML
     private Label labelWelcome;
     @FXML
@@ -63,15 +64,17 @@ public class AdminShopController implements Initializable {
     private Profile profile;
     private Controller cont;
     private Videogame selected;
+    private ObservableList<Videogame> gamesList;
     
 
     public void setUsuario(Profile profile) {
         this.profile = profile;
-        label_Username.setText(profile.getUsername());
+        labelWelcome.setText("Welcome, " + profile.getUsername());
     }
 
     public void setCont(Controller cont) {
         this.cont = cont;
+        loadAllGames();
     }
 
     @FXML
@@ -79,6 +82,11 @@ public class AdminShopController implements Initializable {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/AddGamesWindow.fxml"));
             Parent root = fxmlLoader.load();
+            
+            AddGamesAdminController controllerWindow = fxmlLoader.getController();
+            controllerWindow.setCont(cont);
+            controllerWindow.setAdminShopController(this);
+            
             Stage stage = new Stage();
             stage.setTitle("Add Game Window");
             stage.setScene(new Scene(root));
@@ -106,19 +114,52 @@ public class AdminShopController implements Initializable {
     @FXML
     private void deleteGame(ActionEvent event) {
         if (selected == null) {
-            Alert success = new Alert(Alert.AlertType.INFORMATION);
-            success.setTitle("ERROR!");
-            success.setHeaderText("No selection!");
-            success.setContentText("Please select a game before attempting deletion of one.");
-            success.showAndWait();
+            Alert error = new Alert(Alert.AlertType.INFORMATION);
+            error.setTitle("ERROR!");
+            error.setHeaderText("No selection!");
+            error.setContentText("Please select a game before attempting deletion of one.");
+            error.showAndWait();
         } else {
-            // Delete controller method here
+            // Confirmación antes de eliminar
+            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmation.setTitle("Confirm Deletion");
+            confirmation.setHeaderText("Delete game: " + selected.getName());
+            confirmation.setContentText("Are you sure you want to delete this game? This action cannot be undone.");
+            confirmation.showAndWait();
+            
+            if (confirmation.getResult().equals(ButtonType.OK)) {
+                // Intentar eliminar el juego
+                if (cont.deleteGame(selected)) {
+                    Alert success = new Alert(Alert.AlertType.INFORMATION);
+                    success.setTitle("Success!");
+                    success.setHeaderText("Game deleted successfully");
+                    success.setContentText("The game \"" + selected.getName() + "\" has been removed from the store.");
+                    success.showAndWait();
+                    
+                    // Recargar la tabla
+                    loadAllGames();
+                    selected = null;
+                    labelGameInfo.setText("Select a game");
+                } else {
+                    Alert error = new Alert(Alert.AlertType.ERROR);
+                    error.setTitle("ERROR!");
+                    error.setHeaderText("Deletion failed");
+                    error.setContentText("There was an error deleting the game. Please try again.");
+                    error.showAndWait();
+                }
+            }
         }
     }
     
     @FXML
     private void search(ActionEvent event) {
-        // To be done
+        String name = textFieldSearch.getText();
+        String genre = textFieldGenre.getText();
+        String platform = textFieldPlatform.getText();
+
+        gamesList.clear();
+        gamesList.addAll(cont.getGamesFiltered(name, genre, platform));
+        tableViewGames.setItems(gamesList);
     }
     
     @FXML
@@ -153,6 +194,40 @@ public class AdminShopController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        gamesList = FXCollections.observableArrayList();
 
+        // Configurar las columnas de la tabla
+        configureTableColumns();
+
+        // Configurar listener para selección de fila
+        tableViewGames.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    selected = tableViewGames.getSelectionModel().getSelectedItem();
+                    if (selected != null) {
+                        labelGameInfo.setText(selected.getName() + " - " + selected.getPrice() + "€ - Stock: " + selected.getStock());
+                    }
+                }
+        );
+    }
+
+    private void configureTableColumns() {
+        colTitle.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colGenre.setCellValueFactory(new PropertyValueFactory<>("gameGenre"));
+        colPlatform.setCellValueFactory(new PropertyValueFactory<>("platforms"));
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+        colPegi.setCellValueFactory(new PropertyValueFactory<>("pegi"));
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
+        colCompanyName.setCellValueFactory(new PropertyValueFactory<>("companyName"));
+        colReleaseDate.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
+    }
+
+    private void loadAllGames() {
+        gamesList.clear();
+        gamesList.addAll(cont.getAllGames());
+        tableViewGames.setItems(gamesList);
+    }
+
+    public void reloadGames() {
+        loadAllGames();
     }
 }

@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import model.DBImplementation;
 
 public class Main extends Application {
 
@@ -19,6 +20,25 @@ public class Main extends Application {
             session.close();
 
             System.out.println("Tablas creadas/validadas");
+            
+            // Crear admin por defecto con usuario y contraseña = "admin"
+            DBImplementation db = new DBImplementation();
+            boolean adminCreated = db.createAdmin(
+                "admin",           // username
+                "admin",           // password
+                "admin@store.com", // email
+                "Admin",           // name
+                "000000000",       // telephone
+                "System",          // surname
+                "CTA-ADMIN"        // currentAccount
+            );
+            
+            if (adminCreated) {
+                System.out.println("Admin por defecto creado/validado: admin");
+            } else {
+                System.out.println("Admin 'admin' ya existe o error al crearlo");
+            }
+            
         } catch (Exception e) {
             System.err.println("Error al crear tablas: " + e.getMessage());
             // Decidir si continuar o salir

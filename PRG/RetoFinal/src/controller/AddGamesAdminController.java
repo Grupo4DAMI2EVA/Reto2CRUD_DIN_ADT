@@ -31,10 +31,15 @@ public class AddGamesAdminController implements Initializable {
     @FXML
     private Button buttonAddGame;
     private Controller cont;
+    private AdminShopController adminShopController;
 
     // Set controller instance
     public void setCont(Controller cont) {
         this.cont = cont;
+    }
+
+    public void setAdminShopController(AdminShopController adminShopController) {
+        this.adminShopController = adminShopController;
     }
 
     @FXML
@@ -52,10 +57,14 @@ public class AddGamesAdminController implements Initializable {
             choice.setTitle("Add more?");
             choice.setHeaderText("Do you want to add more games?");
             choice.showAndWait();
-            if (choice.getResult().equals(ButtonType.CLOSE)) {
-                Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
-                currentStage.close();
-            } else {
+            
+            // Recargar la tabla en AdminShopController
+            if (adminShopController != null) {
+                adminShopController.reloadGames();
+            }
+            
+            if (choice.getResult().equals(ButtonType.OK)) {
+                // Si dice OK, limpia los campos para añadir otro juego
                 textFieldName.clear();
                 comboBoxPlatforms.valueProperty().set(null);
                 textFieldCompany.clear();
@@ -64,6 +73,10 @@ public class AddGamesAdminController implements Initializable {
                 spinnerPrice.getValueFactory().setValue(0.0);
                 comboBoxPEGI.valueProperty().set(null);
                 datePickerReleaseDate.setValue(LocalDate.now());
+            } else {
+                // Si dice CANCEL, cierra la ventana
+                Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
+                currentStage.close();
             }
         } else {
             Alert error = new Alert(Alert.AlertType.ERROR);
@@ -77,5 +90,16 @@ public class AddGamesAdminController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         comboBoxGenre.getItems().addAll(GameGenre.values());
         comboBoxPlatforms.getItems().addAll(Platform.values());
+        comboBoxPEGI.getItems().addAll(PEGI.values());
+        
+        // Initialize Spinner for Stock (0 to 1000, step 1, initial value 0)
+        SpinnerValueFactory<Integer> stockValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000, 0, 1);
+        spinnerStock.setValueFactory(stockValueFactory);
+        spinnerStock.setEditable(true);
+        
+        // Initialize Spinner for Price (0.0 to 1000.0, step 0.01, initial value 0.0)
+        SpinnerValueFactory<Double> priceValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1000.0, 0.0, 0.01);
+        spinnerPrice.setValueFactory(priceValueFactory);
+        spinnerPrice.setEditable(true);
     }
 }
