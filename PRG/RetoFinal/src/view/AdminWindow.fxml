@@ -24,14 +24,14 @@
         <Label layoutX="25.0" layoutY="80.0" prefHeight="25.0" prefWidth="200.0" style="-fx-font-weight: bold;" text="Available Games" />
         <TableView id="tableViewGames" fx:id="tableViewGames" layoutX="21.0" layoutY="115.0" prefHeight="350.0" prefWidth="872.0">
             <columns>
-                <TableColumn fx:id="colTitle" prefWidth="250.0" text="Title" />
-                <TableColumn id="col" fx:id="colGenre" prefWidth="120.0" text="Genre" />
-                <TableColumn id="colPlataform" fx:id="colPlatform" prefWidth="120.0" text="Platform" />
-                <TableColumn id="colPrice" fx:id="colPrice" prefWidth="100.0" text="Price (€)" />
-                <TableColumn id="colPegi" fx:id="colPegi" prefWidth="100.0" text="Pegi" />
-                <TableColumn id="colStock" fx:id="colStock" prefWidth="100.0" text="Stock" />
-                <TableColumn id="colCompany" fx:id="colCompanyName" prefWidth="119.0" text="Company" />
-                <TableColumn id="colReleaseDate" fx:id="colReleaseDate" prefWidth="107.0" text="ReleaseDate" />
+                <TableColumn fx:id="colTitle" onEditStart="#getSelectedTableItem" prefWidth="250.0" text="Title" />
+                <TableColumn id="col" fx:id="colGenre" onEditStart="#getSelectedTableItem" prefWidth="120.0" text="Genre" />
+                <TableColumn id="colPlataform" fx:id="colPlatform" onEditStart="#getSelectedTableItem" prefWidth="120.0" text="Platform" />
+                <TableColumn id="colPrice" fx:id="colPrice" onEditStart="#getSelectedTableItem" prefWidth="100.0" text="Price (€)" />
+                <TableColumn id="colPegi" fx:id="colPegi" onEditStart="#getSelectedTableItem" prefWidth="100.0" text="Pegi" />
+                <TableColumn id="colStock" fx:id="colStock" onEditStart="#getSelectedTableItem" prefWidth="100.0" text="Stock" />
+                <TableColumn id="colCompany" fx:id="colCompanyName" onEditStart="#getSelectedTableItem" prefWidth="119.0" text="Company" />
+                <TableColumn id="colReleaseDate" fx:id="colReleaseDate" onEditStart="#getSelectedTableItem" prefWidth="107.0" text="Release Date" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -51,12 +51,12 @@
         <TextField fx:id="textFieldGenre" layoutX="380.0" layoutY="475.0" prefHeight="25.0" prefWidth="120.0" promptText="All" />
         <Label layoutX="510.0" layoutY="480.0" prefHeight="17.0" prefWidth="80.0" text="Platform:" />
         <TextField fx:id="textFieldPlatform" layoutX="590.0" layoutY="475.0" prefHeight="25.0" prefWidth="120.0" promptText="All" />
-        <Button fx:id="buttonSearch" layoutX="720.0" layoutY="475.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000;" text="Search" />
+        <Button fx:id="buttonSearch" layoutX="720.0" layoutY="475.0" mnemonicParsing="false" onAction="#search" prefHeight="25.0" prefWidth="80.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000;" text="Search" />
         <Label layoutX="25.0" layoutY="520.0" prefHeight="25.0" prefWidth="150.0" style="-fx-font-weight: bold;" text="Selected game:" />
         <Label fx:id="labelGameInfo" layoutX="180.0" layoutY="520.0" prefHeight="25.0" prefWidth="400.0" style="-fx-text-fill: #5084C1;" text="Select a game" />
-        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="850.0" layoutY="15.0">
+        <ImageView fx:id="helpIcon" fitHeight="35.0" fitWidth="35.0" layoutX="850.0" layoutY="15.0" onMouseClicked="#helpWindow">
             <image>
-                <Image url="@../images/sports_esports_32dp_5084C1_FILL0_wght400_GRAD0_opsz40.png" />
+                <Image url="@../images/Help_icon.svg.png" />
             </image>
         </ImageView>
         <Button fx:id="buttonAdd" layoutX="25.0" layoutY="555.0" mnemonicParsing="false" onMouseClicked="#addGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Add Game" />

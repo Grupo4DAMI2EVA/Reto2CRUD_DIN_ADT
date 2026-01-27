@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "VIDEOGAME_")
-public class Videogame {
+public class Videogame implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +28,10 @@ public class Videogame {
     @Enumerated(EnumType.STRING)
     @Column(name = "platform")
     private Platform platforms;
-
+    
+    @Enumerated(EnumType.STRING)
     @Column(name = "pegi")
-    private int pegi;
+    private PEGI pegi;
 
     @Column(name = "price")
     private double price;
@@ -50,7 +52,7 @@ public class Videogame {
     public Videogame() {
     }
 
-    public Videogame(String companyName, GameGenre gameGenre, String name, Platform platforms, int pegi, double price, int stock, Date releaseDate) {
+    public Videogame(String companyName, GameGenre gameGenre, String name, Platform platforms, PEGI pegi, double price, int stock, Date releaseDate) {
         this.companyName = companyName;
         this.gameGenre = gameGenre;
         this.name = name;
@@ -102,11 +104,11 @@ public class Videogame {
         this.platforms = platforms;
     }
 
-    public int getPegi() {
+    public PEGI getPegi() {
         return pegi;
     }
 
-    public void setPegi(int pegi) {
+    public void setPegi(PEGI pegi) {
         this.pegi = pegi;
     }
 

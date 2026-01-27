@@ -2,14 +2,14 @@ package model;
 
 import javafx.beans.property.*;
 
-public class CarritoItem {
+public class CartItem {
 
     private final IntegerProperty idUsuario;
     private final IntegerProperty idVideojuego;
     private final IntegerProperty cantidad;
     private final DoubleProperty precio;
 
-    public CarritoItem(int idUsuario, int idVideojuego, int cantidad, double precio) {
+    public CartItem(int idUsuario, int idVideojuego, int cantidad, double precio) {
         this.idUsuario = new SimpleIntegerProperty(idUsuario);
         this.idVideojuego = new SimpleIntegerProperty(idVideojuego);
         this.cantidad = new SimpleIntegerProperty(cantidad);

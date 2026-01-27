@@ -1,6 +1,8 @@
 package controller;
 
 import java.net.URL;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 import javafx.fxml.*;
 import javafx.scene.control.*;
@@ -23,11 +25,11 @@ public class AddGamesAdminController implements Initializable {
     @FXML
     private Spinner<Integer> spinnerStock;
     @FXML
-    private ComboBox<Genre> comboBoxGenre;
+    private ComboBox<GameGenre> comboBoxGenre;
     @FXML
     private Spinner<Double> spinnerPrice;
     @FXML
-    private TextField textFieldPEGI;
+    private ComboBox<PEGI> comboBoxPEGI;
     @FXML
     private DatePicker datePickerReleaseDate;
     @FXML
@@ -116,7 +118,7 @@ public class AddGamesAdminController implements Initializable {
                 return;
             }
             
-            Genre genre = comboBoxGenre.getValue();
+            GameGenre genre = comboBoxGenre.getValue();
             if (genre == null) {
                 logger.severe("Genre not selected for game: " + gameName);
                 showAlert("Error", "You must select a genre.");
@@ -137,8 +139,8 @@ public class AddGamesAdminController implements Initializable {
                 return;
             }
             
-            String pegi = textFieldPEGI.getText();
-            if (pegi == null || pegi.trim().isEmpty()) {
+            PEGI pegi = comboBoxPEGI.getValue();
+            if (pegi == null) {
                 logger.severe("PEGI not specified for game: " + gameName);
                 showAlert("Error", "PEGI rating cannot be empty.");
                 return;
@@ -153,27 +155,35 @@ public class AddGamesAdminController implements Initializable {
             
             logger.info("Game data validated successfully - " + gameName);
             
-            Alert success = new Alert(Alert.AlertType.INFORMATION);
-            success.setTitle("Game added successfully!");
-            success.setHeaderText(gameName + " was added successfully.");
-            success.setContentText("The game " + gameName + " was successfully added to the list of games in the store.");
-            success.showAndWait();
-            
-            logger.info("Game added successfully: " + gameName + " | Platform: " + platform + " | Company: " + company + " | Genre: " + genre + " | Stock: " + stock + " | Price: $" + price + " | PEGI: " + pegi + " | Date: " + releaseDate);
+            if (cont.addGame(company, genre, gameName, platform, pegi, price, stock, Date.valueOf(releaseDate))) {
+                Alert success = new Alert(Alert.AlertType.INFORMATION);
+                success.setTitle("Game added successfully!");
+                success.setHeaderText(gameName + " was added successfully.");
+                success.setContentText("The game " + gameName + " was successfully added to the list of games in the store.");
+                success.showAndWait();
+                
+                logger.info("Game added successfully: " + gameName + " | Platform: " + platform + " | Company: " + company + " | Genre: " + genre + " | Stock: " + stock + " | Price: $" + price + " | PEGI: " + pegi + " | Date: " + releaseDate);
 
-            Alert choice = new Alert(Alert.AlertType.CONFIRMATION);
-            choice.setTitle("Add more?");
-            choice.setHeaderText("Do you want to add more games?");
-            choice.showAndWait();
-            
-            if (choice.getResult().equals(ButtonType.CLOSE)) {
-                logger.info("User closed window after adding game");
-                Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
-                currentStage.close();
-                logger.info("Add games window closed");
+                Alert choice = new Alert(Alert.AlertType.CONFIRMATION);
+                choice.setTitle("Add more?");
+                choice.setHeaderText("Do you want to add more games?");
+                choice.showAndWait();
+                
+                if (choice.getResult().equals(ButtonType.CLOSE)) {
+                    logger.info("User closed window after adding game");
+                    Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
+                    currentStage.close();
+                    logger.info("Add games window closed");
+                } else {
+                    logger.info("User chose to add more games");
+                    clearForm();
+                }
             } else {
-                logger.info("User chose to add more games");
-                clearForm();
+                logger.severe("Database error while adding game: " + gameName);
+                Alert error = new Alert(Alert.AlertType.ERROR);
+                error.setTitle("ERROR");
+                error.setContentText("There was an error while attempting to add the game. Check the fields to see if anything's wrong.");
+                error.showAndWait();
             }
             
         } catch (Exception e) {
@@ -192,7 +202,7 @@ public class AddGamesAdminController implements Initializable {
             spinnerStock.getValueFactory().setValue(1);
             comboBoxGenre.setValue(null);
             spinnerPrice.getValueFactory().setValue(59.99);
-            textFieldPEGI.clear();
+            comboBoxPEGI.setValue(null);
             datePickerReleaseDate.setValue(null);
             
             logger.info("Form cleared successfully");
@@ -254,10 +264,12 @@ public class AddGamesAdminController implements Initializable {
     private void loadComboBoxData() {
         try {
             comboBoxPlatforms.getItems().setAll(Platform.values());
-            comboBoxGenre.getItems().setAll(Genre.values());
+            comboBoxGenre.getItems().setAll(GameGenre.values());
+            comboBoxPEGI.getItems().setAll(PEGI.values());
             
             logger.info("ComboBoxes loaded - Platforms: " + Platform.values().length + 
-                       ", Genres: " + Genre.values().length);
+                       ", Genres: " + GameGenre.values().length + 
+                       ", PEGI: " + PEGI.values().length);
             
         } catch (Exception e) {
             logger.severe("Error loading ComboBox data: " + e.getMessage());

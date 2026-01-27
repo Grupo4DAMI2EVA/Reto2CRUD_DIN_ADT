@@ -11,14 +11,14 @@ import model.ConnectionPool;
  *
  * Author: acer
  */
-public class HiloConnection extends Thread {
+public class ThreadConnection extends Thread {
 
     private int delay = 30;
     private boolean end = false;
     private boolean ready = false;
     private Connection con;
 
-    public HiloConnection(int delay) {
+    public ThreadConnection(int delay) {
         this.delay = delay;
     }
 
@@ -50,7 +50,7 @@ public class HiloConnection extends Thread {
             try {
                 con = ConnectionPool.getConnection();
             } catch (SQLException ex) {
-                Logger.getLogger(HiloConnection.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ThreadConnection.class.getName()).log(Level.SEVERE, null, ex);
             }
             ready = true;
 
@@ -75,7 +75,7 @@ public class HiloConnection extends Thread {
                 try {
                     con.close();
                 } catch (SQLException ex) {
-                    Logger.getLogger(HiloConnection.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ThreadConnection.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }

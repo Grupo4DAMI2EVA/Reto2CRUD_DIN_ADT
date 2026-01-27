@@ -11,20 +11,19 @@ import org.hibernate.SessionFactory;
 
 public class Main extends Application {
 
-    private static void CreateTableHibernate()
-    {
+    private static void CreateTableHibernate() {
         try {
-        
-        SessionFactory  sessionFactory = model.HibernateSession.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.close();
-        
-        System.out.println("Tablas creadas/validadas");
-    } catch (Exception e) {
-        System.err.println("Error al crear tablas: " + e.getMessage());
-        // Decidir si continuar o salir
-        System.exit(1);  // Sale si no puede crear tablas
-    }
+
+            SessionFactory sessionFactory = model.HibernateSession.getSessionFactory();
+            Session session = sessionFactory.openSession();
+            session.close();
+
+            System.out.println("Tablas creadas/validadas");
+        } catch (Exception e) {
+            System.err.println("Error al crear tablas: " + e.getMessage());
+            // Decidir si continuar o salir
+            System.exit(1);  // Sale si no puede crear tablas
+        }
     }
 
     /**
@@ -49,10 +48,6 @@ public class Main extends Application {
      */
     public static void main(String[] args) {
         CreateTableHibernate();
-        
         launch(args);
-        
     }
-    
-    
 }

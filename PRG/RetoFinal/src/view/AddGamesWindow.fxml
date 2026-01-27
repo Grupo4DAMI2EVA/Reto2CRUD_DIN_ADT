@@ -39,7 +39,6 @@
                 <Font size="13.0" />
             </font>
         </Label>
-        <TextField fx:id="textFieldPEGI" layoutX="388.0" layoutY="173.0" prefHeight="27.0" prefWidth="170.0" />
         <Label layoutX="322.0" layoutY="175.0" prefHeight="23.0" prefWidth="56.0" text="PEGI:">
             <font>
                 <Font size="13.0" />
@@ -65,5 +64,6 @@
         <Spinner fx:id="spinnerPrice" layoutX="388.0" layoutY="124.0" prefHeight="26.0" prefWidth="170.0" />
         <ComboBox fx:id="comboBoxGenre" layoutX="387.0" layoutY="81.0" prefHeight="26.0" prefWidth="170.0" />
         <ComboBox fx:id="comboBoxPlatforms" layoutX="96.0" layoutY="125.0" prefHeight="26.0" prefWidth="170.0" />
+      <ComboBox fx:id="comboBoxPEGI" layoutX="387.0" layoutY="173.0" prefHeight="26.0" prefWidth="170.0" />
     </children>
 </AnchorPane>

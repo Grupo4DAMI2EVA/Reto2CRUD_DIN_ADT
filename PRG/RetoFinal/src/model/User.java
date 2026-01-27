@@ -21,7 +21,7 @@ public class User extends Profile {
     private List<Review> reviews = new ArrayList<>();
 
     @Transient
-    private ArrayList<CarritoItem> shoppingCart;
+    private ArrayList<CartItem> shoppingCart;
 
     // Constructor SIN userCode (se genera automático)
     public User() {
