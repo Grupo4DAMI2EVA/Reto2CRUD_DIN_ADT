@@ -119,7 +119,7 @@ public class ShopWindowController implements Initializable {
             logger.info("ShopWindowController initialized successfully");
             
         } catch (Exception e) {
-            logger.severe("Error initializing ShopWindowController: " + e.getMessage());
+            logger.severe(String.format("Error initializing ShopWindowController: %s", e.getMessage()));
             showAlert("Initialization Error", 
                 "Could not initialize the shop window. Please restart the application.");
         }
@@ -130,7 +130,7 @@ public class ShopWindowController implements Initializable {
             logger.info("Configuring table columns");
             
         } catch (Exception e) {
-            logger.severe("Error configuring table columns: " + e.getMessage());
+            logger.severe(String.format("Error configuring table columns: %s", e.getMessage()));
         }
     }
 
@@ -144,7 +144,7 @@ public class ShopWindowController implements Initializable {
             logger.info("Selection listener configured");
             
         } catch (Exception e) {
-            logger.severe("Error setting up selection listener: " + e.getMessage());
+            logger.severe(String.format("Error setting up selection listener: %s", e.getMessage()));
         }
     }
 
@@ -157,7 +157,7 @@ public class ShopWindowController implements Initializable {
             logger.info("Search button configured");
             
         } catch (Exception e) {
-            logger.severe("Error setting up search button: " + e.getMessage());
+            logger.severe(String.format("Error setting up search button: %s", e.getMessage()));
         }
     }
 
@@ -167,7 +167,7 @@ public class ShopWindowController implements Initializable {
             selected = tableViewGames.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 labelGameInfo.setText(selected.getName());
-                logger.info("Game selected: " + selected.getName());
+                logger.info(String.format("Game selected: %s", selected.getName()));
             } else {
                 labelGameInfo.setText("No game selected");
                 logger.info("No game selected from table");
@@ -175,7 +175,7 @@ public class ShopWindowController implements Initializable {
             updateButtonStates();
             
         } catch (Exception e) {
-            logger.severe("Error getting selected table item: " + e.getMessage());
+            logger.severe(String.format("Error getting selected table item: %s", e.getMessage()));
         }
     }
     
@@ -185,31 +185,39 @@ public class ShopWindowController implements Initializable {
             logger.info("Attempting to add game to cart");
             
             if (selected == null) {
-                logger.warning("Add to cart attempt without selecting a game");
-                
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Error!");
-                alert.setHeaderText("No Selection");
-                alert.setContentText("Please select a game before adding it to the cart.");
-                alert.showAndWait();
-                
-                logger.info("Alert shown: No game selected for cart");
+                handleAddToCartWithoutSelection();
             } else {
-                logger.info("Adding game to cart: " + selected.getName());
-                
-                Alert success = new Alert(Alert.AlertType.INFORMATION);
-                success.setTitle("Added to Cart");
-                success.setHeaderText("Game Added");
-                success.setContentText(selected.getName() + " has been added to your cart.");
-                success.showAndWait();
-                
-                logger.info("Game added to cart: " + selected.getName());
+                handleAddToCartWithSelection();
             }
             
         } catch (Exception e) {
-            logger.severe("Error in addToCart: " + e.getMessage());
+            logger.severe(String.format("Error in addToCart: %s", e.getMessage()));
             showAlert("Error", "Could not add the game to the cart.");
         }
+    }
+
+    private void handleAddToCartWithoutSelection() {
+        logger.warning("Add to cart attempt without selecting a game");
+        
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Error!");
+        alert.setHeaderText("No Selection");
+        alert.setContentText("Please select a game before adding it to the cart.");
+        alert.showAndWait();
+        
+        logger.info("Alert shown: No game selected for cart");
+    }
+
+    private void handleAddToCartWithSelection() {
+        logger.info(String.format("Adding game to cart: %s", selected.getName()));
+        
+        Alert success = new Alert(Alert.AlertType.INFORMATION);
+        success.setTitle("Added to Cart");
+        success.setHeaderText("Game Added");
+        success.setContentText(String.format("%s has been added to your cart.", selected.getName()));
+        success.showAndWait();
+        
+        logger.info(String.format("Game added to cart: %s", selected.getName()));
     }
 
     @FXML
@@ -219,14 +227,13 @@ public class ShopWindowController implements Initializable {
             String genreFilter = textFieldGenre.getText();
             String platformFilter = textFieldPlatform.getText();
             
-            logger.info("Searching games - Search: '" + searchText + 
-                       "', Genre: '" + genreFilter + 
-                       "', Platform: '" + platformFilter + "'");
+            logger.info(String.format("Searching games - Search: '%s', Genre: '%s', Platform: '%s'", 
+                       searchText, genreFilter, platformFilter));
             
             showAlert("Information", "Search functionality is not yet implemented.");
             
         } catch (Exception e) {
-            logger.severe("Error in searchGames: " + e.getMessage());
+            logger.severe(String.format("Error in searchGames: %s", e.getMessage()));
             showAlert("Error", "An error occurred while searching for games.");
         }
     }
@@ -239,7 +246,7 @@ public class ShopWindowController implements Initializable {
             showAlert("Information", "Cart view functionality is not yet implemented.");
             
         } catch (Exception e) {
-            logger.severe("Error in viewCart: " + e.getMessage());
+            logger.severe(String.format("Error in viewCart: %s", e.getMessage()));
             showAlert("Error", "Could not open the cart window.");
         }
     }
@@ -250,25 +257,33 @@ public class ShopWindowController implements Initializable {
             logger.info("Opening review window");
             
             if (selected == null) {
-                logger.warning("Review attempt without selecting a game");
-                
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Error!");
-                alert.setHeaderText("No Selection");
-                alert.setContentText("Please select a game before writing a review.");
-                alert.showAndWait();
-                
-                logger.info("Alert shown: No game selected for review");
+                handleReviewWithoutSelection();
             } else {
-                logger.info("Opening review window for game: " + selected.getName());
-                
-                showAlert("Information", "Review functionality is not yet implemented.");
+                handleReviewWithSelection();
             }
             
         } catch (Exception e) {
-            logger.severe("Error in writeReview: " + e.getMessage());
+            logger.severe(String.format("Error in writeReview: %s", e.getMessage()));
             showAlert("Error", "Could not open the review window.");
         }
+    }
+
+    private void handleReviewWithoutSelection() {
+        logger.warning("Review attempt without selecting a game");
+        
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Error!");
+        alert.setHeaderText("No Selection");
+        alert.setContentText("Please select a game before writing a review.");
+        alert.showAndWait();
+        
+        logger.info("Alert shown: No game selected for review");
+    }
+
+    private void handleReviewWithSelection() {
+        logger.info(String.format("Opening review window for game: %s", selected.getName()));
+        
+        showAlert("Information", "Review functionality is not yet implemented.");
     }
 
     @FXML
@@ -279,7 +294,7 @@ public class ShopWindowController implements Initializable {
             showAlert("Information", "Exit functionality is not yet implemented.");
             
         } catch (Exception e) {
-            logger.severe("Error in exitShop: " + e.getMessage());
+            logger.severe(String.format("Error in exitShop: %s", e.getMessage()));
             showAlert("Error", "Could not close the shop window.");
         }
     }
@@ -291,16 +306,16 @@ public class ShopWindowController implements Initializable {
             buttonAddToCart.setDisable(!hasGameSelected);
             buttonReview.setDisable(!hasGameSelected);
             
-            logger.info("Button states updated - Game selected: " + hasGameSelected);
+            logger.info(String.format("Button states updated - Game selected: %s", hasGameSelected));
             
         } catch (Exception e) {
-            logger.severe("Error updating button states: " + e.getMessage());
+            logger.severe(String.format("Error updating button states: %s", e.getMessage()));
         }
     }
 
     private void showAlert(String title, String message) {
         try {
-            logger.info("Showing alert: " + title + " - " + message);
+            logger.info(String.format("Showing alert: %s - %s", title, message));
             
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
@@ -309,7 +324,7 @@ public class ShopWindowController implements Initializable {
             alert.showAndWait();
             
         } catch (Exception e) {
-            logger.severe("Error showing alert: " + e.getMessage());
+            logger.severe(String.format("Error showing alert: %s", e.getMessage()));
         }
     }
 
@@ -318,27 +333,27 @@ public class ShopWindowController implements Initializable {
             logger.info("Loading games into table");
             
         } catch (Exception e) {
-            logger.severe("Error loading games: " + e.getMessage());
+            logger.severe(String.format("Error loading games: %s", e.getMessage()));
             showAlert("Error", "Could not load games into the table.");
         }
     }
 
     public void setUserInfo(String username, double balance) {
         try {
-            logger.info("Setting user info - Username: " + username + ", Balance: " + balance);
+            logger.info(String.format("Setting user info - Username: %s, Balance: %.2f", username, balance));
             
             if (labelWelcome != null) {
-                labelWelcome.setText("Welcome, " + username + "!");
+                labelWelcome.setText(String.format("Welcome, %s!", username));
             }
             
             if (labelBalance != null) {
-                labelBalance.setText("Balance: $" + String.format("%.2f", balance));
+                labelBalance.setText(String.format("Balance: $%.2f", balance));
             }
             
             logger.info("User info displayed successfully");
             
         } catch (Exception e) {
-            logger.severe("Error setting user info: " + e.getMessage());
+            logger.severe(String.format("Error setting user info: %s", e.getMessage()));
         }
     }
 
@@ -354,7 +369,7 @@ public class ShopWindowController implements Initializable {
             logger.info("Selection cleared");
             
         } catch (Exception e) {
-            logger.severe("Error clearing selection: " + e.getMessage());
+            logger.severe(String.format("Error clearing selection: %s", e.getMessage()));
         }
     }
 }

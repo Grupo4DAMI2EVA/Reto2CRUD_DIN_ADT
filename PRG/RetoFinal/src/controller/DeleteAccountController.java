@@ -47,7 +47,7 @@ public class DeleteAccountController implements Initializable {
                 logsFolder.mkdirs();
             }
             
-            Handler fileHandler = new FileHandler("logs/delete_account.log", true);
+            FileHandler fileHandler = new FileHandler("logs/delete_account.log", true);
             
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
@@ -81,7 +81,7 @@ public class DeleteAccountController implements Initializable {
             this.cont = cont;
             logger.info("Main controller set for DeleteAccountController");
         } catch (Exception e) {
-            logger.severe("Error setting main controller: " + e.getMessage());
+            logger.severe(String.format("Error setting main controller: %s", e.getMessage()));
         }
     }
 
@@ -91,9 +91,10 @@ public class DeleteAccountController implements Initializable {
             if (labelUsername != null) {
                 labelUsername.setText(profile.getUsername());
             }
-            logger.info("User profile set: " + (profile != null ? profile.getUsername() : "null"));
+            logger.info(String.format("User profile set: %s", 
+                       profile != null ? profile.getUsername() : "null"));
         } catch (Exception e) {
-            logger.severe("Error setting user profile: " + e.getMessage());
+            logger.severe(String.format("Error setting user profile: %s", e.getMessage()));
         }
     }
 
@@ -102,24 +103,10 @@ public class DeleteAccountController implements Initializable {
         try {
             logger.info("User cancelled account deletion - returning to menu");
             
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
-            Parent root = fxmlLoader.load();
-
-            MenuWindowController controllerWindow = fxmlLoader.getController();
-            controllerWindow.setUser(profile);
-            controllerWindow.setController(this.cont);
-            
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.show();
-            
-            Stage currentStage = (Stage) buttonCancel.getScene().getWindow();
-            currentStage.close();
-            
-            logger.info("Successfully returned to menu");
+            navigateToMenuWindow();
             
         } catch (Exception e) {
-            logger.severe("Error returning to menu: " + e.getMessage());
+            logger.severe(String.format("Error returning to menu: %s", e.getMessage()));
             showAlert("Error", "Could not return to the menu.");
         }
     }
@@ -129,86 +116,138 @@ public class DeleteAccountController implements Initializable {
         try {
             logger.info("Starting user account deletion process");
             
-            if (textFieldPassword.getText().isEmpty()) {
-                logger.severe("Delete attempt without entering password");
-                
-                Alert error = new Alert(Alert.AlertType.ERROR);
-                error.setTitle("Error");
-                error.setHeaderText("Password Required");
-                error.setContentText("Please enter your password to delete your account.");
-                error.showAndWait();
+            if (!validatePasswordField()) {
                 return;
             }
 
-            String username = labelUsername.getText();
-            logger.info("User " + username + " attempting to delete their own account");
+            logger.info(String.format("User %s attempting to delete their own account", 
+                       labelUsername.getText()));
             
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Delete Account");
-            alert.setHeaderText("Are you sure you want to delete your account?");
-            alert.setContentText("This action cannot be undone. All your data will be permanently lost.");
-
-            java.util.Optional<javafx.scene.control.ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK) {
-                
-                String password = textFieldPassword.getText();
-                logger.info("Confirming deletion for user: " + username);
-
-                Boolean success = cont.dropOutUser(username, password);
-                if (success) {
-                    logger.info("User account deleted successfully: " + username);
-                    
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                    successAlert.setTitle("Account Deleted");
-                    successAlert.setHeaderText(null);
-                    successAlert.setContentText("Your account has been successfully deleted.");
-                    successAlert.showAndWait();
-
-                    try {
-                        logger.info("Redirecting to login screen after successful deletion");
-                        
-                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/LogInWindow.fxml"));
-                        Parent root = fxmlLoader.load();
-
-                        LogInWindowController controllerWindow = fxmlLoader.getController();
-                        Stage stage = new Stage();
-                        stage.setScene(new Scene(root));
-                        stage.show();
-                        
-                        Stage currentStage = (Stage) buttonDelete.getScene().getWindow();
-                        currentStage.close();
-                        
-                        logger.info("Successfully redirected to login screen");
-                        
-                    } catch (Exception e) {
-                        logger.severe("Error redirecting to login screen after deletion: " + e.getMessage());
-                        showAlert("Error", "Account deleted but could not redirect to login screen.");
-                    }
-                    
-                } else {
-                    logger.severe("Failed to delete account: Incorrect password for user: " + username);
-                    
-                    Alert error = new Alert(Alert.AlertType.ERROR);
-                    error.setTitle("Error");
-                    error.setHeaderText("Incorrect Password");
-                    error.setContentText("The password is incorrect. Please try again.");
-                    error.showAndWait();
-                }
-
+            if (confirmDeletion()) {
+                processAccountDeletion();
             } else {
-                logger.info("User cancelled account deletion: " + (profile != null ? profile.getUsername() : "unknown"));
-                System.out.println("Account deletion cancelled by the user.");
+                handleDeletionCancellation();
             }
             
         } catch (Exception e) {
-            logger.severe("Error in account deletion process: " + e.getMessage());
-            
-            Alert error = new Alert(Alert.AlertType.ERROR);
-            error.setTitle("Error");
-            error.setHeaderText("Account Could Not Be Deleted");
-            error.setContentText("An unexpected error occurred: " + e.getMessage());
-            error.showAndWait();
+            logger.severe(String.format("Error in account deletion process: %s", e.getMessage()));
+            showErrorAlert("Account Could Not Be Deleted", 
+                String.format("An unexpected error occurred: %s", e.getMessage()));
         }
+    }
+
+    private boolean validatePasswordField() {
+        if (textFieldPassword.getText().isEmpty()) {
+            logger.severe("Delete attempt without entering password");
+            
+            showErrorAlert("Password Required", 
+                "Please enter your password to delete your account.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean confirmDeletion() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Account");
+        alert.setHeaderText("Are you sure you want to delete your account?");
+        alert.setContentText("This action cannot be undone. All your data will be permanently lost.");
+
+        java.util.Optional<javafx.scene.control.ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK;
+    }
+
+    private void processAccountDeletion() {
+        String username = labelUsername.getText();
+        String password = textFieldPassword.getText();
+        
+        logger.info(String.format("Confirming deletion for user: %s", username));
+
+        Boolean success = cont.dropOutUser(username, password);
+        if (success) {
+            handleSuccessfulDeletion(username);
+        } else {
+            handleFailedDeletion(username);
+        }
+    }
+
+    private void handleSuccessfulDeletion(String username) {
+        logger.info(String.format("User account deleted successfully: %s", username));
+        
+        showSuccessAlert("Account Deleted", 
+            "Your account has been successfully deleted.");
+        
+        navigateToLoginScreen();
+    }
+
+    private void handleFailedDeletion(String username) {
+        logger.severe(String.format("Failed to delete account: Incorrect password for user: %s", username));
+        
+        showErrorAlert("Incorrect Password", 
+            "The password is incorrect. Please try again.");
+    }
+
+    private void handleDeletionCancellation() {
+        logger.info(String.format("User cancelled account deletion: %s", 
+                   profile != null ? profile.getUsername() : "unknown"));
+        System.out.println("Account deletion cancelled by the user.");
+    }
+
+    private void navigateToMenuWindow() throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
+        Parent root = fxmlLoader.load();
+
+        MenuWindowController controllerWindow = fxmlLoader.getController();
+        controllerWindow.setUser(profile);
+        controllerWindow.setController(this.cont);
+        
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
+        
+        Stage currentStage = (Stage) buttonCancel.getScene().getWindow();
+        currentStage.close();
+        
+        logger.info("Successfully returned to menu");
+    }
+
+    private void navigateToLoginScreen() {
+        try {
+            logger.info("Redirecting to login screen after successful deletion");
+            
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/LogInWindow.fxml"));
+            Parent root = fxmlLoader.load();
+
+            LogInWindowController controllerWindow = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+            
+            Stage currentStage = (Stage) buttonDelete.getScene().getWindow();
+            currentStage.close();
+            
+            logger.info("Successfully redirected to login screen");
+            
+        } catch (Exception e) {
+            logger.severe(String.format("Error redirecting to login screen after deletion: %s", e.getMessage()));
+            showAlert("Error", "Account deleted but could not redirect to login screen.");
+        }
+    }
+
+    private void showSuccessAlert(String title, String message) {
+        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+        successAlert.setTitle(title);
+        successAlert.setHeaderText(null);
+        successAlert.setContentText(message);
+        successAlert.showAndWait();
+    }
+
+    private void showErrorAlert(String title, String message) {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle(title);
+        error.setHeaderText(title);
+        error.setContentText(message);
+        error.showAndWait();
     }
 
     @Override
@@ -216,21 +255,24 @@ public class DeleteAccountController implements Initializable {
         try {
             logger.info("Initializing DeleteAccountController");
             
-            // Clear any existing data
-            if (textFieldPassword != null) {
-                textFieldPassword.clear();
-            }
+            clearFormData();
             
             logger.info("DeleteAccountController initialized successfully");
             
         } catch (Exception e) {
-            logger.severe("Error initializing DeleteAccountController: " + e.getMessage());
+            logger.severe(String.format("Error initializing DeleteAccountController: %s", e.getMessage()));
+        }
+    }
+
+    private void clearFormData() {
+        if (textFieldPassword != null) {
+            textFieldPassword.clear();
         }
     }
 
     private void showAlert(String title, String message) {
         try {
-            logger.info("Showing alert: " + title + " - " + message);
+            logger.info(String.format("Showing alert: %s - %s", title, message));
             
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
@@ -239,11 +281,10 @@ public class DeleteAccountController implements Initializable {
             alert.showAndWait();
             
         } catch (Exception e) {
-            logger.severe("Error showing alert: " + e.getMessage());
+            logger.severe(String.format("Error showing alert: %s", e.getMessage()));
         }
     }
 
-    // Method to clear the form
     public void clearForm() {
         try {
             logger.info("Clearing account deletion form");
@@ -253,26 +294,30 @@ public class DeleteAccountController implements Initializable {
             logger.info("Form cleared successfully");
             
         } catch (Exception e) {
-            logger.severe("Error clearing form: " + e.getMessage());
+            logger.severe(String.format("Error clearing form: %s", e.getMessage()));
         }
     }
 
-    // Method to refresh user information
     public void refreshUserInfo() {
         try {
             logger.info("Refreshing user information");
             
             if (profile != null && labelUsername != null) {
                 labelUsername.setText(profile.getUsername());
-                logger.info("Username refreshed: " + profile.getUsername());
+                logger.info(String.format("Username refreshed: %s", profile.getUsername()));
             }
             
         } catch (Exception e) {
-            logger.severe("Error refreshing user information: " + e.getMessage());
+            logger.severe(String.format("Error refreshing user information: %s", e.getMessage()));
         }
     }
 
-    void setCont(Controller cont) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setCont(Controller cont) {
+        try {
+            this.cont = cont;
+            logger.info("Controller set via setCont method");
+        } catch (Exception e) {
+            logger.severe(String.format("Error in setCont: %s", e.getMessage()));
+        }
     }
 }

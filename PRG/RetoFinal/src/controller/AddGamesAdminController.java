@@ -95,61 +95,15 @@ public class AddGamesAdminController implements Initializable {
             logger.info("Starting game addition process");
             
             String gameName = textFieldName.getText();
-            
-            if (gameName == null || gameName.trim().isEmpty()) {
-                logger.severe("Attempt to add game without name");
-                showAlert("Error", "Game name cannot be empty.");
-                return;
-            }
-            
-            logger.info("Validating game data: " + gameName);
-            
             Platform platform = comboBoxPlatforms.getValue();
-            if (platform == null) {
-                logger.severe("Platform not selected for game: " + gameName);
-                showAlert("Error", "You must select a platform.");
-                return;
-            }
-            
             String company = textFieldCompany.getText();
-            if (company == null || company.trim().isEmpty()) {
-                logger.severe("Company not specified for game: " + gameName);
-                showAlert("Error", "Developer company cannot be empty.");
-                return;
-            }
-            
             GameGenre genre = comboBoxGenre.getValue();
-            if (genre == null) {
-                logger.severe("Genre not selected for game: " + gameName);
-                showAlert("Error", "You must select a genre.");
-                return;
-            }
-            
             Integer stock = spinnerStock.getValue();
-            if (stock == null || stock <= 0) {
-                logger.severe("Invalid stock for game: " + gameName + " - Stock: " + stock);
-                showAlert("Error", "Stock must be greater than 0.");
-                return;
-            }
-            
             Double price = spinnerPrice.getValue();
-            if (price == null || price <= 0) {
-                logger.severe("Invalid price for game: " + gameName + " - Price: " + price);
-                showAlert("Error", "Price must be greater than 0.");
-                return;
-            }
-            
             PEGI pegi = comboBoxPEGI.getValue();
-            if (pegi == null) {
-                logger.severe("PEGI not specified for game: " + gameName);
-                showAlert("Error", "PEGI rating cannot be empty.");
-                return;
-            }
+            LocalDate releaseDate = datePickerReleaseDate.getValue();
             
-            java.time.LocalDate releaseDate = datePickerReleaseDate.getValue();
-            if (releaseDate == null) {
-                logger.severe("Release date not specified for game: " + gameName);
-                showAlert("Error", "You must select a release date.");
+            if (!validateGameData(gameName, platform, company, genre, stock, price, pegi, releaseDate)) {
                 return;
             }
             
@@ -162,7 +116,8 @@ public class AddGamesAdminController implements Initializable {
                 success.setContentText("The game " + gameName + " was successfully added to the list of games in the store.");
                 success.showAndWait();
                 
-                logger.info("Game added successfully: " + gameName + " | Platform: " + platform + " | Company: " + company + " | Genre: " + genre + " | Stock: " + stock + " | Price: $" + price + " | PEGI: " + pegi + " | Date: " + releaseDate);
+                logger.info(String.format("Game added successfully: %s | Platform: %s | Company: %s | Genre: %s | Stock: %d | Price: $%.2f | PEGI: %s | Date: %s",
+                    gameName, platform, company, genre, stock, price, pegi, releaseDate));
 
                 Alert choice = new Alert(Alert.AlertType.CONFIRMATION);
                 choice.setTitle("Add more?");
@@ -179,7 +134,7 @@ public class AddGamesAdminController implements Initializable {
                     clearForm();
                 }
             } else {
-                logger.severe("Database error while adding game: " + gameName);
+                logger.severe(String.format("Database error while adding game: %s", gameName));
                 Alert error = new Alert(Alert.AlertType.ERROR);
                 error.setTitle("ERROR");
                 error.setContentText("There was an error while attempting to add the game. Check the fields to see if anything's wrong.");
@@ -187,9 +142,64 @@ public class AddGamesAdminController implements Initializable {
             }
             
         } catch (Exception e) {
-            logger.severe("Unexpected error adding game: " + e.getMessage());
+            logger.severe(String.format("Unexpected error adding game: %s", e.getMessage()));
             showAlert("Error", "An unexpected error occurred while adding the game.");
         }
+    }
+
+    private boolean validateGameData(String gameName, Platform platform, String company, 
+                                   GameGenre genre, Integer stock, Double price, 
+                                   PEGI pegi, LocalDate releaseDate) {
+        
+        if (gameName == null || gameName.trim().isEmpty()) {
+            logger.severe("Attempt to add game without name");
+            showAlert("Error", "Game name cannot be empty.");
+            return false;
+        }
+        
+        if (platform == null) {
+            logger.severe(String.format("Platform not selected for game: %s", gameName));
+            showAlert("Error", "You must select a platform.");
+            return false;
+        }
+        
+        if (company == null || company.trim().isEmpty()) {
+            logger.severe(String.format("Company not specified for game: %s", gameName));
+            showAlert("Error", "Developer company cannot be empty.");
+            return false;
+        }
+        
+        if (genre == null) {
+            logger.severe(String.format("Genre not selected for game: %s", gameName));
+            showAlert("Error", "You must select a genre.");
+            return false;
+        }
+        
+        if (stock == null || stock <= 0) {
+            logger.severe(String.format("Invalid stock for game: %s - Stock: %d", gameName, stock));
+            showAlert("Error", "Stock must be greater than 0.");
+            return false;
+        }
+        
+        if (price == null || price <= 0) {
+            logger.severe(String.format("Invalid price for game: %s - Price: %.2f", gameName, price));
+            showAlert("Error", "Price must be greater than 0.");
+            return false;
+        }
+        
+        if (pegi == null) {
+            logger.severe(String.format("PEGI not specified for game: %s", gameName));
+            showAlert("Error", "PEGI rating cannot be empty.");
+            return false;
+        }
+        
+        if (releaseDate == null) {
+            logger.severe(String.format("Release date not specified for game: %s", gameName));
+            showAlert("Error", "You must select a release date.");
+            return false;
+        }
+        
+        return true;
     }
 
     private void clearForm() {
@@ -208,13 +218,13 @@ public class AddGamesAdminController implements Initializable {
             logger.info("Form cleared successfully");
             
         } catch (Exception e) {
-            logger.severe("Error clearing form: " + e.getMessage());
+            logger.severe(String.format("Error clearing form: %s", e.getMessage()));
         }
     }
 
     private void showAlert(String title, String message) {
         try {
-            logger.info("Showing alert: " + title + " - " + message);
+            logger.info(String.format("Showing alert: %s - %s", title, message));
             
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
@@ -223,7 +233,7 @@ public class AddGamesAdminController implements Initializable {
             alert.showAndWait();
             
         } catch (Exception e) {
-            logger.severe("Error showing alert: " + e.getMessage());
+            logger.severe(String.format("Error showing alert: %s", e.getMessage()));
         }
     }
 
@@ -238,7 +248,7 @@ public class AddGamesAdminController implements Initializable {
             logger.info("AddGamesAdminController initialized successfully");
             
         } catch (Exception e) {
-            logger.severe("Error initializing AddGamesAdminController: " + e.getMessage());
+            logger.severe(String.format("Error initializing AddGamesAdminController: %s", e.getMessage()));
             showAlert("Initialization Error", 
                 "Could not initialize the add games form.");
         }
@@ -257,7 +267,7 @@ public class AddGamesAdminController implements Initializable {
             logger.info("Spinners configured successfully");
             
         } catch (Exception e) {
-            logger.severe("Error configuring spinners: " + e.getMessage());
+            logger.severe(String.format("Error configuring spinners: %s", e.getMessage()));
         }
     }
 
@@ -267,12 +277,11 @@ public class AddGamesAdminController implements Initializable {
             comboBoxGenre.getItems().setAll(GameGenre.values());
             comboBoxPEGI.getItems().setAll(PEGI.values());
             
-            logger.info("ComboBoxes loaded - Platforms: " + Platform.values().length + 
-                       ", Genres: " + GameGenre.values().length + 
-                       ", PEGI: " + PEGI.values().length);
+            logger.info(String.format("ComboBoxes loaded - Platforms: %d, Genres: %d, PEGI: %d", 
+                       Platform.values().length, GameGenre.values().length, PEGI.values().length));
             
         } catch (Exception e) {
-            logger.severe("Error loading ComboBox data: " + e.getMessage());
+            logger.severe(String.format("Error loading ComboBox data: %s", e.getMessage()));
         }
     }
 }

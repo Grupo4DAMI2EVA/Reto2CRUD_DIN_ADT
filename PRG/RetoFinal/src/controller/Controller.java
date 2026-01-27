@@ -37,9 +37,22 @@ public class Controller {
      * @return true if signup succeeds, false otherwise
      */
     public boolean signUp(String gender, String cardNumber, String username, String password, String email,
-            String name, String telephone, String surname) {
-        return dao.signUp(gender, cardNumber, username, password, email, name, telephone, surname);
-    }
+        String name, String telephone, String surname) {
+    
+    // AÑADE ESTO AL PRINCIPIO DEL MÉTODO
+    System.out.println("=== DEBUG SIGNUP ===");
+    System.out.println("Username: " + username);
+    System.out.println("Email: " + email);
+    System.out.println("Calling dao.signUp()...");
+    
+    boolean result = dao.signUp(gender, cardNumber, username, password, email, name, telephone, surname);
+    
+    // AÑADE ESTO PARA VER EL RESULTADO
+    System.out.println("dao.signUp() returned: " + result);
+    System.out.println("=====================");
+    
+    return result;
+}
 
     /**
      * Deletes a user account.

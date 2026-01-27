@@ -31,6 +31,8 @@ public class MenuWindowController implements Initializable {
     private Button buttonLogOut;
     @FXML
     private Label labelUsername;
+    @FXML
+    private Button buttonStore;  // Añadido para el botón Store
 
     private Profile profile;
     private Controller cont;
@@ -50,7 +52,7 @@ public class MenuWindowController implements Initializable {
                 logsFolder.mkdirs();
             }
             
-            Handler fileHandler = new FileHandler("logs/menu_window.log", true);
+            FileHandler fileHandler = new FileHandler("logs/menu_window.log", true);
             
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
@@ -85,10 +87,11 @@ public class MenuWindowController implements Initializable {
             if (labelUsername != null) {
                 labelUsername.setText(profile.getUsername());
             }
-            logger.info("User profile set: " + (profile != null ? profile.getUsername() : "null") + 
-                       ", Type: " + (profile != null ? profile.getClass().getSimpleName() : "null"));
+            logger.info(String.format("User profile set: %s, Type: %s", 
+                       profile != null ? profile.getUsername() : "null",
+                       profile != null ? profile.getClass().getSimpleName() : "null"));
         } catch (Exception e) {
-            logger.severe("Error setting user profile: " + e.getMessage());
+            logger.severe(String.format("Error setting user profile: %s", e.getMessage()));
         }
     }
 
@@ -97,7 +100,7 @@ public class MenuWindowController implements Initializable {
             this.cont = cont;
             logger.info("Main controller set for MenuWindowController");
         } catch (Exception e) {
-            logger.severe("Error setting main controller: " + e.getMessage());
+            logger.severe(String.format("Error setting main controller: %s", e.getMessage()));
         }
     }
 
@@ -108,28 +111,33 @@ public class MenuWindowController implements Initializable {
     @FXML
     private void modifyWindow(ActionEvent event) {
         try {
-            logger.info("Opening Modify window for user: " + (profile != null ? profile.getUsername() : "null"));
+            logger.info(String.format("Opening Modify window for user: %s", 
+                       profile != null ? profile.getUsername() : "null"));
             
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
-            Parent root = fxmlLoader.load();
-
-            ModifyWindowController controllerWindow = fxmlLoader.getController();
-            controllerWindow.setProfile(profile);
-            controllerWindow.setController(this.cont);
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.show();
-
-            Stage currentStage = (Stage) buttonModify.getScene().getWindow();
-            currentStage.close();
-            
-            logger.info("Modify window opened successfully");
+            handleModifyWindow();
             
         } catch (Exception e) {
-            logger.severe("Error opening Modify window: " + e.getMessage());
+            logger.severe(String.format("Error opening Modify window: %s", e.getMessage()));
             showAlert("Error", "Could not open the Modify Account window.");
         }
+    }
+
+    private void handleModifyWindow() throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
+        Parent root = fxmlLoader.load();
+
+        ModifyWindowController controllerWindow = fxmlLoader.getController();
+        controllerWindow.setProfile(profile);
+        controllerWindow.setController(this.cont);
+
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
+
+        Stage currentStage = (Stage) buttonModify.getScene().getWindow();
+        currentStage.close();
+        
+        logger.info("Modify window opened successfully");
     }
 
     @FXML
@@ -138,92 +146,143 @@ public class MenuWindowController implements Initializable {
             logger.info("Opening Delete Account window");
             
             if (profile instanceof User) {
-                logger.info("Opening User Delete Account window for: " + profile.getUsername());
-                
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/DeleteAccount.fxml"));
-                Parent root = fxmlLoader.load();
-                DeleteAccountController controllerWindow = fxmlLoader.getController();
-                controllerWindow.setProfile(profile);
-                controllerWindow.setController(cont);
-
-                Stage stage = new Stage();
-                stage.setScene(new Scene(root));
-                stage.show();
-                
-                Stage currentStage = (Stage) buttonDelete.getScene().getWindow();
-                currentStage.close();
-                
-                logger.info("User Delete Account window opened successfully");
-                
+                handleUserDeleteWindow();
             } else if (profile instanceof Admin) {
-                logger.info("Opening Admin Delete Account window for admin: " + profile.getUsername());
-                
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/DeleteAccountAdmin.fxml"));
-                Parent root = fxmlLoader.load();
-                DeleteAccountAdminController controllerWindow = fxmlLoader.getController();
-                controllerWindow.setProfile(profile);
-                controllerWindow.setController(cont);
-                controllerWindow.setComboBoxUser();
-
-                Stage stage = new Stage();
-                stage.setScene(new Scene(root));
-                stage.show();
-                
-                Stage currentStage = (Stage) buttonDelete.getScene().getWindow();
-                currentStage.close();
-                
-                logger.info("Admin Delete Account window opened successfully");
+                handleAdminDeleteWindow();
             } else {
-                logger.severe("Unknown profile type for delete operation");
-                showAlert("Error", "Unknown user type. Cannot open delete window.");
+                handleUnknownProfileType();
             }
             
         } catch (Exception e) {
-            logger.severe("Error opening Delete Account window: " + e.getMessage());
+            logger.severe(String.format("Error opening Delete Account window: %s", e.getMessage()));
             showAlert("Error", "Could not open the Delete Account window.");
         }
+    }
+
+    private void handleUserDeleteWindow() throws Exception {
+        logger.info(String.format("Opening User Delete Account window for: %s", profile.getUsername()));
+        
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/DeleteAccount.fxml"));
+        Parent root = fxmlLoader.load();
+        DeleteAccountController controllerWindow = fxmlLoader.getController();
+        controllerWindow.setProfile(profile);
+        controllerWindow.setController(cont);
+
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
+        
+        Stage currentStage = (Stage) buttonDelete.getScene().getWindow();
+        currentStage.close();
+        
+        logger.info("User Delete Account window opened successfully");
+    }
+
+    private void handleAdminDeleteWindow() throws Exception {
+        logger.info(String.format("Opening Admin Delete Account window for admin: %s", profile.getUsername()));
+        
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/DeleteAccountAdmin.fxml"));
+        Parent root = fxmlLoader.load();
+        DeleteAccountAdminController controllerWindow = fxmlLoader.getController();
+        controllerWindow.setProfile(profile);
+        controllerWindow.setController(cont);
+        controllerWindow.setComboBoxUser();
+
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
+        
+        Stage currentStage = (Stage) buttonDelete.getScene().getWindow();
+        currentStage.close();
+        
+        logger.info("Admin Delete Account window opened successfully");
+    }
+
+    private void handleUnknownProfileType() {
+        logger.severe("Unknown profile type for delete operation");
+        showAlert("Error", "Unknown user type. Cannot open delete window.");
     }
 
     @FXML
     private void logOut(ActionEvent event) {
         try {
             String username = profile != null ? profile.getUsername() : "unknown";
-            logger.info("User logging out: " + username);
+            logger.info(String.format("User logging out: %s", username));
             
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.close();
-            
-            logger.info("Logout completed for user: " + username);
+            handleLogout(event);
             
         } catch (Exception e) {
-            logger.severe("Error during logout: " + e.getMessage());
+            logger.severe(String.format("Error during logout: %s", e.getMessage()));
             showAlert("Error", "Could not complete logout.");
         }
+    }
+
+    private void handleLogout(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close();
+        
+        String username = profile != null ? profile.getUsername() : "unknown";
+        logger.info(String.format("Logout completed for user: %s", username));
+    }
+
+    @FXML
+    private void openShop(ActionEvent event) {
+        try {
+            logger.info(String.format("Opening Shop window for user: %s", 
+                       profile != null ? profile.getUsername() : "null"));
+            
+            handleOpenShop();
+            
+        } catch (Exception e) {
+            logger.severe(String.format("Error opening Shop window: %s", e.getMessage()));
+            showAlert("Error", "Could not open the Shop window.");
+        }
+    }
+
+    private void handleOpenShop() throws Exception {
+        // TODO: Implementar lógica para abrir la tienda
+        // Ejemplo:
+        // FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ShopWindow.fxml"));
+        // Parent root = fxmlLoader.load();
+        // ... etc ...
+        
+        Alert info = new Alert(Alert.AlertType.INFORMATION);
+        info.setTitle("Store");
+        info.setHeaderText("Store functionality");
+        info.setContentText("The store feature is not yet implemented.");
+        info.showAndWait();
+        
+        logger.info("Store button clicked - functionality not yet implemented");
     }
 
     @FXML
     private void openHelp(ActionEvent event) {
         try {
-            logger.info("Opening Help window for user: " + (profile != null ? profile.getUsername() : "null"));
+            logger.info(String.format("Opening Help window for user: %s", 
+                       profile != null ? profile.getUsername() : "null"));
             
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/HelpWindow.fxml"));
-            Parent root = fxmlLoader.load();
-
-            HelpWindowController controllerWindow = fxmlLoader.getController();
-            controllerWindow.setUser(profile);
-            controllerWindow.setController(cont);
-
-            Stage stage = new Stage();
-            stage.setTitle("Help");
-            stage.setScene(new Scene(root));
-            stage.show();
-            
-            logger.info("Help window opened successfully");
+            handleHelpWindow();
             
         } catch (Exception e) {
-            logger.severe("Error opening Help window: " + e.getMessage());
+            logger.severe(String.format("Error opening Help window: %s", e.getMessage()));
             showAlert("Error", "Could not open the Help window.");
         }
+    }
+
+    private void handleHelpWindow() throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/HelpWindow.fxml"));
+        Parent root = fxmlLoader.load();
+
+        HelpWindowController controllerWindow = fxmlLoader.getController();
+        controllerWindow.setUser(profile);
+        controllerWindow.setController(cont);
+
+        Stage stage = new Stage();
+        stage.setTitle("Help");
+        stage.setScene(new Scene(root));
+        stage.show();
+        
+        logger.info("Help window opened successfully");
     }
 
     @Override
@@ -231,21 +290,24 @@ public class MenuWindowController implements Initializable {
         try {
             logger.info("Initializing MenuWindowController");
             
-            // Set up any initial UI state
-            if (labelUsername != null && profile != null) {
-                labelUsername.setText(profile.getUsername());
-            }
+            initializeUI();
             
             logger.info("MenuWindowController initialized successfully");
             
         } catch (Exception e) {
-            logger.severe("Error initializing MenuWindowController: " + e.getMessage());
+            logger.severe(String.format("Error initializing MenuWindowController: %s", e.getMessage()));
+        }
+    }
+
+    private void initializeUI() {
+        if (labelUsername != null && profile != null) {
+            labelUsername.setText(profile.getUsername());
         }
     }
 
     private void showAlert(String title, String message) {
         try {
-            logger.info("Showing alert: " + title + " - " + message);
+            logger.info(String.format("Showing alert: %s - %s", title, message));
             
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
@@ -254,26 +316,24 @@ public class MenuWindowController implements Initializable {
             alert.showAndWait();
             
         } catch (Exception e) {
-            logger.severe("Error showing alert: " + e.getMessage());
+            logger.severe(String.format("Error showing alert: %s", e.getMessage()));
         }
     }
 
-    // Method to refresh user information display
     public void refreshUserInfo() {
         try {
             logger.info("Refreshing user information display");
             
             if (profile != null && labelUsername != null) {
                 labelUsername.setText(profile.getUsername());
-                logger.info("Username display refreshed: " + profile.getUsername());
+                logger.info(String.format("Username display refreshed: %s", profile.getUsername()));
             }
             
         } catch (Exception e) {
-            logger.severe("Error refreshing user information: " + e.getMessage());
+            logger.severe(String.format("Error refreshing user information: %s", e.getMessage()));
         }
     }
 
-    // Method to update the profile (e.g., after modification)
     public void updateProfile(Profile updatedProfile) {
         try {
             logger.info("Updating user profile in MenuWindowController");
@@ -284,15 +344,26 @@ public class MenuWindowController implements Initializable {
             logger.info("User profile updated successfully");
             
         } catch (Exception e) {
-            logger.severe("Error updating user profile: " + e.getMessage());
+            logger.severe(String.format("Error updating user profile: %s", e.getMessage()));
         }
     }
 
-    void setUsuario(Profile profile) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setUsuario(Profile profile) {
+        try {
+            this.profile = profile;
+            logger.info(String.format("Profile set via setUsuario: %s", 
+                       profile != null ? profile.getUsername() : "null"));
+        } catch (Exception e) {
+            logger.severe(String.format("Error in setUsuario: %s", e.getMessage()));
+        }
     }
 
-    void setCont(Controller cont) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setCont(Controller cont) {
+        try {
+            this.cont = cont;
+            logger.info("Controller set via setCont method");
+        } catch (Exception e) {
+            logger.severe(String.format("Error in setCont: %s", e.getMessage()));
+        }
     }
 }

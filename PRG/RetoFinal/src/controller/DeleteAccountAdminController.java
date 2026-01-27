@@ -48,7 +48,7 @@ public class DeleteAccountAdminController implements Initializable {
                 logsFolder.mkdirs();
             }
             
-            Handler fileHandler = new FileHandler("logs/admin_delete_account.log", true);
+            FileHandler fileHandler = new FileHandler("logs/admin_delete_account.log", true);
             
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
@@ -82,16 +82,17 @@ public class DeleteAccountAdminController implements Initializable {
             this.cont = cont;
             logger.info("Main controller set for DeleteAccountAdminController");
         } catch (Exception e) {
-            logger.severe("Error setting main controller: " + e.getMessage());
+            logger.severe(String.format("Error setting main controller: %s", e.getMessage()));
         }
     }
 
     public void setProfile(Profile profile) {
         try {
             this.profile = profile;
-            logger.info("Admin profile set: " + (profile != null ? profile.getUsername() : "null"));
+            logger.info(String.format("Admin profile set: %s", 
+                       profile != null ? profile.getUsername() : "null"));
         } catch (Exception e) {
-            logger.severe("Error setting admin profile: " + e.getMessage());
+            logger.severe(String.format("Error setting admin profile: %s", e.getMessage()));
         }
     }
 
@@ -101,10 +102,10 @@ public class DeleteAccountAdminController implements Initializable {
             comboBoxUser.getItems().clear();
             comboBoxUser.getItems().addAll(users);
             
-            logger.info("ComboBox populated with " + users.size() + " users");
+            logger.info(String.format("ComboBox populated with %d users", users.size()));
             
         } catch (Exception e) {
-            logger.severe("Error populating ComboBox with users: " + e.getMessage());
+            logger.severe(String.format("Error populating ComboBox with users: %s", e.getMessage()));
             showAlert("Error", "Could not load user list.");
         }
     }
@@ -114,24 +115,10 @@ public class DeleteAccountAdminController implements Initializable {
         try {
             logger.info("Cancelling account deletion - returning to menu");
             
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
-            Parent root = fxmlLoader.load();
-
-            MenuWindowController controllerWindow = fxmlLoader.getController();
-            controllerWindow.setUser(profile);
-            controllerWindow.setController(this.cont);
-
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.show();
-
-            Stage currentStage = (Stage) buttonCancel.getScene().getWindow();
-            currentStage.close();
-            
-            logger.info("Returned to menu successfully");
+            navigateToMenuWindow();
             
         } catch (Exception e) {
-            logger.severe("Error returning to menu: " + e.getMessage());
+            logger.severe(String.format("Error returning to menu: %s", e.getMessage()));
             showAlert("Error", "Could not return to the menu.");
         }
     }
@@ -141,101 +128,145 @@ public class DeleteAccountAdminController implements Initializable {
         try {
             logger.info("Starting account deletion process");
             
-            if (textFieldPassword.getText().isEmpty()) {
-                logger.severe("Delete attempt without entering password");
-                
-                Alert error = new Alert(Alert.AlertType.ERROR);
-                error.setTitle("Error");
-                error.setHeaderText("Password Required");
-                error.setContentText("Please enter your password to delete the account.");
-                error.showAndWait();
-                return;
-            }
-
-            if (comboBoxUser.getValue() == null || comboBoxUser.getValue().isEmpty()) {
-                logger.severe("Delete attempt without selecting user");
-                
-                Alert error = new Alert(Alert.AlertType.ERROR);
-                error.setTitle("Error");
-                error.setHeaderText("User Not Selected");
-                error.setContentText("Please select a user to delete.");
-                error.showAndWait();
+            if (!validateInputs()) {
                 return;
             }
 
             String userToDelete = comboBoxUser.getValue();
-            logger.info("Attempting to delete user: " + userToDelete);
+            logger.info(String.format("Attempting to delete user: %s", userToDelete));
             
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Delete Account");
-            alert.setHeaderText("Are you sure you want to delete this account?");
-            alert.setContentText("This action cannot be undone.");
-
-            java.util.Optional<javafx.scene.control.ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK) {
-                
-                String adminPassword = textFieldPassword.getText();
-                String adminUsername = profile.getUsername();
-                
-                logger.info("Admin " + adminUsername + " attempting to delete user: " + userToDelete);
-
-                Boolean success = cont.dropOutAdmin(userToDelete, adminUsername, adminPassword);
-                if (success) {
-                    logger.info("User account deleted successfully: " + userToDelete);
-                    
-                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                    successAlert.setTitle("Account Deleted");
-                    successAlert.setHeaderText(null);
-                    successAlert.setContentText("The account has been successfully deleted.");
-                    successAlert.showAndWait();
-
-                    try {
-                        logger.info("Returning to menu after successful deletion");
-                        
-                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
-                        Parent root = fxmlLoader.load();
-
-                        MenuWindowController controllerWindow = fxmlLoader.getController();
-                        controllerWindow.setUser(profile);
-                        controllerWindow.setController(this.cont);
-                        Stage stage = new Stage();
-                        stage.setScene(new Scene(root));
-                        stage.show();
-                        
-                        Stage currentStage = (Stage) buttonCancel.getScene().getWindow();
-                        currentStage.close();
-                        
-                        logger.info("Successfully returned to menu");
-
-                    } catch (Exception e) {
-                        logger.severe("Error returning to menu after deletion: " + e.getMessage());
-                        showAlert("Error", "Account deleted but could not return to menu.");
-                    }
-                    
-                } else {
-                    logger.severe("Failed to delete user: Incorrect admin password");
-                    
-                    Alert error = new Alert(Alert.AlertType.ERROR);
-                    error.setTitle("Error");
-                    error.setHeaderText("Incorrect Password");
-                    error.setContentText("The password is incorrect. Please try again.");
-                    error.showAndWait();
-                }
-
+            if (confirmDeletion()) {
+                processAccountDeletion(userToDelete);
             } else {
-                logger.info("User cancelled account deletion");
-                System.out.println("Deletion cancelled by the user.");
+                handleDeletionCancellation();
             }
             
         } catch (Exception e) {
-            logger.severe("Error in delete account process: " + e.getMessage());
-            
-            Alert error = new Alert(Alert.AlertType.ERROR);
-            error.setTitle("Error");
-            error.setHeaderText("Account Could Not Be Deleted");
-            error.setContentText("An unexpected error occurred: " + e.getMessage());
-            error.showAndWait();
+            logger.severe(String.format("Error in delete account process: %s", e.getMessage()));
+            showErrorAlert("Account Could Not Be Deleted", 
+                String.format("An unexpected error occurred: %s", e.getMessage()));
         }
+    }
+
+    private boolean validateInputs() {
+        if (textFieldPassword.getText().isEmpty()) {
+            logger.severe("Delete attempt without entering password");
+            showErrorAlert("Password Required", 
+                "Please enter your password to delete the account.");
+            return false;
+        }
+
+        if (comboBoxUser.getValue() == null || comboBoxUser.getValue().isEmpty()) {
+            logger.severe("Delete attempt without selecting user");
+            showErrorAlert("User Not Selected", 
+                "Please select a user to delete.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean confirmDeletion() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Account");
+        alert.setHeaderText("Are you sure you want to delete this account?");
+        alert.setContentText("This action cannot be undone.");
+
+        java.util.Optional<javafx.scene.control.ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK;
+    }
+
+    private void processAccountDeletion(String userToDelete) {
+        String adminPassword = textFieldPassword.getText();
+        String adminUsername = profile.getUsername();
+        
+        logger.info(String.format("Admin %s attempting to delete user: %s", adminUsername, userToDelete));
+
+        Boolean success = cont.dropOutAdmin(userToDelete, adminUsername, adminPassword);
+        if (success) {
+            handleSuccessfulDeletion(userToDelete);
+        } else {
+            handleFailedDeletion();
+        }
+    }
+
+    private void handleSuccessfulDeletion(String userToDelete) {
+        logger.info(String.format("User account deleted successfully: %s", userToDelete));
+        
+        showSuccessAlert("Account Deleted", 
+            "The account has been successfully deleted.");
+        
+        navigateToMenuWindowAfterDeletion();
+    }
+
+    private void handleFailedDeletion() {
+        logger.severe("Failed to delete user: Incorrect admin password");
+        showErrorAlert("Incorrect Password", 
+            "The password is incorrect. Please try again.");
+    }
+
+    private void handleDeletionCancellation() {
+        logger.info("User cancelled account deletion");
+        System.out.println("Deletion cancelled by the user.");
+    }
+
+    private void navigateToMenuWindow() throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
+        Parent root = fxmlLoader.load();
+
+        MenuWindowController controllerWindow = fxmlLoader.getController();
+        controllerWindow.setUser(profile);
+        controllerWindow.setController(this.cont);
+
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
+
+        Stage currentStage = (Stage) buttonCancel.getScene().getWindow();
+        currentStage.close();
+        
+        logger.info("Returned to menu successfully");
+    }
+
+    private void navigateToMenuWindowAfterDeletion() {
+        try {
+            logger.info("Returning to menu after successful deletion");
+            
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
+            Parent root = fxmlLoader.load();
+
+            MenuWindowController controllerWindow = fxmlLoader.getController();
+            controllerWindow.setUser(profile);
+            controllerWindow.setController(this.cont);
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+            
+            Stage currentStage = (Stage) buttonCancel.getScene().getWindow();
+            currentStage.close();
+            
+            logger.info("Successfully returned to menu");
+
+        } catch (Exception e) {
+            logger.severe(String.format("Error returning to menu after deletion: %s", e.getMessage()));
+            showAlert("Error", "Account deleted but could not return to menu.");
+        }
+    }
+
+    private void showSuccessAlert(String title, String message) {
+        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+        successAlert.setTitle(title);
+        successAlert.setHeaderText(null);
+        successAlert.setContentText(message);
+        successAlert.showAndWait();
+    }
+
+    private void showErrorAlert(String title, String message) {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle(title);
+        error.setHeaderText(title);
+        error.setContentText(message);
+        error.showAndWait();
     }
 
     @Override
@@ -243,20 +274,23 @@ public class DeleteAccountAdminController implements Initializable {
         try {
             logger.info("Initializing DeleteAccountAdminController");
             
-            // Clear any existing data
-            comboBoxUser.getItems().clear();
-            textFieldPassword.clear();
+            clearFormData();
             
             logger.info("DeleteAccountAdminController initialized successfully");
             
         } catch (Exception e) {
-            logger.severe("Error initializing DeleteAccountAdminController: " + e.getMessage());
+            logger.severe(String.format("Error initializing DeleteAccountAdminController: %s", e.getMessage()));
         }
+    }
+
+    private void clearFormData() {
+        comboBoxUser.getItems().clear();
+        textFieldPassword.clear();
     }
 
     private void showAlert(String title, String message) {
         try {
-            logger.info("Showing alert: " + title + " - " + message);
+            logger.info(String.format("Showing alert: %s - %s", title, message));
             
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
@@ -265,11 +299,10 @@ public class DeleteAccountAdminController implements Initializable {
             alert.showAndWait();
             
         } catch (Exception e) {
-            logger.severe("Error showing alert: " + e.getMessage());
+            logger.severe(String.format("Error showing alert: %s", e.getMessage()));
         }
     }
 
-    // Method to refresh the user list
     public void refreshUserList() {
         try {
             logger.info("Refreshing user list in ComboBox");
@@ -280,20 +313,18 @@ public class DeleteAccountAdminController implements Initializable {
             comboBoxUser.getItems().clear();
             comboBoxUser.getItems().addAll(users);
             
-            // Try to restore previous selection if it still exists
             if (currentSelection != null && users.contains(currentSelection)) {
                 comboBoxUser.setValue(currentSelection);
             }
             
-            logger.info("User list refreshed - " + users.size() + " users available");
+            logger.info(String.format("User list refreshed - %d users available", users.size()));
             
         } catch (Exception e) {
-            logger.severe("Error refreshing user list: " + e.getMessage());
+            logger.severe(String.format("Error refreshing user list: %s", e.getMessage()));
             showAlert("Error", "Could not refresh the user list.");
         }
     }
 
-    // Method to clear form
     public void clearForm() {
         try {
             logger.info("Clearing account deletion form");
@@ -304,11 +335,16 @@ public class DeleteAccountAdminController implements Initializable {
             logger.info("Form cleared successfully");
             
         } catch (Exception e) {
-            logger.severe("Error clearing form: " + e.getMessage());
+            logger.severe(String.format("Error clearing form: %s", e.getMessage()));
         }
     }
 
-    void setCont(Controller cont) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setCont(Controller cont) {
+        try {
+            this.cont = cont;
+            logger.info("Controller set via setCont method");
+        } catch (Exception e) {
+            logger.severe(String.format("Error in setCont: %s", e.getMessage()));
+        }
     }
 }

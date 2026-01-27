@@ -93,11 +93,11 @@ public class ReviewController {
             updateVisualStars(sliderRating.getValue());
             updateSubmitButtonState();
             
-            logger.info("ReviewController initialized successfully. Game: " + 
-                       (gameName.isEmpty() ? "Not configured" : gameName));
+            logger.info(String.format("ReviewController initialized successfully. Game: %s", 
+                       gameName.isEmpty() ? "Not configured" : gameName));
             
         } catch (Exception e) {
-            logger.severe("Critical error initializing ReviewController: " + e.getMessage());
+            logger.severe(String.format("Critical error initializing ReviewController: %s", e.getMessage()));
             showAlert("Initialization Error", 
                 "Could not initialize the review window. Please restart the application.");
         }
@@ -118,12 +118,12 @@ public class ReviewController {
             }
             
         } catch (NullPointerException e) {
-            logger.severe("Star images not found in specified path: " + e.getMessage());
+            logger.severe(String.format("Star images not found in specified path: %s", e.getMessage()));
             showAlert("Resource Error", 
                 "Could not load necessary images. Contact the administrator.");
             
         } catch (Exception e) {
-            logger.severe("Error loading star images: " + e.getMessage());
+            logger.severe(String.format("Error loading star images: %s", e.getMessage()));
         }
     }
 
@@ -147,17 +147,17 @@ public class ReviewController {
                     labelRating.setText(String.format("%.1f", value));
                     updateVisualStars(value);
                     
-                    logger.info("Slider updated - Value: " + value);
+                    logger.info(String.format("Slider updated - Value: %.1f", value));
                     
                 } catch (Exception e) {
-                    logger.warning("Error updating slider: " + e.getMessage());
+                    logger.warning(String.format("Error updating slider: %s", e.getMessage()));
                 }
             });
             
             logger.info("Slider configured successfully");
             
         } catch (Exception e) {
-            logger.severe("Error configuring slider: " + e.getMessage());
+            logger.severe(String.format("Error configuring slider: %s", e.getMessage()));
         }
     }
 
@@ -175,12 +175,12 @@ public class ReviewController {
                 }
             }
             
-            logger.info("Visual stars updated - Rating: " + rating);
+            logger.info(String.format("Visual stars updated - Rating: %.1f", rating));
             
         } catch (NullPointerException e) {
-            logger.warning("Error updating stars (images not loaded): " + e.getMessage());
+            logger.warning(String.format("Error updating stars (images not loaded): %s", e.getMessage()));
         } catch (Exception e) {
-            logger.warning("Unexpected error updating visual stars: " + e.getMessage());
+            logger.warning(String.format("Unexpected error updating visual stars: %s", e.getMessage()));
         }
     }
 
@@ -192,36 +192,39 @@ public class ReviewController {
 
             textAreaComment.textProperty().addListener((observable, oldValue, newValue) -> {
                 try {
-                    int characters = newValue.length();
-                    labelCharacterCount.setText(characters + "/" + MAX_CHARACTERS + " characters");
-
-                    if (characters > MAX_CHARACTERS * 0.9) {
-                        labelCharacterCount.setStyle("-fx-text-fill: #FF5722;");
-                    } else if (characters > MAX_CHARACTERS * 0.75) {
-                        labelCharacterCount.setStyle("-fx-text-fill: #FF9800;");
-                    } else {
-                        labelCharacterCount.setStyle("-fx-text-fill: #666666;");
-                    }
-
-                    if (newValue.length() > MAX_CHARACTERS) {
-                        textAreaComment.setText(oldValue);
-                        logger.info("Character limit reached (" + MAX_CHARACTERS + ")");
-                    }
-
+                    updateCharacterCount(newValue, MAX_CHARACTERS);
                     updateSubmitButtonState();
                     
-                    logger.info("Character counter updated: " + characters);
-                    
                 } catch (Exception e) {
-                    logger.warning("Error in TextArea listener: " + e.getMessage());
+                    logger.warning(String.format("Error in TextArea listener: %s", e.getMessage()));
                 }
             });
             
-            logger.info("TextArea configured successfully (limit: " + MAX_CHARACTERS + " characters)");
+            logger.info(String.format("TextArea configured successfully (limit: %d characters)", MAX_CHARACTERS));
             
         } catch (Exception e) {
-            logger.severe("Error configuring TextArea: " + e.getMessage());
+            logger.severe(String.format("Error configuring TextArea: %s", e.getMessage()));
         }
+    }
+
+    private void updateCharacterCount(String newValue, final int MAX_CHARACTERS) {
+        int characters = newValue.length();
+        labelCharacterCount.setText(String.format("%d/%d characters", characters, MAX_CHARACTERS));
+
+        if (characters > MAX_CHARACTERS * 0.9) {
+            labelCharacterCount.setStyle("-fx-text-fill: #FF5722;");
+        } else if (characters > MAX_CHARACTERS * 0.75) {
+            labelCharacterCount.setStyle("-fx-text-fill: #FF9800;");
+        } else {
+            labelCharacterCount.setStyle("-fx-text-fill: #666666;");
+        }
+
+        if (newValue.length() > MAX_CHARACTERS) {
+            textAreaComment.setText(newValue.substring(0, MAX_CHARACTERS));
+            logger.info(String.format("Character limit reached (%d)", MAX_CHARACTERS));
+        }
+
+        logger.info(String.format("Character counter updated: %d", characters));
     }
 
     private void updateSubmitButtonState() {
@@ -229,18 +232,17 @@ public class ReviewController {
             boolean hasComment = !textAreaComment.getText().trim().isEmpty();
             buttonSubmit.setDisable(!hasComment);
             
-            logger.info("Submit button state updated - Enabled: " + hasComment);
+            logger.info(String.format("Submit button state updated - Enabled: %s", hasComment));
             
         } catch (Exception e) {
-            logger.warning("Error updating submit button state: " + e.getMessage());
+            logger.warning(String.format("Error updating submit button state: %s", e.getMessage()));
         }
     }
 
     @FXML
     private void submitReview() {
         try {
-            logger.info("Starting review submission - User: " + userId + 
-                       ", Game: " + gameName);
+            logger.info(String.format("Starting review submission - User: %d, Game: %s", userId, gameName));
             
             if (!validateReview()) {
                 logger.warning("Validation failed when submitting review");
@@ -250,8 +252,7 @@ public class ReviewController {
             double rating = Math.round(sliderRating.getValue() * 2) / 2.0;
             String comment = textAreaComment.getText().trim();
 
-            logger.info("Review data prepared - Rating: " + rating + 
-                       ", Characters: " + comment.length());
+            logger.info(String.format("Review data prepared - Rating: %.1f, Characters: %d", rating, comment.length()));
 
             Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
             confirmation.setTitle("Confirm Submission");
@@ -265,34 +266,37 @@ public class ReviewController {
             confirmation.showAndWait().ifPresent(response -> {
                 try {
                     if (response == buttonTypeYes) {
-                        logger.info("User confirmed review submission");
-                        
-                        saveReviewToDB(rating, comment);
-
-                        Alert success = new Alert(Alert.AlertType.INFORMATION);
-                        success.setTitle("Rating Submitted");
-                        success.setHeaderText("Thank you for your rating!");
-                        success.setContentText("Your review has been published successfully.");
-                        success.showAndWait();
-
-                        logger.info("Review submitted successfully");
-                        
-                        cancel();
-                        
+                        handleReviewConfirmation(rating, comment);
                     } else {
                         logger.info("User cancelled review submission");
                     }
                 } catch (Exception e) {
-                    logger.severe("Error processing review confirmation: " + e.getMessage());
+                    logger.severe(String.format("Error processing review confirmation: %s", e.getMessage()));
                     showAlert("Error", "Could not process your rating. Please try again.");
                 }
             });
             
         } catch (Exception e) {
-            logger.severe("Critical error in submitReview: " + e.getMessage());
+            logger.severe(String.format("Critical error in submitReview: %s", e.getMessage()));
             showAlert("System Error", 
                 "An error occurred while submitting your rating. Please try again later.");
         }
+    }
+
+    private void handleReviewConfirmation(double rating, String comment) {
+        logger.info("User confirmed review submission");
+        
+        saveReviewToDB(rating, comment);
+
+        Alert success = new Alert(Alert.AlertType.INFORMATION);
+        success.setTitle("Rating Submitted");
+        success.setHeaderText("Thank you for your rating!");
+        success.setContentText("Your review has been published successfully.");
+        success.showAndWait();
+
+        logger.info("Review submitted successfully");
+        
+        cancel();
     }
 
     private boolean validateReview() {
@@ -300,77 +304,96 @@ public class ReviewController {
             logger.info("Validating review data");
             
             String comment = textAreaComment.getText().trim();
-            if (comment.isEmpty()) {
-                logger.warning("Validation failed: empty comment");
-                showAlert("Error", "Please write a comment before submitting.");
-                return false;
-            }
-
-            if (comment.length() < 10) {
-                logger.warning("Validation failed: comment too short (" + comment.length() + " characters)");
-                showAlert("Error", "The comment must have at least 10 characters.");
-                return false;
-            }
-
             double rating = sliderRating.getValue();
-            if (rating < 0 || rating > 5) {
-                logger.warning("Validation failed: rating out of range (" + rating + ")");
-                showAlert("Error", "The rating must be between 0 and 5.");
+
+            if (!validateComment(comment)) {
                 return false;
             }
 
-            if (gameName.isEmpty() || gameId == 0) {
-                logger.severe("Validation failed: game not configured");
-                showAlert("Error", "A valid game has not been selected.");
+            if (!validateRating(rating)) {
                 return false;
             }
 
-            if (userId == 0) {
-                logger.warning("Validation failed: user not configured or ID=0");
-                showAlert("Error", "User has not been identified.");
+            if (!validateGameConfiguration()) {
                 return false;
             }
 
-            logger.info("Validation successful - Rating: " + rating + 
-                       ", Characters: " + comment.length());
+            if (!validateUserConfiguration()) {
+                return false;
+            }
+
+            logger.info(String.format("Validation successful - Rating: %.1f, Characters: %d", rating, comment.length()));
             return true;
             
         } catch (Exception e) {
-            logger.severe("Error in validateReview: " + e.getMessage());
+            logger.severe(String.format("Error in validateReview: %s", e.getMessage()));
             showAlert("Validation Error", 
                 "An error occurred while validating data. Please check the information.");
             return false;
         }
     }
 
+    private boolean validateComment(String comment) {
+        if (comment.isEmpty()) {
+            logger.warning("Validation failed: empty comment");
+            showAlert("Error", "Please write a comment before submitting.");
+            return false;
+        }
+
+        if (comment.length() < 10) {
+            logger.warning(String.format("Validation failed: comment too short (%d characters)", comment.length()));
+            showAlert("Error", "The comment must have at least 10 characters.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validateRating(double rating) {
+        if (rating < 0 || rating > 5) {
+            logger.warning(String.format("Validation failed: rating out of range (%.1f)", rating));
+            showAlert("Error", "The rating must be between 0 and 5.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validateGameConfiguration() {
+        if (gameName.isEmpty() || gameId == 0) {
+            logger.severe("Validation failed: game not configured");
+            showAlert("Error", "A valid game has not been selected.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validateUserConfiguration() {
+        if (userId == 0) {
+            logger.warning("Validation failed: user not configured or ID=0");
+            showAlert("Error", "User has not been identified.");
+            return false;
+        }
+
+        return true;
+    }
+
     private void saveReviewToDB(double rating, String comment) {
         try {
-            logger.info("Saving review to DB - UserID: " + userId + 
-                       ", GameID: " + gameId + 
-                       ", Rating: " + rating);
+            logger.info(String.format("Saving review to DB - UserID: %d, GameID: %d, Rating: %.1f", userId, gameId, rating));
             
             logger.info("Simulating save to DB:");
-            logger.info("  User ID: " + userId);
-            logger.info("  Game ID: " + gameId);
-            logger.info("  Game: " + gameName);
-            logger.info("  Rating: " + rating);
-            logger.info("  Comment (length): " + comment.length() + " characters");
-            logger.info("  Comment (preview): " + 
-                       (comment.length() > 50 ? comment.substring(0, 50) + "..." : comment));
+            logger.info(String.format("  User ID: %d", userId));
+            logger.info(String.format("  Game ID: %d", gameId));
+            logger.info(String.format("  Game: %s", gameName));
+            logger.info(String.format("  Rating: %.1f", rating));
+            logger.info(String.format("  Comment (length): %d characters", comment.length()));
+            logger.info(String.format("  Comment (preview): %s", 
+                       comment.length() > 50 ? comment.substring(0, 50) + "..." : comment));
 
-            // TODO: Implement real database connection
-            // Example:
-            // Connection conn = DatabaseManager.getConnection();
-            // PreparedStatement stmt = conn.prepareStatement(
-            //     "INSERT INTO reviews (user_id, game_id, rating, comment) VALUES (?, ?, ?, ?)");
-            // stmt.setInt(1, userId);
-            // stmt.setInt(2, gameId);
-            // stmt.setDouble(3, rating);
-            // stmt.setString(4, comment);
-            // int rowsAffected = stmt.executeUpdate();
-            
         } catch (Exception e) {
-            logger.severe("Error saving review to DB: " + e.getMessage());
+            logger.severe(String.format("Error saving review to DB: %s", e.getMessage()));
             throw new RuntimeException("Could not save the rating", e);
         }
     }
@@ -381,38 +404,42 @@ public class ReviewController {
             logger.info("Review cancellation requested");
             
             if (!textAreaComment.getText().trim().isEmpty()) {
-                logger.info("Text exists, requesting confirmation");
-                
-                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-                confirmation.setTitle("Confirm Cancellation");
-                confirmation.setHeaderText("Discard Rating?");
-                confirmation.setContentText("You have a rating written. Are you sure you want to cancel?");
-
-                ButtonType buttonTypeYes = new ButtonType("Yes");
-                ButtonType buttonTypeNo = new ButtonType("No");
-                confirmation.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
-
-                confirmation.showAndWait().ifPresent(response -> {
-                    try {
-                        if (response == buttonTypeYes) {
-                            logger.info("User confirmed cancel review");
-                            closeWindow();
-                        } else {
-                            logger.info("User cancelled exit action");
-                        }
-                    } catch (Exception e) {
-                        logger.severe("Error processing cancellation confirmation: " + e.getMessage());
-                    }
-                });
+                handleCancelWithText();
             } else {
                 logger.info("No text written, closing directly");
                 closeWindow();
             }
             
         } catch (Exception e) {
-            logger.severe("Error in cancel: " + e.getMessage());
+            logger.severe(String.format("Error in cancel: %s", e.getMessage()));
             showAlert("Error", "Could not cancel the operation.");
         }
+    }
+
+    private void handleCancelWithText() {
+        logger.info("Text exists, requesting confirmation");
+        
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirm Cancellation");
+        confirmation.setHeaderText("Discard Rating?");
+        confirmation.setContentText("You have a rating written. Are you sure you want to cancel?");
+
+        ButtonType buttonTypeYes = new ButtonType("Yes");
+        ButtonType buttonTypeNo = new ButtonType("No");
+        confirmation.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+        confirmation.showAndWait().ifPresent(response -> {
+            try {
+                if (response == buttonTypeYes) {
+                    logger.info("User confirmed cancel review");
+                    closeWindow();
+                } else {
+                    logger.info("User cancelled exit action");
+                }
+            } catch (Exception e) {
+                logger.severe(String.format("Error processing cancellation confirmation: %s", e.getMessage()));
+            }
+        });
     }
 
     private void closeWindow() {
@@ -428,13 +455,13 @@ public class ReviewController {
             logger.severe("Error closing window: stage not initialized");
             showAlert("Error", "Could not close the window. Try closing it manually.");
         } catch (Exception e) {
-            logger.severe("Error closing window: " + e.getMessage());
+            logger.severe(String.format("Error closing window: %s", e.getMessage()));
         }
     }
 
     private void showAlert(String title, String message) {
         try {
-            logger.info("Showing alert: " + title + " - " + message);
+            logger.info(String.format("Showing alert: %s - %s", title, message));
             
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
@@ -443,7 +470,7 @@ public class ReviewController {
             alert.showAndWait();
             
         } catch (Exception e) {
-            logger.severe("Error showing alert: " + e.getMessage());
+            logger.severe(String.format("Error showing alert: %s", e.getMessage()));
         }
     }
 
@@ -458,15 +485,15 @@ public class ReviewController {
             
             this.gameName = name;
             this.gameId = gameId;
-            labelGame.setText("Game: " + name);
+            labelGame.setText(String.format("Game: %s", name));
             
-            logger.info("Game configured - Name: " + name + ", ID: " + gameId);
+            logger.info(String.format("Game configured - Name: %s, ID: %d", name, gameId));
             
         } catch (IllegalArgumentException e) {
-            logger.severe("Error configuring game: " + e.getMessage());
+            logger.severe(String.format("Error configuring game: %s", e.getMessage()));
             throw e;
         } catch (Exception e) {
-            logger.severe("Unexpected error configuring game: " + e.getMessage());
+            logger.severe(String.format("Unexpected error configuring game: %s", e.getMessage()));
         }
     }
 
@@ -477,13 +504,13 @@ public class ReviewController {
             }
             
             this.userId = userId;
-            logger.info("User configured - ID: " + userId);
+            logger.info(String.format("User configured - ID: %d", userId));
             
         } catch (IllegalArgumentException e) {
-            logger.severe("Error configuring user: " + e.getMessage());
+            logger.severe(String.format("Error configuring user: %s", e.getMessage()));
             throw e;
         } catch (Exception e) {
-            logger.severe("Unexpected error configuring user: " + e.getMessage());
+            logger.severe(String.format("Unexpected error configuring user: %s", e.getMessage()));
         }
     }
 
@@ -497,10 +524,10 @@ public class ReviewController {
             logger.info("Stage configured in ReviewController");
             
         } catch (IllegalArgumentException e) {
-            logger.severe("Error configuring stage: " + e.getMessage());
+            logger.severe(String.format("Error configuring stage: %s", e.getMessage()));
             throw e;
         } catch (Exception e) {
-            logger.severe("Unexpected error configuring stage: " + e.getMessage());
+            logger.severe(String.format("Unexpected error configuring stage: %s", e.getMessage()));
         }
     }
 
@@ -509,7 +536,7 @@ public class ReviewController {
             logger.info("Loading existing review for editing");
             
             if (rating < 0 || rating > 5) {
-                throw new IllegalArgumentException("Rating out of range: " + rating);
+                throw new IllegalArgumentException(String.format("Rating out of range: %.1f", rating));
             }
             
             if (comment == null) {
@@ -520,14 +547,13 @@ public class ReviewController {
             textAreaComment.setText(comment);
             updateVisualStars(rating);
             
-            logger.info("Existing review loaded - Rating: " + rating + 
-                       ", Characters: " + comment.length());
+            logger.info(String.format("Existing review loaded - Rating: %.1f, Characters: %d", rating, comment.length()));
             
         } catch (IllegalArgumentException e) {
-            logger.severe("Validation error loading existing review: " + e.getMessage());
+            logger.severe(String.format("Validation error loading existing review: %s", e.getMessage()));
             throw e;
         } catch (Exception e) {
-            logger.severe("Error loading existing review: " + e.getMessage());
+            logger.severe(String.format("Error loading existing review: %s", e.getMessage()));
             showAlert("Error", "Could not load the review for editing.");
         }
     }
@@ -553,7 +579,7 @@ public class ReviewController {
             );
             
         } catch (Exception e) {
-            return "Error getting review info: " + e.getMessage();
+            return String.format("Error getting review info: %s", e.getMessage());
         }
     }
 }

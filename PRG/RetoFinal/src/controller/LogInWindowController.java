@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -22,7 +23,6 @@ public class LogInWindowController implements Initializable {
     private static final Logger logger = Logger.getLogger(LogInWindowController.class.getName());
     private static boolean loggerInitialized = false;
     
-    // NOMBRES ORIGINALES DE TU FXML
     @FXML
     private TextField TextField_Username;
     @FXML
@@ -34,7 +34,7 @@ public class LogInWindowController implements Initializable {
     @FXML
     private Label labelIncorrecto;
 
-    private Controller cont = new Controller(new DBImplementation());
+    private Controller cont = new Controller();
 
     static {
         initializeLogger();
@@ -85,10 +85,9 @@ public class LogInWindowController implements Initializable {
         try {
             logger.info("=== Opening Sign Up window ===");
             
-            // Verificar campos FXML
-            logger.info("Field check:");
-            logger.info("  Button_SignUp: " + (Button_SignUp == null ? "NULL" : "OK"));
-            logger.info("  TextField_Username: " + (TextField_Username == null ? "NULL" : "OK"));
+            if (!validateSignUpFields()) {
+                return;
+            }
             
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/SignUpWindow.fxml"));
             Parent root = fxmlLoader.load();
@@ -96,8 +95,8 @@ public class LogInWindowController implements Initializable {
             logger.info("FXML loaded successfully");
             
             SignUpWindowController controllerWindow = fxmlLoader.getController();
-            logger.info("SignUpWindowController obtained: " + 
-                       (controllerWindow == null ? "NULL" : controllerWindow.getClass().getName()));
+            logger.info(String.format("SignUpWindowController obtained: %s", 
+                       controllerWindow == null ? "NULL" : controllerWindow.getClass().getName()));
             
             controllerWindow.setController(cont);
             
@@ -112,84 +111,126 @@ public class LogInWindowController implements Initializable {
             logger.info("=== Sign Up window opened successfully ===");
             
         } catch (Exception e) {
-            logger.severe("Error opening Sign Up window: " + e.toString());
+            logger.severe(String.format("Error opening Sign Up window: %s", e.toString()));
             showAlert("Error", "Could not open the Sign Up window: " + e.getMessage());
         }
     }
 
     @FXML
-    private void logIn() {
-        try {
-            logger.info("=== Login attempt ===");
-            
-            // Verificar que los campos existan
-            if (TextField_Username == null || PasswordField_Password == null) {
-                logger.severe("Login fields are null!");
-                showAlert("System Error", "Application not properly initialized");
-                return;
-            }
-            
-            String username = TextField_Username.getText();
-            String password = PasswordField_Password.getText();
-            
-            logger.info("Credentials - Username: '" + username + "', Password length: " + password.length());
-            
-            if (username.isEmpty() || password.isEmpty()) {
-                logger.warning("Empty fields detected");
-                if (labelIncorrecto != null) {
-                    labelIncorrecto.setText("Please fill in both fields.");
-                } else {
-                    showAlert("Input Error", "Please fill in both username and password fields.");
-                }
-                return;
-            }
-
-            logger.info("Calling cont.logIn()...");
-            Profile profile = cont.logIn(username, password);
-            
-            if (profile != null) {
-                logger.info("=== LOGIN SUCCESSFUL ===");
-                logger.info("User type: " + profile.getClass().getSimpleName());
-                logger.info("Username: " + profile.getUsername());
-                
-                try {
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
-                    Parent root = fxmlLoader.load();
-
-                    MenuWindowController controllerWindow = fxmlLoader.getController();
-                    controllerWindow.setUser(profile);
-                    controllerWindow.setController(cont);
-
-                    Stage stage = new Stage();
-                    stage.setScene(new Scene(root));
-                    stage.show();
-
-                    Stage currentStage = (Stage) Button_LogIn.getScene().getWindow();
-                    currentStage.close();
-                    
-                    logger.info("=== Redirected to MenuWindow successfully ===");
-                    
-                } catch (Exception e) {
-                    logger.severe("Error opening MenuWindow: " + e.toString());
-                    showAlert("Navigation Error", "Login successful but could not open main menu.");
-                }
-            } else {
-                logger.warning("=== LOGIN FAILED - Invalid credentials ===");
-                if (labelIncorrecto != null) {
-                    labelIncorrecto.setText("The username and/or password are incorrect.");
-                } else {
-                    showAlert("Login Failed", "The username and/or password are incorrect.");
-                }
-                
-                // Clear password for security
-                PasswordField_Password.clear();
-                PasswordField_Password.requestFocus();
-            }
-            
-        } catch (Exception e) {
-            logger.severe("Error in login process: " + e.toString());
-            showAlert("Login Error", "An error occurred during login: " + e.getMessage());
+private void logIn() {
+    try {
+        logger.info("=== Login attempt ===");
+        
+        String username = TextField_Username.getText();
+        String password = PasswordField_Password.getText();
+        
+        logger.info(String.format("Credentials - Username: '%s', Password length: %d", username, password.length()));
+        
+        if (!validateLoginFields(username, password)) {
+            return;
         }
+
+        logger.info("Calling cont.logIn()...");
+        Profile profile = cont.logIn(username, password);
+        
+        if (profile != null) {
+            logger.info("=== LOGIN SUCCESSFUL ===");
+            logger.info(String.format("User type: %s, Username: %s", 
+                       profile.getClass().getSimpleName(), profile.getUsername()));
+            
+            // AÑADE ESTO PARA DEBUG
+            logger.info("Attempting to open MenuWindow...");
+            logger.info("FXML Path: /view/MenuWindow.fxml");
+            
+            handleSuccessfulLogin(profile, username);
+        } else {
+            handleFailedLogin(username);
+        }
+        
+    } catch (Exception e) {
+        logger.severe(String.format("Error in login process: %s", e.toString()));
+        // AÑADE ESTO PARA VER EL STACK TRACE COMPLETO
+        e.printStackTrace();
+        showAlert("Login Error", "An error occurred during login: " + e.getMessage());
+    }
+}
+
+    private boolean validateSignUpFields() {
+        logger.info("Validating Sign Up fields");
+        logger.info(String.format("Button_SignUp: %s", Button_SignUp == null ? "NULL" : "OK"));
+        logger.info(String.format("TextField_Username: %s", TextField_Username == null ? "NULL" : "OK"));
+        
+        if (Button_SignUp == null) {
+            logger.severe("Button_SignUp is null");
+            showAlert("System Error", "Application not properly initialized");
+            return false;
+        }
+        
+        return true;
+    }
+
+    private boolean validateLoginFields(String username, String password) {
+        if (TextField_Username == null || PasswordField_Password == null) {
+            logger.severe("Login fields are null!");
+            showAlert("System Error", "Application not properly initialized");
+            return false;
+        }
+        
+        if (username.isEmpty() || password.isEmpty()) {
+            logger.warning("Empty fields detected");
+            if (labelIncorrecto != null) {
+                labelIncorrecto.setText("Please fill in both fields.");
+            } else {
+                showAlert("Input Error", "Please fill in both username and password fields.");
+            }
+            return false;
+        }
+        
+        return true;
+    }
+
+    private void handleSuccessfulLogin(Profile profile, String username) {
+    try {
+        logger.info("Trying SIMPLIFIED version...");
+        
+        // Cargar FXML sin controlador primero
+        Parent root = FXMLLoader.load(getClass().getResource("/view/MenuWindow.fxml"));
+        
+        // Crear ventana simple
+        Stage stage = new Stage();
+        stage.setTitle("Main Menu - " + username);
+        stage.setScene(new Scene(root, 600, 400));
+        stage.show();
+        
+        // Cerrar login
+        Stage currentStage = (Stage) Button_LogIn.getScene().getWindow();
+        currentStage.close();
+        
+        logger.info("Simplified version worked!");
+        
+    } catch (Exception e) {
+        logger.severe("Simplified version also failed: " + e.getMessage());
+        e.printStackTrace();
+        
+        // Muestra una ventana de emergencia
+        Label label = new Label("Login successful!\nUsername: " + username + "\n\nMenuWindow.fxml not loading properly.");
+        Scene scene = new Scene(label, 300, 200);
+        Stage emergencyStage = new Stage();
+        emergencyStage.setScene(scene);
+        emergencyStage.show();
+    }
+}
+
+    private void handleFailedLogin(String username) {
+        logger.warning("=== LOGIN FAILED - Invalid credentials ===");
+        if (labelIncorrecto != null) {
+            labelIncorrecto.setText("The username and/or password are incorrect.");
+        } else {
+            showAlert("Login Failed", "The username and/or password are incorrect.");
+        }
+        
+        PasswordField_Password.clear();
+        PasswordField_Password.requestFocus();
     }
 
     @Override
@@ -197,36 +238,41 @@ public class LogInWindowController implements Initializable {
         try {
             logger.info("=== Initializing LogInWindowController ===");
             
-            // Verificar inyección de campos FXML
-            logger.info("FXML Field Injection Check:");
-            logger.info("  TextField_Username: " + (TextField_Username == null ? "NULL" : "OK"));
-            logger.info("  PasswordField_Password: " + (PasswordField_Password == null ? "NULL" : "OK"));
-            logger.info("  Button_LogIn: " + (Button_LogIn == null ? "NULL" : "OK"));
-            logger.info("  Button_SignUp: " + (Button_SignUp == null ? "NULL" : "OK"));
-            logger.info("  labelIncorrecto: " + (labelIncorrecto == null ? "NULL" : "OK"));
-            
-            // Limpiar campos
-            if (TextField_Username != null) {
-                TextField_Username.clear();
-                TextField_Username.requestFocus();
-            }
-            if (PasswordField_Password != null) {
-                PasswordField_Password.clear();
-            }
-            if (labelIncorrecto != null) {
-                labelIncorrecto.setText("");
-            }
+            logFieldInjectionStatus();
+            clearFormOnInitialize();
             
             logger.info("=== LogInWindowController initialized successfully ===");
             
         } catch (Exception e) {
-            logger.severe("Error in initialize: " + e.toString());
+            logger.severe(String.format("Error in initialize: %s", e.toString()));
+        }
+    }
+
+    private void logFieldInjectionStatus() {
+        logger.info("FXML Field Injection Check:");
+        logger.info(String.format("  TextField_Username: %s", TextField_Username == null ? "NULL" : "OK"));
+        logger.info(String.format("  PasswordField_Password: %s", PasswordField_Password == null ? "NULL" : "OK"));
+        logger.info(String.format("  Button_LogIn: %s", Button_LogIn == null ? "NULL" : "OK"));
+        logger.info(String.format("  Button_SignUp: %s", Button_SignUp == null ? "NULL" : "OK"));
+        logger.info(String.format("  labelIncorrecto: %s", labelIncorrecto == null ? "NULL" : "OK"));
+    }
+
+    private void clearFormOnInitialize() {
+        if (TextField_Username != null) {
+            TextField_Username.clear();
+            TextField_Username.requestFocus();
+        }
+        if (PasswordField_Password != null) {
+            PasswordField_Password.clear();
+        }
+        if (labelIncorrecto != null) {
+            labelIncorrecto.setText("");
         }
     }
 
     private void showAlert(String title, String message) {
         try {
-            logger.info("Showing alert: " + title + " - " + message);
+            logger.info(String.format("Showing alert: %s - %s", title, message));
             
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
@@ -235,11 +281,10 @@ public class LogInWindowController implements Initializable {
             alert.showAndWait();
             
         } catch (Exception e) {
-            logger.severe("Error showing alert: " + e.toString());
+            logger.severe(String.format("Error showing alert: %s", e.toString()));
         }
     }
 
-    // Método para limpiar el formulario
     public void clearForm() {
         try {
             logger.info("Clearing login form");
@@ -260,14 +305,13 @@ public class LogInWindowController implements Initializable {
             logger.info("Login form cleared");
             
         } catch (Exception e) {
-            logger.severe("Error clearing form: " + e.toString());
+            logger.severe(String.format("Error clearing form: %s", e.toString()));
         }
     }
 
-    // Método para probar login rápido (testing)
     public void testLogin(String username, String password) {
         try {
-            logger.info("Test login - Username: " + username);
+            logger.info(String.format("Test login - Username: %s", username));
             
             if (TextField_Username != null) {
                 TextField_Username.setText(username);
@@ -279,7 +323,7 @@ public class LogInWindowController implements Initializable {
             logIn();
             
         } catch (Exception e) {
-            logger.severe("Error in testLogin: " + e.toString());
+            logger.severe(String.format("Error in testLogin: %s", e.toString()));
         }
     }
 }

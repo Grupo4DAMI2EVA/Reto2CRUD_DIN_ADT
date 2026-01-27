@@ -21,18 +21,17 @@ public class SignUpWindowController implements Initializable {
     private static final Logger logger = Logger.getLogger(SignUpWindowController.class.getName());
     private static boolean loggerInitialized = false;
     
-    // USANDO LOS NOMBRES ORIGINALES DE TU FXML
     @FXML
     private TextField textFieldEmail, textFieldName, textFieldSurname, textFieldTelephone;
     @FXML
-    private TextField textFieldCardN, textFieldPassword, textFieldCPassword, textFieldUsername; // NOMBRES ORIGINALES
+    private TextField textFieldCardN, textFieldPassword, textFieldCPassword, textFieldUsername;
     @FXML
-    private RadioButton rButtonM, rButtonW, rButtonO; // NOMBRES ORIGINALES
+    private RadioButton rButtonM, rButtonW, rButtonO;
     @FXML
     private Button buttonSignUp, buttonLogIn;
 
     private Controller cont;
-    private ToggleGroup grupOp; // Nombre original
+    private ToggleGroup grupOp;
 
     static {
         initializeLogger();
@@ -83,7 +82,7 @@ public class SignUpWindowController implements Initializable {
             logger.info("setController called");
             this.cont = cont;
         } catch (Exception e) {
-            logger.severe("Error in setController: " + e.toString());
+            logger.severe(String.format("Error in setController: %s", e.toString()));
         }
     }
 
@@ -104,7 +103,7 @@ public class SignUpWindowController implements Initializable {
             currentStage.close();
             
         } catch (Exception e) {
-            logger.severe("Error opening login window: " + e.toString());
+            logger.severe(String.format("Error opening login window: %s", e.toString()));
             showAlert("Error", "Could not open login window");
         }
     }
@@ -114,15 +113,8 @@ public class SignUpWindowController implements Initializable {
         try {
             logger.info("=== SIGNUP STARTED ===");
             
-            // Verificar campos
-            logger.info("Field check:");
-            logger.info("  textFieldCardN: " + (textFieldCardN == null ? "NULL" : "OK"));
-            logger.info("  textFieldCPassword: " + (textFieldCPassword == null ? "NULL" : "OK"));
-            logger.info("  rButtonM: " + (rButtonM == null ? "NULL" : "OK"));
-            logger.info("  rButtonW: " + (rButtonW == null ? "NULL" : "OK"));
-            logger.info("  rButtonO: " + (rButtonO == null ? "NULL" : "OK"));
+            logFieldStatus();
             
-            // Obtener datos
             String email = textFieldEmail.getText();
             String name = textFieldName.getText();
             String surname = textFieldSurname.getText();
@@ -132,53 +124,57 @@ public class SignUpWindowController implements Initializable {
             String confirmPassword = textFieldCPassword != null ? textFieldCPassword.getText() : "";
             String username = textFieldUsername.getText();
             
-            logger.info("Data collected:");
-            logger.info("  Username: " + username);
-            logger.info("  Email: " + email);
-            logger.info("  Card: " + cardNumber);
-            logger.info("  Password: " + (password.isEmpty() ? "EMPTY" : "SET"));
-            logger.info("  Confirm: " + (confirmPassword.isEmpty() ? "EMPTY" : "SET"));
+            logger.info(String.format("Data collected - Username: %s, Email: %s, Card: %s", username, email, cardNumber));
             
-            // Validar datos requeridos
-            if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                showAlert("Error", "Please fill in all required fields");
+            if (!validateSignUpData(username, email, password, confirmPassword)) {
                 return;
             }
             
-            // Obtener género
             String gender = getGender();
-            logger.info("Gender: " + gender);
+            logger.info(String.format("Gender selected: %s", gender));
             
-            // Validar contraseñas
-            if (!password.equals(confirmPassword)) {
-                showAlert("Password Error", "Passwords do not match");
-                return;
-            }
-            
-            // Validar controlador
             if (cont == null) {
                 logger.severe("Controller is null");
                 showAlert("System Error", "Application not properly initialized");
                 return;
             }
             
-            // Intentar crear cuenta
             logger.info("Calling cont.signUp()...");
             boolean success = cont.signUp(gender, cardNumber, username, password, email, name, telephone, surname);
             
             if (success) {
-                logger.info("=== SIGNUP SUCCESSFUL ===");
-                showAlert("Success", "Account created successfully!");
-                login(); // Volver al login
+                handleSuccessfulSignup();
             } else {
-                logger.warning("=== SIGNUP FAILED ===");
-                showAlert("Error", "Could not create account. Username may already exist.");
+                handleFailedSignup();
             }
             
         } catch (Exception e) {
-            logger.severe("Error in signup: " + e.toString());
+            logger.severe(String.format("Error in signup: %s", e.toString()));
             showAlert("Error", "An error occurred: " + e.getMessage());
         }
+    }
+
+    private void logFieldStatus() {
+        logger.info("Field check:");
+        logger.info(String.format("  textFieldCardN: %s", textFieldCardN == null ? "NULL" : "OK"));
+        logger.info(String.format("  textFieldCPassword: %s", textFieldCPassword == null ? "NULL" : "OK"));
+        logger.info(String.format("  rButtonM: %s", rButtonM == null ? "NULL" : "OK"));
+        logger.info(String.format("  rButtonW: %s", rButtonW == null ? "NULL" : "OK"));
+        logger.info(String.format("  rButtonO: %s", rButtonO == null ? "NULL" : "OK"));
+    }
+
+    private boolean validateSignUpData(String username, String email, String password, String confirmPassword) {
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            showAlert("Error", "Please fill in all required fields");
+            return false;
+        }
+        
+        if (!password.equals(confirmPassword)) {
+            showAlert("Password Error", "Passwords do not match");
+            return false;
+        }
+        
+        return true;
     }
     
     private String getGender() {
@@ -193,8 +189,19 @@ public class SignUpWindowController implements Initializable {
         } else if (rButtonO.isSelected()) {
             return "Other";
         } else {
-            return "Other"; // Default
+            return "Other";
         }
+    }
+
+    private void handleSuccessfulSignup() {
+        logger.info("=== SIGNUP SUCCESSFUL ===");
+        showAlert("Success", "Account created successfully!");
+        login();
+    }
+
+    private void handleFailedSignup() {
+        logger.warning("=== SIGNUP FAILED ===");
+        showAlert("Error", "Could not create account. Username may already exist.");
     }
 
     @Override
@@ -202,7 +209,6 @@ public class SignUpWindowController implements Initializable {
         try {
             logger.info("Initializing with original names");
             
-            // Configurar ToggleGroup con nombres originales
             grupOp = new ToggleGroup();
             
             if (rButtonM != null) rButtonM.setToggleGroup(grupOp);
@@ -213,7 +219,7 @@ public class SignUpWindowController implements Initializable {
             logger.info("Initialize completed successfully");
             
         } catch (Exception e) {
-            logger.severe("Error in initialize: " + e.toString());
+            logger.severe(String.format("Error in initialize: %s", e.toString()));
         }
     }
 
@@ -225,10 +231,10 @@ public class SignUpWindowController implements Initializable {
             alert.setContentText(message);
             alert.showAndWait();
             
-            logger.info("Alert: " + title + " - " + message);
+            logger.info(String.format("Alert: %s - %s", title, message));
             
         } catch (Exception e) {
-            logger.severe("Error showing alert: " + e.toString());
+            logger.severe(String.format("Error showing alert: %s", e.toString()));
         }
     }
 }
