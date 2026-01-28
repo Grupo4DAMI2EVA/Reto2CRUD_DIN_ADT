@@ -75,9 +75,9 @@ public class AddGamesAdminController implements Initializable {
             choice.showAndWait();
             
             // Recargar la tabla en AdminShopController
-            if (adminShopController != null) {
+           /* if (adminShopController != null) {
                 adminShopController.reloadGames();
-            }
+            }*/
             
             if (choice.getResult().equals(ButtonType.OK)) {
                 // Si dice OK, limpia los campos para añadir otro juego
