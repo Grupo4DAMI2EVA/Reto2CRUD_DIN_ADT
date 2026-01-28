@@ -5,10 +5,12 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.logging.*;
+import javafx.collections.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.*;
@@ -16,7 +18,6 @@ import model.*;
 
 public class AdminShopController implements Initializable {
 
-    private Label label_Username;
     @FXML
     private Label labelWelcome;
     @FXML
@@ -66,17 +67,23 @@ public class AdminShopController implements Initializable {
 
     public void setUsuario(Profile profile) {
         this.profile = profile;
-        label_Username.setText(profile.getUsername());
+        labelWelcome.setText("Welcome, " + profile.getUsername());
     }
 
     public void setCont(Controller cont) {
         this.cont = cont;
+        loadAllGames();
     }
 
     private void addGame(ActionEvent event) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/AddGamesWindow.fxml"));
             Parent root = fxmlLoader.load();
+            
+            AddGamesAdminController controllerWindow = fxmlLoader.getController();
+            controllerWindow.setCont(cont);
+            controllerWindow.setAdminShopController(this);
+            
             Stage stage = new Stage();
             stage.setTitle("Add Game Window");
             stage.setScene(new Scene(root));
@@ -91,11 +98,11 @@ public class AdminShopController implements Initializable {
     @FXML
     private void modifyGame(ActionEvent event) {
         if (selected == null) {
-            Alert success = new Alert(Alert.AlertType.INFORMATION);
-            success.setTitle("ERROR!");
-            success.setHeaderText("No selection!");
-            success.setContentText("Please select a game before attempting a modification.");
-            success.showAndWait();
+            Alert error = new Alert(Alert.AlertType.INFORMATION);
+            error.setTitle("ERROR!");
+            error.setHeaderText("No selection!");
+            error.setContentText("Please select a game before attempting a modification.");
+            error.showAndWait();
         } else {
             if (selected == null) {
             Alert success = new Alert(Alert.AlertType.INFORMATION);
@@ -123,11 +130,11 @@ public class AdminShopController implements Initializable {
     @FXML
     private void deleteGame(ActionEvent event) {
         if (selected == null) {
-            Alert success = new Alert(Alert.AlertType.INFORMATION);
-            success.setTitle("ERROR!");
-            success.setHeaderText("No selection!");
-            success.setContentText("Please select a game before attempting deletion of one.");
-            success.showAndWait();
+            Alert error = new Alert(Alert.AlertType.INFORMATION);
+            error.setTitle("ERROR!");
+            error.setHeaderText("No selection!");
+            error.setContentText("Please select a game before attempting deletion of one.");
+            error.showAndWait();
         } else {
             if (cont.deleteGame(selected)) {
                 Alert success = new Alert(Alert.AlertType.INFORMATION);
@@ -147,7 +154,13 @@ public class AdminShopController implements Initializable {
 
     @FXML
     private void search(ActionEvent event) {
-        // To be done
+        String name = textFieldSearch.getText();
+        String genre = textFieldGenre.getText();
+        String platform = textFieldPlatform.getText();
+
+        gamesList.clear();
+        gamesList.addAll(cont.getGamesFiltered(name, genre, platform));
+        tableViewGames.setItems(gamesList);
     }
 
     @FXML
