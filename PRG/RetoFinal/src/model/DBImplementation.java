@@ -8,8 +8,7 @@ import org.hibernate.query.Query;
 import java.util.List;
 
 /**
- * Implementation of ClassDAO using Hibernate ORM. Handles all database
- * interactions for users and admins.
+ * Implementation of ClassDAO using Hibernate ORM. Handles all database interactions for users and admins.
  *
  * Author: acer
  */
@@ -432,7 +431,7 @@ public class DBImplementation implements ClassDAO {
                 return false;
             }
 
-            // Crear y configurar el Videogame
+            // Crear y configurar el Juego
             Videogame videogame = new Videogame(companyName, gameGenre, name, platforms, pegi, price, stock, releaseDate);
 
             // Guardar en la base de datos
@@ -462,13 +461,22 @@ public class DBImplementation implements ClassDAO {
         Transaction transaction = null;
 
         try {
+            // Verificar si el juego ya existe
+            String checkHql = "SELECT COUNT(u) FROM VIDEOGAME_ v WHERE v.name = :name";
+            Query<Long> checkQuery = session.createQuery(checkHql, Long.class);
+            checkQuery.setParameter("name", game.getName());
+            Long count = checkQuery.uniqueResult();
+
+            if (count > 0) {
+                System.out.println("Game already exists.");
+                return false;
+            }
+
             transaction = session.beginTransaction();
-            
-            // Actualizar el videojuego en la base de datos
             session.update(game);
             transaction.commit();
-            
-            System.out.println("Game modified successfully: " + game.getName());
+
+            System.out.println("Game " + game.getName() + " modified correctly!");
             return true;
 
         } catch (Exception e) {
@@ -526,23 +534,24 @@ public class DBImplementation implements ClassDAO {
 
         return success;
     }
-    
+
     /**
      * Retrieves all videogames from the database.
+     *
      * @return List of all videogames
      */
     @Override
     public List<Videogame> getAllGames() {
         Session session = HibernateSession.getSessionFactory().openSession();
         List<Videogame> games = new ArrayList<>();
-        
+
         try {
             String hql = "FROM Videogame v ORDER BY v.name ASC";
             Query<Videogame> query = session.createQuery(hql, Videogame.class);
-            
+
             games = query.getResultList();
             System.out.println("Total de juegos encontrados: " + games.size());
-            
+
         } catch (Exception e) {
             System.out.println("Database error on retrieving games: " + e.getMessage());
             e.printStackTrace();
@@ -556,6 +565,7 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Retrieves videogames filtered by criteria
+     *
      * @param name Game name or part of it (can be null or empty)
      * @param genre Game genre (can be null or empty)
      * @param platform Platform (can be null or empty)
@@ -565,10 +575,10 @@ public class DBImplementation implements ClassDAO {
     public List<Videogame> getGamesFiltered(String name, String genre, String platform) {
         Session session = HibernateSession.getSessionFactory().openSession();
         List<Videogame> games = new ArrayList<>();
-        
+
         try {
             StringBuilder hql = new StringBuilder("FROM Videogame v WHERE 1=1");
-            
+
             // Construir la consulta dinámicamente basado en los filtros
             if (name != null && !name.trim().isEmpty()) {
                 hql.append(" AND LOWER(v.name) LIKE LOWER(:name)");
@@ -579,11 +589,11 @@ public class DBImplementation implements ClassDAO {
             if (platform != null && !platform.trim().isEmpty()) {
                 hql.append(" AND v.platforms = :platform");
             }
-            
+
             hql.append(" ORDER BY v.name ASC");
-            
+
             Query<Videogame> query = session.createQuery(hql.toString(), Videogame.class);
-            
+
             // Establecer parámetros si existen
             if (name != null && !name.trim().isEmpty()) {
                 query.setParameter("name", "%" + name.trim() + "%");
@@ -608,10 +618,10 @@ public class DBImplementation implements ClassDAO {
                     return new ArrayList<>();
                 }
             }
-            
+
             games = query.getResultList();
             System.out.println("Juegos encontrados con filtros: " + games.size());
-            
+
         } catch (Exception e) {
             System.out.println("Database error on retrieving filtered games: " + e.getMessage());
             e.printStackTrace();

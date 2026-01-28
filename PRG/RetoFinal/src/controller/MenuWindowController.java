@@ -132,9 +132,8 @@ public class MenuWindowController implements Initializable {
         // Initialization logic if needed
     }
 
-     /**
-     * Opens the Shop/Store window.
-     * Users go to shopWindow, Admins go to AdminWindow
+    /**
+     * Opens the Shop/Store window. Users go to shopWindow, Admins go to AdminWindow
      */
     @FXML
     private void StoreWindow(ActionEvent event) {
@@ -143,37 +142,36 @@ public class MenuWindowController implements Initializable {
                 // ADMIN: Va a la ventana de administrador de tienda
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/StoreAdminWindow.fxml"));
                 Parent root = fxmlLoader.load();
-                
+
                 AdminShopController controllerWindow = fxmlLoader.getController();
                 controllerWindow.setUsuario(profile);
                 controllerWindow.setCont(cont);
-                
+
                 // Crear y mostrar la nueva ventana
                 Stage stage = new Stage();
                 stage.setScene(new Scene(root));
                 stage.setTitle("Admin Game Store");
                 stage.show();
-                
             } else {
                 // USER: Va a la ventana normal de tienda
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/StoreWindow.fxml")); // <-- CAMBIADO A shopWindow.fxml
                 Parent root = fxmlLoader.load();
-                
+
                 ShopWindowController controllerWindow = fxmlLoader.getController();
                 controllerWindow.setUsuario(profile);
                 controllerWindow.setCont(cont);
-                
+
                 // Crear y mostrar la nueva ventana
                 Stage stage = new Stage();
                 stage.setScene(new Scene(root));
                 stage.setTitle("Game Store");
                 stage.show();
             }
-            
+
             // Cerrar la ventana actual del menú
             Stage currentStage = (Stage) Button_Store.getScene().getWindow();
             currentStage.close();
-            
+
         } catch (IOException ex) {
             Logger.getLogger(MenuWindowController.class.getName()).log(Level.SEVERE, "Error al abrir la ventana de tienda", ex);
         }

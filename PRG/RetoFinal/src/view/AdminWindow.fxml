@@ -3,24 +3,24 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane id="AnchorPane" prefHeight="610.0" prefWidth="913.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AdminShopController">
     <children>
-        <Label layoutX="297.0" layoutY="24.0" prefHeight="44.0" prefWidth="356.0" text="STORE MANAGENENT">
+        <Label layoutX="297.0" layoutY="44.0" prefHeight="44.0" prefWidth="356.0" text="STORE MANAGENENT">
             <font>
                 <Font name="Arial Black" size="28.0" />
             </font>
         </Label>
-        <Label fx:id="labelWelcome" layoutX="25.0" layoutY="20.0" prefHeight="25.0" prefWidth="300.0" text="Welcome, [Admin]" />
-        <Label fx:id="labelBalance" layoutX="25.0" layoutY="45.0" prefHeight="20.0" prefWidth="300.0" style="-fx-text-fill: #5084C1;" text="Balance: 0.00€" />
+        <Label fx:id="labelWelcome" layoutX="25.0" layoutY="27.0" prefHeight="25.0" prefWidth="300.0" text="Welcome, [Admin]" />
+        <Label fx:id="labelBalance" layoutX="25.0" layoutY="52.0" prefHeight="20.0" prefWidth="300.0" style="-fx-text-fill: #5084C1;" text="Balance: 0.00€" />
         <Label layoutX="25.0" layoutY="80.0" prefHeight="25.0" prefWidth="200.0" style="-fx-font-weight: bold;" text="Available Games" />
         <TableView id="tableViewGames" fx:id="tableViewGames" layoutX="21.0" layoutY="115.0" prefHeight="350.0" prefWidth="872.0">
             <columns>
@@ -54,14 +54,18 @@
         <Button fx:id="buttonSearch" layoutX="720.0" layoutY="475.0" mnemonicParsing="false" onAction="#search" prefHeight="25.0" prefWidth="80.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000;" text="Search" />
         <Label layoutX="25.0" layoutY="520.0" prefHeight="25.0" prefWidth="150.0" style="-fx-font-weight: bold;" text="Selected game:" />
         <Label fx:id="labelGameInfo" layoutX="180.0" layoutY="520.0" prefHeight="25.0" prefWidth="400.0" style="-fx-text-fill: #5084C1;" text="Select a game" />
-        <ImageView fx:id="helpIcon" fitHeight="35.0" fitWidth="35.0" layoutX="850.0" layoutY="15.0" onMouseClicked="#helpWindow">
-            <image>
-                <Image url="@../images/Help_icon.svg.png" />
-            </image>
-        </ImageView>
-        <Button fx:id="buttonAdd" layoutX="25.0" layoutY="555.0" mnemonicParsing="false" onMouseClicked="#addGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Add Game" />
+        <Button fx:id="buttonAdd" layoutX="25.0" layoutY="555.0" mnemonicParsing="false" onAction="#addGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Add Game" />
         <Button fx:id="buttonExit" layoutX="755.0" layoutY="555.0" mnemonicParsing="false" onMouseClicked="#exit" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: F08080; -fx-border-color: #000000;" text="Exit" />
         <Button fx:id="buttonModify" layoutX="165.0" layoutY="555.0" mnemonicParsing="false" onAction="#modifyGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Modify Game" />
         <Button fx:id="buttonDelete" layoutX="297.0" layoutY="555.0" mnemonicParsing="false" onAction="#deleteGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Delete Game" />
+      <MenuBar layoutY="-1.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="913.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem fx:id="menuHelp" mnemonicParsing="false" onAction="#helpWindow" text="Help Window" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
     </children>
 </AnchorPane>

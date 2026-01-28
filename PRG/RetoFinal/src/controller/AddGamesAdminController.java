@@ -101,9 +101,8 @@ public class AddGamesAdminController implements Initializable {
             error.showAndWait();
         }
     }
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    
+    private void setupCBoxes() {
         comboBoxGenre.getItems().addAll(GameGenre.values());
         comboBoxPlatforms.getItems().addAll(Platform.values());
         comboBoxPEGI.getItems().addAll(PEGI.values());
@@ -117,5 +116,10 @@ public class AddGamesAdminController implements Initializable {
         SpinnerValueFactory<Double> priceValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1000.0, 0.0, 0.01);
         spinnerPrice.setValueFactory(priceValueFactory);
         spinnerPrice.setEditable(true);
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        setupCBoxes();
     }
 }
