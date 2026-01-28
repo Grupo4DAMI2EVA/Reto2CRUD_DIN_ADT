@@ -458,16 +458,66 @@ public class DBImplementation implements ClassDAO {
 
     @Override
     public boolean modifyGame(Videogame game) {
-        boolean success = false;
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
 
-        return success;
+        try {
+            transaction = session.beginTransaction();
+            
+            // Actualizar el videojuego en la base de datos
+            session.update(game);
+            transaction.commit();
+            
+            System.out.println("Game modified successfully: " + game.getName());
+            return true;
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on modifying game: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
 
     @Override
     public boolean deleteGame(Videogame game) {
-        boolean success = false;
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
 
-        return success;
+        try {
+            transaction = session.beginTransaction();
+            
+            // Cargar el videojuego desde la base de datos para asegurar que está asociado a la sesión
+            Videogame videogameToDelete = session.get(Videogame.class, game.getIdVideogame());
+            
+            if (videogameToDelete != null) {
+                session.delete(videogameToDelete);
+                transaction.commit();
+                System.out.println("Game deleted successfully: " + videogameToDelete.getName());
+                return true;
+            } else {
+                System.out.println("Game not found in database");
+                return false;
+            }
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on deleting game: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
 
     @Override

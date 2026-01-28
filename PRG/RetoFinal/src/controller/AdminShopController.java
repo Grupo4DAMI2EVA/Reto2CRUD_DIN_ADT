@@ -101,13 +101,30 @@ public class AdminShopController implements Initializable {
     @FXML
     private void modifyGame(ActionEvent event) {
         if (selected == null) {
-            Alert success = new Alert(Alert.AlertType.INFORMATION);
-            success.setTitle("ERROR!");
-            success.setHeaderText("No selection!");
-            success.setContentText("Please select a game before attempting a modification.");
-            success.showAndWait();
+            Alert error = new Alert(Alert.AlertType.INFORMATION);
+            error.setTitle("ERROR!");
+            error.setHeaderText("No selection!");
+            error.setContentText("Please select a game before attempting a modification.");
+            error.showAndWait();
         } else {
-            // Modify method here
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ModifyGameWindow.fxml"));
+                Parent root = fxmlLoader.load();
+                
+                ModifyGameAdminController controllerWindow = fxmlLoader.getController();
+                controllerWindow.setCont(cont);
+                controllerWindow.setAdminShopController(this);
+                controllerWindow.setVideogame(selected);
+                
+                Stage stage = new Stage();
+                stage.setTitle("Modify Game Window");
+                stage.setScene(new Scene(root));
+                stage.initModality(Modality.WINDOW_MODAL);
+                stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+                stage.show();
+            } catch (IOException ex) {
+                Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 

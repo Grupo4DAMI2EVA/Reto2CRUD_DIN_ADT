@@ -44,6 +44,22 @@ public class AddGamesAdminController implements Initializable {
 
     @FXML
     private void addGame(MouseEvent event) {
+        // Forzar actualización de los valores editables de los spinners
+        if (spinnerPrice.getEditor().getText() != null && !spinnerPrice.getEditor().getText().isEmpty()) {
+            try {
+                spinnerPrice.getValueFactory().setValue(Double.valueOf(spinnerPrice.getEditor().getText()));
+            } catch (NumberFormatException e) {
+                // Mantener valor actual si hay error
+            }
+        }
+        if (spinnerStock.getEditor().getText() != null && !spinnerStock.getEditor().getText().isEmpty()) {
+            try {
+                spinnerStock.getValueFactory().setValue(Integer.valueOf(spinnerStock.getEditor().getText()));
+            } catch (NumberFormatException e) {
+                // Mantener valor actual si hay error
+            }
+        }
+        
         if (cont.addGame(textFieldCompany.getText(), comboBoxGenre.getValue(), textFieldName.getText(),
                 comboBoxPlatforms.getValue(), comboBoxPEGI.getValue(), spinnerPrice.getValue(), spinnerStock.getValue(), Date.valueOf(datePickerReleaseDate.getValue()))) {
             Alert success = new Alert(Alert.AlertType.INFORMATION);
