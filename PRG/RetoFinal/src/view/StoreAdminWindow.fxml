@@ -14,7 +14,7 @@
 
 <AnchorPane id="AnchorPane" prefHeight="610.0" prefWidth="913.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AdminShopController">
     <children>
-        <Label layoutX="300.0" layoutY="20.0" prefHeight="44.0" prefWidth="307.0" text="GAME STORE - ADMIN">
+        <Label layoutX="300.0" layoutY="20.0" prefHeight="44.0" prefWidth="354.0" text="GAME STORE - ADMIN" textAlignment="CENTER">
             <font>
                 <Font name="Arial Black" size="28.0" />
             </font>
