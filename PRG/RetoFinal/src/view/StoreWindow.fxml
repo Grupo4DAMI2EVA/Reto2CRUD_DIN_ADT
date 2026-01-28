@@ -41,12 +41,15 @@
                 <TableColumn id="colReleaseDate" fx:id="colReleaseDate" prefWidth="107.0" text="ReleaseDate" />
             </columns>
          <contextMenu>
-            <ContextMenu>
-              <items>
-                <MenuItem mnemonicParsing="false" onAction="#addToCart" text="Add to Cart" />
-              </items>
-            </ContextMenu>
-         </contextMenu>
+    <ContextMenu>
+        <items>
+            <MenuItem mnemonicParsing="false" onAction="#toggleFavorite" text="Añadir a Favoritos" />
+            <MenuItem mnemonicParsing="false" onAction="#viewGameDetails" text="Ver Detalles" />
+            <SeparatorMenuItem />
+            <MenuItem mnemonicParsing="false" onAction="#addToCart" text="Añadir al Carrito" />
+        </items>
+    </ContextMenu>
+</contextMenu>
         </TableView>
       
         <Label layoutX="25.0" layoutY="480.0" prefHeight="17.0" prefWidth="100.0" text="Search game:" />
