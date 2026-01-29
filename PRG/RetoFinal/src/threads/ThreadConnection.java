@@ -24,6 +24,7 @@ public class ThreadConnection extends Thread {
 
     /**
      * Returns the connection obtained by the thread.
+     * @return 
      */
     public Connection getConnection() {
         return con;
@@ -31,6 +32,7 @@ public class ThreadConnection extends Thread {
 
     /**
      * Returns true if the connection is ready.
+     * @return 
      */
     public boolean isReady() {
         return ready;

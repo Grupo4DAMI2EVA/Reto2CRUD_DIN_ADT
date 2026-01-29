@@ -8,8 +8,7 @@ import org.hibernate.query.Query;
 import java.util.List;
 
 /**
- * Implementation of ClassDAO using Hibernate ORM. Handles all database
- * interactions for users and admins.
+ * Implementation of ClassDAO using Hibernate ORM. Handles all database interactions for users and admins.
  *
  * Author: acer
  */
@@ -421,8 +420,8 @@ public class DBImplementation implements ClassDAO {
         try {
             transaction = session.beginTransaction();
 
-            // Verificar si el username ya existe
-            String checkHql = "SELECT COUNT(u) FROM VIDEOGAME_ v WHERE v.name = :name";
+            // Verificar si el juego ya existe
+            String checkHql = "SELECT COUNT(v) FROM Videogame v WHERE v.name = :name";
             Query<Long> checkQuery = session.createQuery(checkHql, Long.class);
             checkQuery.setParameter("name", name);
             Long count = checkQuery.uniqueResult();
@@ -432,7 +431,7 @@ public class DBImplementation implements ClassDAO {
                 return false;
             }
 
-            // Crear y configurar el User
+            // Crear y configurar el Juego
             Videogame videogame = new Videogame(companyName, gameGenre, name, platforms, pegi, price, stock, releaseDate);
 
             // Guardar en la base de datos
@@ -458,16 +457,75 @@ public class DBImplementation implements ClassDAO {
 
     @Override
     public boolean modifyGame(Videogame game) {
-        boolean success = false;
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
 
-        return success;
+        try {
+            // Verificar si el juego ya existe
+            String checkHql = "SELECT COUNT(u) FROM VIDEOGAME_ v WHERE v.name = :name";
+            Query<Long> checkQuery = session.createQuery(checkHql, Long.class);
+            checkQuery.setParameter("name", game.getName());
+            Long count = checkQuery.uniqueResult();
+
+            if (count > 0) {
+                System.out.println("Game already exists.");
+                return false;
+            }
+
+            transaction = session.beginTransaction();
+            session.update(game);
+            transaction.commit();
+
+            System.out.println("Game " + game.getName() + " modified correctly!");
+            return true;
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on modifying game: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
 
     @Override
     public boolean deleteGame(Videogame game) {
-        boolean success = false;
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
 
-        return success;
+        try {
+            transaction = session.beginTransaction();
+            
+            // Cargar el videojuego desde la base de datos para asegurar que está asociado a la sesión
+            Videogame videogameToDelete = session.get(Videogame.class, game.getIdVideogame());
+            
+            if (videogameToDelete != null) {
+                session.delete(videogameToDelete);
+                transaction.commit();
+                System.out.println("Game deleted successfully: " + videogameToDelete.getName());
+                return true;
+            } else {
+                System.out.println("Game not found in database");
+                return false;
+            }
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on deleting game: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
 
     @Override
@@ -476,23 +534,24 @@ public class DBImplementation implements ClassDAO {
 
         return success;
     }
-    
+
     /**
      * Retrieves all videogames from the database.
+     *
      * @return List of all videogames
      */
     @Override
     public List<Videogame> getAllGames() {
         Session session = HibernateSession.getSessionFactory().openSession();
         List<Videogame> games = new ArrayList<>();
-        
+
         try {
             String hql = "FROM Videogame v ORDER BY v.name ASC";
             Query<Videogame> query = session.createQuery(hql, Videogame.class);
-            
+
             games = query.getResultList();
             System.out.println("Total de juegos encontrados: " + games.size());
-            
+
         } catch (Exception e) {
             System.out.println("Database error on retrieving games: " + e.getMessage());
             e.printStackTrace();
@@ -506,6 +565,7 @@ public class DBImplementation implements ClassDAO {
 
     /**
      * Retrieves videogames filtered by criteria
+     *
      * @param name Game name or part of it (can be null or empty)
      * @param genre Game genre (can be null or empty)
      * @param platform Platform (can be null or empty)
@@ -515,10 +575,10 @@ public class DBImplementation implements ClassDAO {
     public List<Videogame> getGamesFiltered(String name, String genre, String platform) {
         Session session = HibernateSession.getSessionFactory().openSession();
         List<Videogame> games = new ArrayList<>();
-        
+
         try {
             StringBuilder hql = new StringBuilder("FROM Videogame v WHERE 1=1");
-            
+
             // Construir la consulta dinámicamente basado en los filtros
             if (name != null && !name.trim().isEmpty()) {
                 hql.append(" AND LOWER(v.name) LIKE LOWER(:name)");
@@ -529,11 +589,11 @@ public class DBImplementation implements ClassDAO {
             if (platform != null && !platform.trim().isEmpty()) {
                 hql.append(" AND v.platforms = :platform");
             }
-            
+
             hql.append(" ORDER BY v.name ASC");
-            
+
             Query<Videogame> query = session.createQuery(hql.toString(), Videogame.class);
-            
+
             // Establecer parámetros si existen
             if (name != null && !name.trim().isEmpty()) {
                 query.setParameter("name", "%" + name.trim() + "%");
@@ -558,10 +618,10 @@ public class DBImplementation implements ClassDAO {
                     return new ArrayList<>();
                 }
             }
-            
+
             games = query.getResultList();
             System.out.println("Juegos encontrados con filtros: " + games.size());
-            
+
         } catch (Exception e) {
             System.out.println("Database error on retrieving filtered games: " + e.getMessage());
             e.printStackTrace();
@@ -571,5 +631,67 @@ public class DBImplementation implements ClassDAO {
             }
         }
         return games;
+    }
+
+    /**
+     * Creates a new admin in the database with validation.
+     *
+     * @param username
+     * @param password
+     * @param email
+     * @param name
+     * @param telephone
+     * @param surname
+     * @param currentAccount
+     * @return true if admin was created successfully, false otherwise
+     */
+    @Override
+    public boolean createAdmin(String username, String password, String email, String name, String telephone, String surname, String currentAccount) {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Verificar si el username ya existe
+            String checkHql = "SELECT COUNT(p) FROM Profile p WHERE p.username = :username";
+            Query<Long> checkQuery = session.createQuery(checkHql, Long.class);
+            checkQuery.setParameter("username", username);
+            Long count = checkQuery.uniqueResult();
+
+            if (count > 0) {
+                System.out.println("Username ya existe: " + username);
+                return false;
+            }
+
+            // Crear y configurar el Admin
+            Admin newAdmin = new Admin();
+            newAdmin.setUsername(username);
+            newAdmin.setPassword(password);
+            newAdmin.setEmail(email);
+            newAdmin.setName(name);
+            newAdmin.setTelephone(telephone);
+            newAdmin.setSurname(surname);
+            newAdmin.setCurrentAccount(currentAccount);
+
+            // Guardar en la base de datos
+            session.save(newAdmin);
+            transaction.commit();
+
+            System.out.println("Admin registrado exitosamente: " + username);
+            return true;
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on creating admin: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
 }

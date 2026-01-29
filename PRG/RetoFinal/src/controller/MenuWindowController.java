@@ -226,36 +226,6 @@ public class MenuWindowController implements Initializable {
     }
 
     @FXML
-    private void openShop(ActionEvent event) {
-        try {
-            logger.info(String.format("Opening Shop window for user: %s", 
-                       profile != null ? profile.getUsername() : "null"));
-            
-            handleOpenShop();
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error opening Shop window: %s", e.getMessage()));
-            showAlert("Error", "Could not open the Shop window.");
-        }
-    }
-
-    private void handleOpenShop() throws Exception {
-        // TODO: Implementar lógica para abrir la tienda
-        // Ejemplo:
-        // FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ShopWindow.fxml"));
-        // Parent root = fxmlLoader.load();
-        // ... etc ...
-        
-        Alert info = new Alert(Alert.AlertType.INFORMATION);
-        info.setTitle("Store");
-        info.setHeaderText("Store functionality");
-        info.setContentText("The store feature is not yet implemented.");
-        info.showAndWait();
-        
-        logger.info("Store button clicked - functionality not yet implemented");
-    }
-
-    @FXML
     private void openHelp(ActionEvent event) {
         try {
             logger.info(String.format("Opening Help window for user: %s", 
@@ -364,6 +334,57 @@ public class MenuWindowController implements Initializable {
             logger.info("Controller set via setCont method");
         } catch (Exception e) {
             logger.severe(String.format("Error in setCont: %s", e.getMessage()));
+        }
+    }
+
+    /**
+     * Opens the Shop/Store window. Users go to ShopWindow, Admins go to AdminWindow
+     */
+    @FXML
+    private void storeWindow(ActionEvent event) {
+        try {
+            logger.info(String.format("Opening Store window for user: %s", 
+                       profile != null ? profile.getUsername() : "null"));
+            
+            if (profile instanceof Admin) {
+                // ADMIN: Va a la ventana de administrador de tienda
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/StoreAdminWindow.fxml"));
+                Parent root = fxmlLoader.load();
+
+                AdminShopController controllerWindow = fxmlLoader.getController();
+                controllerWindow.setUsuario(profile);
+                controllerWindow.setCont(cont);
+
+                // Crear y mostrar la nueva ventana
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Admin Game Store");
+                stage.show();
+            } else {
+                // USER: Va a la ventana normal de tienda
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/StoreWindow.fxml"));
+                Parent root = fxmlLoader.load();
+
+                ShopWindowController controllerWindow = fxmlLoader.getController();
+                controllerWindow.setUsuario(profile);
+                controllerWindow.setCont(cont);
+
+                // Crear y mostrar la nueva ventana
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Game Store");
+                stage.show();
+            }
+
+            // Cerrar la ventana actual del menú
+            Stage currentStage = (Stage) buttonStore.getScene().getWindow();
+            currentStage.close();
+
+            logger.info("Store window opened successfully");
+
+        } catch (Exception ex) {
+            logger.severe(String.format("Error opening Store window: %s", ex.getMessage()));
+            showAlert("Error", "Could not open the Store window.");
         }
     }
 }

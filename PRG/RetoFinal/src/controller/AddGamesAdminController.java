@@ -35,6 +35,7 @@ public class AddGamesAdminController implements Initializable {
     @FXML
     private Button buttonAddGame;
     private Controller cont;
+    private AdminShopController adminShopController;
 
     static {
         inicializarLogger();
@@ -89,10 +90,30 @@ public class AddGamesAdminController implements Initializable {
         }
     }
 
+    public void setAdminShopController(AdminShopController adminShopController) {
+        this.adminShopController = adminShopController;
+    }
+
     @FXML
     private void addGame(MouseEvent event) {
         try {
             logger.info("Starting game addition process");
+            
+            // Forzar actualización de los valores editables de los spinners
+            if (spinnerPrice.getEditor().getText() != null && !spinnerPrice.getEditor().getText().isEmpty()) {
+                try {
+                    spinnerPrice.getValueFactory().setValue(Double.valueOf(spinnerPrice.getEditor().getText()));
+                } catch (NumberFormatException e) {
+                    // Mantener valor actual si hay error
+                }
+            }
+            if (spinnerStock.getEditor().getText() != null && !spinnerStock.getEditor().getText().isEmpty()) {
+                try {
+                    spinnerStock.getValueFactory().setValue(Integer.valueOf(spinnerStock.getEditor().getText()));
+                } catch (NumberFormatException e) {
+                    // Mantener valor actual si hay error
+                }
+            }
             
             String gameName = textFieldName.getText();
             Platform platform = comboBoxPlatforms.getValue();
@@ -124,14 +145,19 @@ public class AddGamesAdminController implements Initializable {
                 choice.setHeaderText("Do you want to add more games?");
                 choice.showAndWait();
                 
-                if (choice.getResult().equals(ButtonType.CLOSE)) {
+                // Recargar la tabla en AdminShopController
+                if (adminShopController != null) {
+                    adminShopController.reloadGames();
+                }
+                
+                if (choice.getResult().equals(ButtonType.OK)) {
+                    logger.info("User chose to add more games");
+                    clearForm();
+                } else {
                     logger.info("User closed window after adding game");
                     Stage currentStage = (Stage) buttonAddGame.getScene().getWindow();
                     currentStage.close();
                     logger.info("Add games window closed");
-                } else {
-                    logger.info("User chose to add more games");
-                    clearForm();
                 }
             } else {
                 logger.severe(String.format("Database error while adding game: %s", gameName));
@@ -236,14 +262,29 @@ public class AddGamesAdminController implements Initializable {
             logger.severe(String.format("Error showing alert: %s", e.getMessage()));
         }
     }
+    
+    private void setupCBoxes() {
+        comboBoxGenre.getItems().addAll(GameGenre.values());
+        comboBoxPlatforms.getItems().addAll(Platform.values());
+        comboBoxPEGI.getItems().addAll(PEGI.values());
+        
+        // Initialize Spinner for Stock (0 to 1000, step 1, initial value 0)
+        SpinnerValueFactory<Integer> stockValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000, 0, 1);
+        spinnerStock.setValueFactory(stockValueFactory);
+        spinnerStock.setEditable(true);
+        
+        // Initialize Spinner for Price (0.0 to 1000.0, step 0.01, initial value 0.0)
+        SpinnerValueFactory<Double> priceValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1000.0, 0.0, 0.01);
+        spinnerPrice.setValueFactory(priceValueFactory);
+        spinnerPrice.setEditable(true);
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
             logger.info("Initializing AddGamesAdminController");
             
-            setupSpinners();
-            loadComboBoxData();
+            setupCBoxes();
             
             logger.info("AddGamesAdminController initialized successfully");
             
@@ -251,37 +292,6 @@ public class AddGamesAdminController implements Initializable {
             logger.severe(String.format("Error initializing AddGamesAdminController: %s", e.getMessage()));
             showAlert("Initialization Error", 
                 "Could not initialize the add games form.");
-        }
-    }
-
-    private void setupSpinners() {
-        try {
-            SpinnerValueFactory<Integer> stockFactory = 
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1000, 1);
-            spinnerStock.setValueFactory(stockFactory);
-            
-            SpinnerValueFactory<Double> priceFactory = 
-                new SpinnerValueFactory.DoubleSpinnerValueFactory(0.99, 299.99, 59.99, 0.01);
-            spinnerPrice.setValueFactory(priceFactory);
-            
-            logger.info("Spinners configured successfully");
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error configuring spinners: %s", e.getMessage()));
-        }
-    }
-
-    private void loadComboBoxData() {
-        try {
-            comboBoxPlatforms.getItems().setAll(Platform.values());
-            comboBoxGenre.getItems().setAll(GameGenre.values());
-            comboBoxPEGI.getItems().setAll(PEGI.values());
-            
-            logger.info(String.format("ComboBoxes loaded - Platforms: %d, Genres: %d, PEGI: %d", 
-                       Platform.values().length, GameGenre.values().length, PEGI.values().length));
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error loading ComboBox data: %s", e.getMessage()));
         }
     }
 }

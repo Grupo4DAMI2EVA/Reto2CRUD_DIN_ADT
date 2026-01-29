@@ -99,6 +99,19 @@ public class HelpWindowController implements Initializable {
             item1.setText("Shop Management");
             item2.setText("Add Game");
             item3.setText("Modify Game");
+            item4.setVisible(true);
+            item4.setDisable(false);
+            item4.setText("Delete Game");
+        } catch (Exception e) {
+            logger.severe(String.format("Error loading admin items: %s", e.getMessage()));
+        }
+    }
+
+    public void loadAdminItems() {
+        try {
+            item1.setText("Shop Management");
+            item2.setText("Add Game");
+            item3.setText("Modify Game");
             item4.setText("Delete Game");
             item4.setVisible(true);
             item4.setDisable(false);

@@ -4,19 +4,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.*;
+import javafx.collections.*;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.fxml.*;
+import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -27,8 +21,7 @@ public class AdminShopController implements Initializable {
 
     private static final Logger logger = Logger.getLogger(AdminShopController.class.getName());
     private static boolean loggerInitialized = false;
-    
-    private Label label_Username;
+
     @FXML
     private Label labelWelcome;
     @FXML
@@ -73,6 +66,13 @@ public class AdminShopController implements Initializable {
     private Profile profile;
     private Controller cont;
     private Videogame selected;
+    
+    private static final Logger logger = Logger.getLogger(AdminShopController.class.getName());
+    private static boolean loggerInitialized = false;
+    
+    @FXML
+    private MenuItem menuHelp;
+    private ObservableList<Videogame> gamesList;
 
     static {
         initializeLogger();
@@ -118,24 +118,108 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    public void setUser(Profile profile) {
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
         try {
-            this.profile = profile;
-            if (label_Username != null) {
-                label_Username.setText(profile.getUsername());
+            logger.info("Initializing AdminShopController");
+            
+            // INICIALIZAR la lista de juegos
+            gamesList = FXCollections.observableArrayList();
+            tableViewGames.setItems(gamesList);
+            
+            // Configurar las columnas de la tabla
+            configureTableColumns();
+            
+            // Configurar icono de ayuda
+            if (menuHelp != null) {
+                try {
+                    ImageView helpIcon = new ImageView("../images/Help_icon.png");
+                    menuHelp.setGraphic(helpIcon);
+                } catch (Exception e) {
+                    logger.info("Help icon not found, skipping");
+                }
             }
-            logger.info(String.format("User profile set for AdminShopController: %s", profile.getUsername()));
+            
+            // Configurar listener para selección de fila
+            tableViewGames.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> getSelectedTableItem(newValue)
+            );
+            
+            logger.info("AdminShopController initialized successfully");
+            
         } catch (Exception e) {
-            logger.severe(String.format("Error setting user profile: %s", e.getMessage()));
+            logger.severe(String.format("Error initializing AdminShopController: %s", e.getMessage()));
+        }
+    }
+    
+    private void configureTableColumns() {
+        try {
+            colTitle.setCellValueFactory(new PropertyValueFactory<>("name"));
+            colGenre.setCellValueFactory(new PropertyValueFactory<>("gameGenre"));
+            colPlatform.setCellValueFactory(new PropertyValueFactory<>("platforms"));
+            colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+            colPegi.setCellValueFactory(new PropertyValueFactory<>("pegi"));
+            colStock.setCellValueFactory(new PropertyValueFactory<>("stock"));
+            colCompanyName.setCellValueFactory(new PropertyValueFactory<>("companyName"));
+            colReleaseDate.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
+            logger.info("Table columns configured successfully");
+        } catch (Exception e) {
+            logger.severe(String.format("Error configuring table columns: %s", e.getMessage()));
+        }
+    }
+    
+    private void getSelectedTableItem(Videogame newValue) {
+        try {
+            selected = newValue;
+            if (selected != null) {
+                labelGameInfo.setText(selected.getName() + " - " + selected.getPrice() + "€");
+            } else {
+                labelGameInfo.setText("");
+            }
+        } catch (Exception e) {
+            logger.severe(String.format("Error selecting table item: %s", e.getMessage()));
         }
     }
 
-    public void setController(Controller cont) {
+    public void setUsuario(Profile profile) {
+        try {
+            this.profile = profile;
+            labelWelcome.setText("Welcome, " + profile.getUsername());
+            logger.info(String.format("User set for AdminShopController: %s", profile.getUsername()));
+        } catch (Exception e) {
+            logger.severe(String.format("Error setting user: %s", e.getMessage()));
+        }
+    }
+    
+    public void reloadGames() {
+        try {
+            logger.info("Reloading games");
+            loadAllGames();
+        } catch (Exception e) {
+            logger.severe(String.format("Error reloading games: %s", e.getMessage()));
+        }
+    }
+    
+    private void loadAllGames() {
+        try {
+            if (cont != null) {
+                gamesList.clear();
+                gamesList.addAll(cont.getAllGames());
+                tableViewGames.refresh();
+                logger.info(String.format("Games loaded: %d", gamesList.size()));
+            }
+        } catch (Exception e) {
+            logger.severe(String.format("Error loading games: %s", e.getMessage()));
+        }
+    }
+
+    public void setCont(Controller cont) {
         try {
             this.cont = cont;
+            loadAllGames();
             logger.info("Main controller set for AdminShopController");
         } catch (Exception e) {
-            logger.severe(String.format("Error setting main controller: %s", e.getMessage()));
+            logger.severe(String.format("Error setting controller: %s", e.getMessage()));
         }
     }
 
@@ -144,13 +228,28 @@ public class AdminShopController implements Initializable {
         try {
             logger.info("Opening Add Game window");
             
-            openAddGameWindow(event);
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/AddGamesWindow.fxml"));
+            Parent root = fxmlLoader.load();
             
-        } catch (IOException e) {
-            logger.severe(String.format("Error opening Add Game window: %s", e.getMessage()));
+            AddGamesAdminController controllerWindow = fxmlLoader.getController();
+            controllerWindow.setCont(cont);
+            controllerWindow.setAdminShopController(this);
+            
+            Stage stage = new Stage();
+            stage.setTitle("Add Game Window");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+            stage.show();
+            
+            logger.info("Add Game window opened successfully");
+            
+        } catch (IOException ex) {
+            logger.severe(String.format("Error opening Add Game window: %s", ex.getMessage()));
             showAlert("Error", "Could not open the Add Game window.");
         } catch (Exception e) {
             logger.severe(String.format("Unexpected error in addGame: %s", e.getMessage()));
+            showAlert("Error", "An unexpected error occurred.");
         }
     }
 
@@ -169,116 +268,86 @@ public class AdminShopController implements Initializable {
 
     @FXML
     private void modifyGame(ActionEvent event) {
-        try {
-            logger.info("Attempting to modify game");
-            
-            if (selected == null) {
-                handleModifyWithoutSelection();
-            } else {
-                handleModifyWithSelection();
+        if (selected == null) {
+            Alert error = new Alert(Alert.AlertType.INFORMATION);
+            error.setTitle("ERROR!");
+            error.setHeaderText("No selection!");
+            error.setContentText("Please select a game before attempting a modification.");
+            error.showAndWait();
+        } else {
+            try {
+                logger.info("Attempting to modify game: " + selected.getName());
+                
+                // Abrir ventana de modificación
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ModifyGameAdmin.fxml"));
+                Parent root = fxmlLoader.load();
+                
+                ModifyGameAdminController controllerWindow = fxmlLoader.getController();
+                controllerWindow.setCont(cont);
+                controllerWindow.setAdminShopController(this);
+                controllerWindow.setVideogame(selected);
+                
+                Stage stage = new Stage();
+                stage.setTitle("Modify Game Window");
+                stage.setScene(new Scene(root));
+                stage.initModality(Modality.WINDOW_MODAL);
+                stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+                stage.showAndWait();
+                
+                // Recargar juegos después de cerrar la ventana
+                loadAllGames();
+                
+                logger.info("Game modified successfully: " + selected.getName());
+            } catch (IOException ex) {
+                logger.severe(String.format("Error opening Modify Game window: %s", ex.getMessage()));
+                Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error in modifyGame: %s", e.getMessage()));
-            showAlert("Error", "An error occurred while trying to modify the game.");
         }
-    }
-
-    private void handleModifyWithoutSelection() {
-        logger.severe("Modify attempt without selecting a game");
-        
-        showInformationAlert("Error!", "No Selection", 
-            "Please select a game before attempting to modify it.");
-        
-        logger.info("Alert shown: No game selected for modification");
-    }
-
-    private void handleModifyWithSelection() {
-        logger.info(String.format("Game selected for modification: %s", selected.getName()));
-        
-        logger.info(String.format("Modify functionality not yet implemented for: %s", selected.getName()));
     }
 
     @FXML
     private void deleteGame(ActionEvent event) {
-        try {
-            logger.info("Attempting to delete game");
+        if (selected == null) {
+            Alert error = new Alert(Alert.AlertType.INFORMATION);
+            error.setTitle("ERROR!");
+            error.setHeaderText("No selection!");
+            error.setContentText("Please select a game before attempting deletion of one.");
+            error.showAndWait();
+        } else {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Confirm Deletion");
+            confirm.setHeaderText("Delete " + selected.getName() + "?");
+            confirm.setContentText("Are you sure you want to delete this game?");
             
-            if (selected == null) {
-                handleDeleteWithoutSelection();
-            } else {
-                handleDeleteWithSelection();
+            if (confirm.showAndWait().get() == ButtonType.OK) {
+                try {
+                    logger.info("Attempting to delete game: " + selected.getName());
+                    
+                    if (cont.deleteGame(selected)) {
+                        Alert success = new Alert(Alert.AlertType.INFORMATION);
+                        success.setTitle("Delete successful!");
+                        success.setContentText("The game " + selected.getName() + " was deleted.");
+                        success.showAndWait();
+                        
+                        logger.info("Game deleted successfully: " + selected.getName());
+                        
+                        // Recargar la lista
+                        loadAllGames();
+                        selected = null;
+                        labelGameInfo.setText("");
+                    } else {
+                        Alert error = new Alert(Alert.AlertType.INFORMATION);
+                        error.setTitle("ERROR!");
+                        error.setHeaderText("An issue occurred");
+                        error.setContentText("The game could not be deleted.");
+                        error.showAndWait();
+                        
+                        logger.severe("Failed to delete game: " + selected.getName());
+                    }
+                } catch (Exception e) {
+                    logger.severe(String.format("Error deleting game: %s", e.getMessage()));
+                }
             }
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error in deleteGame: %s", e.getMessage()));
-            showAlert("Error", "An error occurred while trying to delete the game.");
-        }
-    }
-
-    private void handleDeleteWithoutSelection() {
-        logger.severe("Delete attempt without selecting a game");
-        
-        showInformationAlert("Error!", "No Selection", 
-            "Please select a game before attempting to delete it.");
-        
-        logger.info("Alert shown: No game selected for deletion");
-    }
-
-    private void handleDeleteWithSelection() {
-        logger.info(String.format("Game selected for deletion: %s", selected.getName()));
-        
-        Alert confirmation = createDeletionConfirmationAlert();
-        
-        confirmation.showAndWait().ifPresent(response -> {
-            if (response == javafx.scene.control.ButtonType.OK) {
-                confirmAndDeleteGame();
-            } else {
-                handleDeletionCancellation();
-            }
-        });
-    }
-
-    private Alert createDeletionConfirmationAlert() {
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setTitle("Confirm Deletion");
-        confirmation.setHeaderText(String.format("Delete Game: %s", selected.getName()));
-        confirmation.setContentText("Are you sure you want to delete this game? This action cannot be undone.");
-        return confirmation;
-    }
-
-    private void confirmAndDeleteGame() {
-        logger.info(String.format("User confirmed deletion of game: %s", selected.getName()));
-        
-        logger.info(String.format("Game marked for deletion: %s", selected.getName()));
-        
-        clearGameSelection();
-        
-        logger.info("Delete functionality not yet implemented");
-    }
-
-    private void handleDeletionCancellation() {
-        logger.info(String.format("User canceled deletion of game: %s", selected.getName()));
-    }
-
-    private void clearGameSelection() {
-        selected = null;
-        labelGameInfo.setText("No game selected");
-        tableViewGames.getSelectionModel().clearSelection();
-    }
-
-    @FXML
-    private void getSelectedTableItem() {
-        try {
-            selected = tableViewGames.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                labelGameInfo.setText(selected.getName());
-                logger.info(String.format("Game selected from table: %s", selected.getName()));
-            } else {
-                logger.info("No game selected from table");
-            }
-        } catch (Exception e) {
-            logger.severe(String.format("Error getting selected table item: %s", e.getMessage()));
         }
     }
 
@@ -287,85 +356,27 @@ public class AdminShopController implements Initializable {
         try {
             logger.info("Closing Admin Shop window");
             
-            closeWindow(event);
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
+            Parent root = fxmlLoader.load();
+            MenuWindowController controllerWindow = fxmlLoader.getController();
+            controllerWindow.setUsuario(profile);
+            controllerWindow.setCont(cont);
+            Stage stage = new Stage();
+            stage.setTitle("Main Window");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+            stage.show();
             
-        } catch (Exception e) {
-            logger.severe(String.format("Error closing Admin Shop window: %s", e.getMessage()));
-            showAlert("Error", "Could not close the window.");
+            // Cerrar la ventana actual
+            Stage currentStage = (Stage) buttonExit.getScene().getWindow();
+            currentStage.close();
+            
+            logger.info("Admin Shop window closed successfully");
+        } catch (IOException ex) {
+            logger.severe(String.format("Error closing Admin Shop window: %s", ex.getMessage()));
+            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private void closeWindow(MouseEvent event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.close();
-        
-        logger.info("Admin Shop window closed successfully");
-    }
-
-    @FXML
-    private void searchGames(ActionEvent event) {
-        try {
-            String searchText = textFieldSearch.getText();
-            String genreFilter = textFieldGenre.getText();
-            String platformFilter = textFieldPlatform.getText();
-            
-            logger.info(String.format("Searching games - Search: '%s', Genre: '%s', Platform: '%s'", 
-                       searchText, genreFilter, platformFilter));
-            
-            handleSearchFunctionality();
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error in searchGames: %s", e.getMessage()));
-            showAlert("Error", "An error occurred while searching for games.");
-        }
-    }
-
-    private void handleSearchFunctionality() {
-        logger.info("Search functionality not yet implemented");
-        showAlert("Information", "Search functionality is not yet implemented.");
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        try {
-            logger.info("Initializing AdminShopController");
-            
-            initializeControllerComponents();
-            
-            logger.info("AdminShopController initialized successfully");
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error initializing AdminShopController: %s", e.getMessage()));
-            showAlert("Initialization Error", 
-                "Could not initialize the Admin Shop. Please restart the application.");
-        }
-    }
-
-    private void initializeControllerComponents() {
-        initializeTableColumns();
-        setupSelectionListener();
-    }
-
-    private void initializeTableColumns() {
-        try {
-            logger.info("Table columns initialization placeholder");
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error initializing table columns: %s", e.getMessage()));
-        }
-    }
-
-    private void setupSelectionListener() {
-        tableViewGames.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> getSelectedTableItem());
-    }
-
-    private void showInformationAlert(String title, String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     private void showAlert(String title, String message) {
@@ -380,31 +391,6 @@ public class AdminShopController implements Initializable {
             
         } catch (Exception e) {
             logger.severe(String.format("Error showing alert: %s", e.getMessage()));
-        }
-    }
-
-    public void loadGames() {
-        try {
-            logger.info("Loading games into table");
-            
-            logger.info("Game loading functionality not yet implemented");
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error loading games: %s", e.getMessage()));
-            showAlert("Error", "Could not load games into the table.");
-        }
-    }
-
-    public void refreshGameList() {
-        try {
-            logger.info("Refreshing game list");
-            
-            clearGameSelection();
-            
-            logger.info("Refresh functionality not yet implemented");
-            
-        } catch (Exception e) {
-            logger.severe(String.format("Error refreshing game list: %s", e.getMessage()));
         }
     }
 }
