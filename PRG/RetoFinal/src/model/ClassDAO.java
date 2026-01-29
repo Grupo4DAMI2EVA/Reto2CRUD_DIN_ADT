@@ -35,4 +35,6 @@ public interface ClassDAO {
     public List<Videogame> getAllGames();
 
     public List<Videogame> getGamesFiltered(String name, String genre, String platform);
+
+    public boolean createAdmin(String username, String password, String email, String name, String telephone, String surname, String currentAccount);
 }

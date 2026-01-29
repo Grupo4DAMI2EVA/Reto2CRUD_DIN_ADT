@@ -140,7 +140,7 @@ public class MenuWindowController implements Initializable {
         try {
             if (profile instanceof Admin) {
                 // ADMIN: Va a la ventana de administrador de tienda
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/AdminWindow.fxml")); // Ajusta el nombre si es diferente
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/StoreAdminWindow.fxml"));
                 Parent root = fxmlLoader.load();
 
                 AdminShopController controllerWindow = fxmlLoader.getController();
