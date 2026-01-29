@@ -24,7 +24,6 @@ public class HelpWindowController implements Initializable {
     private TextArea info;
 
     private Profile profile;
-    private Controller cont;
 
     public void setUsuario(Profile profile) {
         this.profile = profile;

@@ -10,33 +10,73 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import model.*;
 
+/**
+ *
+ * @author Usuario
+ */
 public class AddGamesAdminController implements Initializable {
 
+    /**
+     * Field for the new game's name.
+     */
     @FXML
     private TextField textFieldName;
+    /**
+     * Combobox for the new game's platform.
+     */
     @FXML
     private ComboBox<Platform> comboBoxPlatforms;
+    /**
+     * Field for the new game's company's name.
+     */
     @FXML
     private TextField textFieldCompany;
+    /**
+     * Spinner for the amount of stock to be added for the new game.
+     */
     @FXML
     private Spinner<Integer> spinnerStock;
+    /**
+     * Combobox for the new game's genre.
+     */
     @FXML
     private ComboBox<GameGenre> comboBoxGenre;
+    /**
+     * Spinner for the price of the new game.
+     */
     @FXML
     private Spinner<Double> spinnerPrice;
+    /**
+     * Combobox for the new game's PEGI Rating.
+     */
     @FXML
     private ComboBox<PEGI> comboBoxPEGI;
+    /**
+     * DatePicker for the release date of the new game.
+     */
     @FXML
     private DatePicker datePickerReleaseDate;
     @FXML
     private Button buttonAddGame;
+    /**
+     * The controller used for calling database methods.
+     */
     private Controller cont;
 
-    // Set controller instance
+    /**
+     * Method called from a different controller to set up the controller ahead of time.
+     *
+     * @param cont
+     */
     public void setCont(Controller cont) {
         this.cont = cont;
     }
 
+    /**
+     * The main method that is used cofr compiling the info to add a game, asking the admin fi they want to add more games if successful, or showing an error message when something fails.
+     *
+     * @param event
+     */
     @FXML
     private void addGame(MouseEvent event) {
         if (cont.addGame(textFieldCompany.getText(), comboBoxGenre.getValue(), textFieldName.getText(),
@@ -44,7 +84,6 @@ public class AddGamesAdminController implements Initializable {
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("Game added successfully!");
             success.setHeaderText(textFieldName.getText() + " was added successfully.");
-            //Game title in the content and header
             success.setContentText("The game " + textFieldName.getText() + " was successfully added to the list of games in the store.");
             success.showAndWait();
 
@@ -72,10 +111,14 @@ public class AddGamesAdminController implements Initializable {
             error.showAndWait();
         }
     }
-    
+
+    /**
+     * Method to set up the values for the Enum comboboxes.
+     */
     private void setupCBoxes() {
         comboBoxGenre.getItems().addAll(GameGenre.values());
         comboBoxPlatforms.getItems().addAll(Platform.values());
+        comboBoxPEGI.getItems().addAll(PEGI.values());
     }
 
     @Override
