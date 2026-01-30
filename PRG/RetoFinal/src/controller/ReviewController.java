@@ -5,6 +5,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import model.Profile;
 
 public class ReviewController {
 
@@ -36,15 +37,27 @@ public class ReviewController {
     private String nombreVideojuego = "";
     private int idUsuario = 0;
     private int idVideojuego = 0;
+    private Profile profile;
+    private Controller cont;
 
     // Imágenes para las estrellas
-    private final Image estrellaLlena = new Image(getClass().getResourceAsStream("/images/star_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
-    private final Image estrellaVacia = new Image(getClass().getResourceAsStream("/images/star_border_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
-    private final Image estrellaMedia = new Image(getClass().getResourceAsStream("/images/star_half_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
+    private  Image estrellaLlena;
+    private  Image estrellaVacia ;
+    private  Image estrellaMedia ;
+    
+    
 
-    @FXML
     private void initialize() {
         // Configurar el slider
+         try {
+        // Cargar imágenes en initialize() que se llama después de que FXML está listo
+       // estrellaLlena = new Image(getClass().getResourceAsStream("/images/star_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
+       // estrellaVacia = new Image(getClass().getResourceAsStream("/images/star_border_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
+       // estrellaMedia = new Image(getClass().getResourceAsStream("/images/star_half_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
+    } catch (Exception e) {
+      //  System.err.println("Error cargando imágenes: " + e.getMessage());
+    }
+        
         configurarSlider();
 
         // Configurar el TextArea con contador de caracteres
@@ -55,6 +68,18 @@ public class ReviewController {
 
         // Deshabilitar botón enviar si no hay comentario
         actualizarEstadoBotonEnviar();
+    }
+    
+    public void setUsuario(Profile profile) {
+        this.profile = profile;
+    }
+
+    public void setCont(Controller cont) {
+        this.cont = cont;
+    }
+
+    public Controller getCont() {
+        return cont;
     }
 
     private void configurarSlider() {
