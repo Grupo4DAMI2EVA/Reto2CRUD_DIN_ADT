@@ -90,7 +90,8 @@ public class HelpWindowController implements Initializable {
                     + "Genre: Uno de los generos del juego."
                     + "Price: El precio del juego. El uso de decimales es perimitido."
                     + "PEGI: El PEGI del juego. Puede ser ninguno si el juego no lo tiene aun."
-                    + "Release Date: El dia en el que un juego haya salido/vaya a salir en.");
+                    + "Release Date: El dia en el que un juego haya salido/vaya a salir en."
+                    + "Usa el boton 'Add Game' para añadir el juego.");
         } else {
             info.setText("");
         }
