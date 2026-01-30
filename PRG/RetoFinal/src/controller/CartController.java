@@ -249,7 +249,7 @@ public class CartController {
                     totalItems += cantidad;
                     totalPagar += precio * cantidad;
                 }
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 System.err.println("Error procesando item: " + item);
             }
         }
