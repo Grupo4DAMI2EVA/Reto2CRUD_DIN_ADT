@@ -107,10 +107,6 @@ public class AdminShopController implements Initializable {
         // Configurar las columnas de la tabla
         configureTableColumns();
 
-        // Configurar icono de ayuda
-        ImageView helpIcon = new ImageView("../images/Help_icon.png");
-        menuHelp.setGraphic(helpIcon);
-
         // Configurar listener para selección de fila
         tableViewGames.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> getSelectedTableItem(newValue)
@@ -230,7 +226,7 @@ public class AdminShopController implements Initializable {
         } else {
             try {
                 // Abrir ventana de modificación
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ModifyGameAdmin.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ModifyGameWindow.fxml"));
                 Parent root = fxmlLoader.load();
 
                 ModifyGameAdminController controllerWindow = fxmlLoader.getController();
@@ -339,18 +335,18 @@ public class AdminShopController implements Initializable {
      * @param event
      */
     @FXML
-    private void exit(MouseEvent event) {
+    private void exit(ActionEvent event) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
-            Parent root = fxmlLoader.load();
-            MenuWindowController controllerWindow = fxmlLoader.getController();
-            controllerWindow.setUsuario(profile);
-            controllerWindow.setCont(cont);
-            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
+            Parent root = loader.load();
+
+            MenuWindowController controller = loader.getController();
+            controller.setUsuario(profile);
+            controller.setCont(cont);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setTitle("Main Window");
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
 
             // Cerrar la ventana actual

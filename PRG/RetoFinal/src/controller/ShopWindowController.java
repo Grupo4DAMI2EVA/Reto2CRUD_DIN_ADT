@@ -41,9 +41,9 @@ public class ShopWindowController implements Initializable {
     @FXML
     private TextField textFieldSearch;
     @FXML
-    private TextField textFieldGenre;
+    private ComboBox<GameGenre> comboBoxGenre;
     @FXML
-    private TextField textFieldPlatform;
+    private ComboBox<Platform> comboBoxPlatform;
     @FXML
     private Button buttonSearch;
     @FXML
@@ -68,6 +68,16 @@ public class ShopWindowController implements Initializable {
 
         // Configurar las columnas de la tabla
         configureTableColumns();
+
+        // Inicializar ComboBoxes
+        comboBoxGenre.getItems().addAll(GameGenre.values());
+        comboBoxPlatform.getItems().addAll(Platform.values());
+
+        // Agregar opción "All" a los ComboBoxes
+        comboBoxGenre.getItems().add(0, null);
+        comboBoxPlatform.getItems().add(0, null);
+        comboBoxGenre.setValue(null);
+        comboBoxPlatform.setValue(null);
 
         // Cargar todos los juegos inicialmente
         loadAllGames();
@@ -114,8 +124,8 @@ public class ShopWindowController implements Initializable {
     @FXML
     private void searchGames(ActionEvent event) {
         String name = textFieldSearch.getText();
-        String genre = textFieldGenre.getText();
-        String platform = textFieldPlatform.getText();
+        String genre = comboBoxGenre.getValue() != null ? comboBoxGenre.getValue().name() : "";
+        String platform = comboBoxPlatform.getValue() != null ? comboBoxPlatform.getValue().name() : "";
 
         gamesList.clear();
         gamesList.addAll(cont.getGamesFiltered(name, genre, platform));
@@ -141,10 +151,15 @@ public class ShopWindowController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CartWindow.fxml"));
             Parent root = loader.load();
             CartController cartC = loader.getController();
+
+            // PRIMERO llamar setup() para inicializar carritoData
+            cartC.setup();
+
+            // LUEGO cargar los datos
             cartC.cargarDatosEjemplo();
             cartC.actualizarTotales();
             cartC.actualizarEstadoBotones();
-            cartC.setup();
+
             Stage stage = new Stage();
             stage.setTitle("Your Cart");
             stage.setScene(new Scene(root));
@@ -152,14 +167,14 @@ public class ShopWindowController implements Initializable {
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
         } catch (IOException ex) {
-            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ShopWindowController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void refreshGamesList() {
         String name = textFieldSearch.getText();
-        String genre = textFieldGenre.getText();
-        String platform = textFieldPlatform.getText();
+        String genre = comboBoxGenre.getValue() != null ? comboBoxGenre.getValue().name() : "";
+        String platform = comboBoxPlatform.getValue() != null ? comboBoxPlatform.getValue().name() : "";
 
         // Si hay filtros aplicados, mantenerlos
         if (!name.isEmpty() || !genre.isEmpty() || !platform.isEmpty()) {
@@ -171,9 +186,74 @@ public class ShopWindowController implements Initializable {
 
     @FXML
     private void handleExitButton(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
+            Parent root = loader.load();
+
+            MenuWindowController controller = loader.getController();
+            controller.setUsuario(profile);
+            controller.setCont(cont);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setTitle("Main Window");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
     @FXML
     private void handleReviewButton(ActionEvent event) {
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No game selected");
+            alert.setHeaderText("Please select a game");
+            alert.setContentText("You need to select a game from the table before writing a review.");
+            alert.showAndWait();
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ReviewWindow.fxml"));
+            Parent root = loader.load();
+
+            ReviewController controller = loader.getController();
+
+            // Configurar el videojuego seleccionado
+            controller.setVideojuego(selected.getName(), selected.getIdVideogame()); // Asume que Videogame tiene getId()
+
+            // Configurar usuario si es necesario
+            if (profile != null) {
+                controller.setUsuario(profile.getUserCode()); // O profile.getUserId() o similar
+            }
+
+            // Crear una NUEVA ventana (Stage) modal
+            Stage stage = new Stage();
+            stage.setTitle("Review Game: " + selected.getName());
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL); // Modal respecto a la ventana principal
+            stage.initOwner(((Node) event.getSource()).getScene().getWindow()); // Establecer ventana padre
+            stage.setResizable(false); // Opcional: hacerla no redimensionable
+            stage.show();
+
+        } catch (IOException e) {
+            Logger.getLogger(ShopWindowController.class.getName()).log(Level.SEVERE, "Error loading ReviewWindow", e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Cannot open review window");
+            alert.setContentText("An error occurred while trying to open the review window.");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    private void toggleFavorite(ActionEvent event) {
+    }
+
+    @FXML
+    private void viewGameDetails(ActionEvent event) {
     }
 }
