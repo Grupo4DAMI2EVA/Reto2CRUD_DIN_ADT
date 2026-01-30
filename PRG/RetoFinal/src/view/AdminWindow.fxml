@@ -24,26 +24,26 @@
         <Label layoutX="25.0" layoutY="80.0" prefHeight="25.0" prefWidth="200.0" style="-fx-font-weight: bold;" text="Available Games" />
         <TableView id="tableViewGames" fx:id="tableViewGames" layoutX="21.0" layoutY="115.0" prefHeight="350.0" prefWidth="872.0">
             <columns>
-                <TableColumn fx:id="colTitle" onEditStart="#getSelectedTableItem" prefWidth="250.0" text="Title" />
-                <TableColumn id="col" fx:id="colGenre" onEditStart="#getSelectedTableItem" prefWidth="120.0" text="Genre" />
-                <TableColumn id="colPlataform" fx:id="colPlatform" onEditStart="#getSelectedTableItem" prefWidth="120.0" text="Platform" />
-                <TableColumn id="colPrice" fx:id="colPrice" onEditStart="#getSelectedTableItem" prefWidth="100.0" text="Price (€)" />
-                <TableColumn id="colPegi" fx:id="colPegi" onEditStart="#getSelectedTableItem" prefWidth="100.0" text="Pegi" />
-                <TableColumn id="colStock" fx:id="colStock" onEditStart="#getSelectedTableItem" prefWidth="100.0" text="Stock" />
-                <TableColumn id="colCompany" fx:id="colCompanyName" onEditStart="#getSelectedTableItem" prefWidth="119.0" text="Company" />
-                <TableColumn id="colReleaseDate" fx:id="colReleaseDate" onEditStart="#getSelectedTableItem" prefWidth="107.0" text="Release Date" />
+                <TableColumn fx:id="colTitle"  prefWidth="250.0" text="Title" />
+                <TableColumn id="col" fx:id="colGenre"  prefWidth="120.0" text="Genre" />
+                <TableColumn id="colPlataform" fx:id="colPlatform"  prefWidth="120.0" text="Platform" />
+                <TableColumn id="colPrice" fx:id="colPrice"  prefWidth="100.0" text="Price (€)" />
+                <TableColumn id="colPegi" fx:id="colPegi"  prefWidth="100.0" text="Pegi" />
+                <TableColumn id="colStock" fx:id="colStock"  prefWidth="100.0" text="Stock" />
+                <TableColumn id="colCompany" fx:id="colCompanyName"  prefWidth="119.0" text="Company" />
+                <TableColumn id="colReleaseDate" fx:id="colReleaseDate"  prefWidth="107.0" text="Release Date" />
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
-         <contextMenu>
-            <ContextMenu>
-              <items>
-                <MenuItem mnemonicParsing="false" onAction="#modifyGame" text="Modify Game" />
-                  <MenuItem mnemonicParsing="false" onAction="#deleteGame" text="Delete Game" />
-              </items>
-            </ContextMenu>
-         </contextMenu>
+            <contextMenu>
+                <ContextMenu>
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#modifyGame" text="Modify Game" />
+                        <MenuItem mnemonicParsing="false" onAction="#deleteGame" text="Delete Game" />
+                    </items>
+                </ContextMenu>
+            </contextMenu>
         </TableView>
         <Label layoutX="25.0" layoutY="480.0" prefHeight="17.0" prefWidth="100.0" text="Search game:" />
         <TextField fx:id="textFieldSearch" layoutX="116.0" layoutY="475.0" prefHeight="25.0" prefWidth="200.0" promptText="Game name..." />
@@ -55,17 +55,17 @@
         <Label layoutX="25.0" layoutY="520.0" prefHeight="25.0" prefWidth="150.0" style="-fx-font-weight: bold;" text="Selected game:" />
         <Label fx:id="labelGameInfo" layoutX="180.0" layoutY="520.0" prefHeight="25.0" prefWidth="400.0" style="-fx-text-fill: #5084C1;" text="Select a game" />
         <Button fx:id="buttonAdd" layoutX="25.0" layoutY="555.0" mnemonicParsing="false" onAction="#addGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Add Game" />
-        <Button fx:id="buttonExit" layoutX="755.0" layoutY="555.0" mnemonicParsing="false" onMouseClicked="#exit" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: F08080; -fx-border-color: #000000;" text="Exit" />
+        <Button fx:id="buttonExit" layoutX="755.0" layoutY="555.0" mnemonicParsing="false" onAction="#exit" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: F08080; -fx-border-color: #000000;" text="Exit" />
         <Button fx:id="buttonModify" layoutX="165.0" layoutY="555.0" mnemonicParsing="false" onAction="#modifyGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Modify Game" />
         <Button fx:id="buttonDelete" layoutX="297.0" layoutY="555.0" mnemonicParsing="false" onAction="#deleteGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Delete Game" />
-      <MenuBar layoutY="-1.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="913.0">
-        <menus>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem fx:id="menuHelp" mnemonicParsing="false" onAction="#helpWindow" text="Help Window" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
+        <MenuBar layoutY="-1.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="913.0">
+            <menus>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem fx:id="menuHelp" mnemonicParsing="false" onAction="#helpWindow" text="Help Window" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
     </children>
 </AnchorPane>

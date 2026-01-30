@@ -71,20 +71,16 @@ public class AdminShopController implements Initializable {
         // INICIALIZAR la lista de juegos
         gamesList = FXCollections.observableArrayList();
         tableViewGames.setItems(gamesList);
-        
+
         // Configurar las columnas de la tabla
         configureTableColumns();
-        
-        // Configurar icono de ayuda
-        ImageView helpIcon = new ImageView("../images/Help_icon.png");
-        menuHelp.setGraphic(helpIcon);
-        
+
         // Configurar listener para selección de fila
         tableViewGames.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> getSelectedTableItem(newValue)
+                (observable, oldValue, newValue) -> getSelectedTableItem(newValue)
         );
     }
-    
+
     // AÑADIR: Método para configurar columnas
     private void configureTableColumns() {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -96,7 +92,7 @@ public class AdminShopController implements Initializable {
         colCompanyName.setCellValueFactory(new PropertyValueFactory<>("companyName"));
         colReleaseDate.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
     }
-    
+
     // AÑADIR: Método para manejar selección de items
     private void getSelectedTableItem(Videogame newValue) {
         selected = newValue;
@@ -111,12 +107,12 @@ public class AdminShopController implements Initializable {
         this.profile = profile;
         labelWelcome.setText("Welcome, " + profile.getUsername());
     }
-    
+
     // AÑADIR: Este método falta y es llamado desde ModifyGameAdminController
     public void reloadGames() {
         loadAllGames();
     }
-    
+
     private void loadAllGames() {
         if (cont != null) {
             gamesList.clear();
@@ -135,11 +131,11 @@ public class AdminShopController implements Initializable {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/AddGamesWindow.fxml"));
             Parent root = fxmlLoader.load();
-            
+
             AddGamesAdminController controllerWindow = fxmlLoader.getController();
             controllerWindow.setCont(cont);
             controllerWindow.setAdminShopController(this);
-            
+
             Stage stage = new Stage();
             stage.setTitle("Add Game Window");
             stage.setScene(new Scene(root));
@@ -162,21 +158,21 @@ public class AdminShopController implements Initializable {
         } else {
             try {
                 // Abrir ventana de modificación
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ModifyGameAdmin.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ModifyGameWindow.fxml"));
                 Parent root = fxmlLoader.load();
-                
+
                 ModifyGameAdminController controllerWindow = fxmlLoader.getController();
                 controllerWindow.setCont(cont);
                 controllerWindow.setAdminShopController(this);
                 controllerWindow.setVideogame(selected);
-                
+
                 Stage stage = new Stage();
                 stage.setTitle("Modify Game Window");
                 stage.setScene(new Scene(root));
                 stage.initModality(Modality.WINDOW_MODAL);
                 stage.initOwner(((Node) event.getSource()).getScene().getWindow());
                 stage.showAndWait();
-                
+
                 // Recargar juegos después de cerrar la ventana
                 loadAllGames();
             } catch (IOException ex) {
@@ -198,14 +194,14 @@ public class AdminShopController implements Initializable {
             confirm.setTitle("Confirm Deletion");
             confirm.setHeaderText("Delete " + selected.getName() + "?");
             confirm.setContentText("Are you sure you want to delete this game?");
-            
+
             if (confirm.showAndWait().get() == ButtonType.OK) {
                 if (cont.deleteGame(selected)) {
                     Alert success = new Alert(Alert.AlertType.INFORMATION);
                     success.setTitle("Delete successful!");
                     success.setContentText("The game " + selected.getName() + " was deleted.");
                     success.showAndWait();
-                    
+
                     // Recargar la lista
                     loadAllGames();
                     selected = null;
@@ -249,25 +245,23 @@ public class AdminShopController implements Initializable {
     }
 
     @FXML
-    private void exit(MouseEvent event) {
+    private void exit(ActionEvent event) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
-            Parent root = fxmlLoader.load();
-            MenuWindowController controllerWindow = fxmlLoader.getController();
-            controllerWindow.setUsuario(profile);
-            controllerWindow.setCont(cont);
-            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
+            Parent root = loader.load();
+
+            MenuWindowController controller = loader.getController();
+            controller.setUsuario(profile);
+            controller.setCont(cont);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setTitle("Main Window");
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
-            
-            // Cerrar la ventana actual
-            Stage currentStage = (Stage) buttonExit.getScene().getWindow();
-            currentStage.close();
-        } catch (IOException ex) {
-            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (IOException e) {
+            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
+
 }

@@ -17,7 +17,7 @@
                 <Font size="13.0" />
             </font>
         </Label>
-        <Button fx:id="buttonModifyGame" layoutX="243.0" layoutY="270.0" mnemonicParsing="false" onMouseClicked="#modifyGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: FFD700; -fx-border-color: black;" text="Modify Game" />
+        <Button fx:id="buttonModifyGame" layoutX="243.0" layoutY="270.0" mnemonicParsing="false" onMouseClicked="#modifyGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: #FFD700; -fx-border-color: black;" text="Modify Game" />
         <Label layoutX="323.0" layoutY="82.0" prefHeight="23.0" prefWidth="56.0" text="Genre:">
             <font>
                 <Font size="13.0" />
