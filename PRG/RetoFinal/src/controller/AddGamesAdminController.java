@@ -74,9 +74,9 @@ public class AddGamesAdminController implements Initializable {
     }
 
     /**
-     * The main method that is used cofr compiling the info to add a game, asking the admin fi they want to add more games if successful, or showing an error message when something fails.
+     * Method to get the controller from the Admin Shop Window to be able to quickly update the games.
      *
-     * @param event
+     * @param adminShopController
      */
     public void setAdminShopController(AdminShopController adminShopController) {
         this.adminShopController = adminShopController;
