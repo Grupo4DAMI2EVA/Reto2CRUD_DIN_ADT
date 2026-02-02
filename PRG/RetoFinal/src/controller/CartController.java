@@ -54,13 +54,6 @@ public class CartController {
                 (observable, oldValue, newValue) -> mostrarDetalleItem(newValue));
     }
 
-    public void cargarDatosEjemplo() {
-        // Datos de ejemplo para probar
-        carritoData.add("Usuario: 1 | Videojuego: FIFA 23 | Cantidad: 2 | Precio: $59.99");
-        carritoData.add("Usuario: 1 | Videojuego: Call of Duty | Cantidad: 1 | Precio: $69.99");
-        carritoData.add("Usuario: 2 | Videojuego: Minecraft | Cantidad: 3 | Precio: $24.99");
-        carritoData.add("Usuario: 3 | Videojuego: GTA V | Cantidad: 1 | Precio: $39.99");
-    }
 
     private void mostrarDetalleItem(String item) {
         if (item != null) {
@@ -241,16 +234,30 @@ public class CartController {
                     String cantidadStr = cantidadParte.split(":")[1].trim();
                     int cantidad = Integer.parseInt(cantidadStr);
 
-                    // Extraer precio
+                    // Extraer precio - manejar formato "Precio: $19,99"
                     String precioParte = partes[3].trim();
-                    String precioStr = precioParte.split("\\$")[1].trim();
-                    double precio = Double.parseDouble(precioStr);
+                    // Buscar el símbolo de moneda y extraer el número
+                    int startIndex = precioParte.indexOf('$');
+                    if (startIndex == -1) {
+                        startIndex = precioParte.indexOf('€');
+                    }
+                    if (startIndex == -1) {
+                        startIndex = precioParte.indexOf(':');
+                    }
+                    
+                    if (startIndex != -1) {
+                        String precioStr = precioParte.substring(startIndex + 1).trim();
+                        // Reemplazar coma por punto para parseo correcto
+                        precioStr = precioStr.replace(",", ".");
+                        double precio = Double.parseDouble(precioStr);
 
-                    totalItems += cantidad;
-                    totalPagar += precio * cantidad;
+                        totalItems += cantidad;
+                        totalPagar += precio * cantidad;
+                    }
                 }
             } catch (Exception e) {
                 System.err.println("Error procesando item: " + item);
+                e.printStackTrace(); // Añadir stack trace para mejor depuración
             }
         }
 

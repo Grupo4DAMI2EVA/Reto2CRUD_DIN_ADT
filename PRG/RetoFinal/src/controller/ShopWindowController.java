@@ -61,11 +61,15 @@ public class ShopWindowController implements Initializable {
     private Profile profile;
     private Controller cont;
     private ObservableList<Videogame> gamesList;
+    private ObservableList<Integer> favoriteGameIds;
+    private static ObservableList<CartItem> sharedCart;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         cont = new Controller();
         gamesList = FXCollections.observableArrayList();
+        favoriteGameIds = FXCollections.observableArrayList();
+        sharedCart = FXCollections.observableArrayList();
 
         // Configurar las columnas de la tabla
         configureTableColumns();
@@ -87,6 +91,23 @@ public class ShopWindowController implements Initializable {
         tableViewGames.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> getSelectedTableItem()
         );
+        
+        // Configurar resaltado para juegos favoritos
+        tableViewGames.setRowFactory(tv -> new TableRow<Videogame>() {
+            @Override
+            protected void updateItem(Videogame game, boolean empty) {
+                super.updateItem(game, empty);
+                if (empty || game == null) {
+                    setStyle("");
+                } else {
+                    if (favoriteGameIds.contains(game.getIdVideogame())) {
+                        setStyle("-fx-background-color: #ffeb3b; -fx-font-weight: bold;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            }
+        });
     }
 
     public void setUsuario(Profile profile) {
@@ -140,17 +161,72 @@ public class ShopWindowController implements Initializable {
     @FXML
     private void addToCart(ActionEvent event) {
         if (selected == null) {
-            Alert success = new Alert(Alert.AlertType.INFORMATION);
+            Alert success = new Alert(Alert.AlertType.WARNING);
             success.setTitle("ERROR!");
             success.setHeaderText("No selection!");
             success.setContentText("Please select a game before attempting add it to your cart.");
             success.showAndWait();
-        } else {
-            // Add cart method here
+            return;
         }
+        
+        if (profile == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("User not logged in");
+            alert.setContentText("You must be logged in to add games to cart.");
+            alert.showAndWait();
+            return;
+        }
+        
+        if (selected.getStock() <= 0) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Out of Stock");
+            alert.setHeaderText("Game not available");
+            alert.setContentText(selected.getName() + " is currently out of stock.");
+            alert.showAndWait();
+            return;
+        }
+        
+        // Check if game already in cart
+        boolean gameInCart = false;
+        for (CartItem item : sharedCart) {
+            if (item.getIdVideojuego() == selected.getIdVideogame() && item.getIdUsuario() == profile.getUserCode()) {
+                gameInCart = true;
+                break;
+            }
+        }
+        
+        if (gameInCart) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Already in Cart");
+            alert.setHeaderText("Game already added");
+            alert.setContentText(selected.getName() + " is already in your cart.");
+            alert.showAndWait();
+            return;
+        }
+        
+        // Add to cart
+        CartItem cartItem = new CartItem(
+            profile.getUserCode(),
+            selected.getIdVideogame(),
+            1,
+            selected.getPrice()
+        );
+        
+        sharedCart.add(cartItem);
+        
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Added to Cart");
+        alert.setHeaderText("Game added successfully");
+        alert.setContentText(selected.getName() + " has been added to your cart!");
+        alert.showAndWait();
     }
 
-    @FXML
+    public static ObservableList<CartItem> getSharedCart() {
+        return sharedCart;
+    }
+
+     @FXML
     private void openCart(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CartWindow.fxml"));
@@ -159,9 +235,10 @@ public class ShopWindowController implements Initializable {
 
             // PRIMERO llamar setup() para inicializar carritoData
             cartC.setup();
-
-            // LUEGO cargar los datos
-            cartC.cargarDatosEjemplo();
+            
+            // Cargar los items del carrito compartido
+            loadCartItemsToController(cartC);
+            
             cartC.actualizarTotales();
             cartC.actualizarEstadoBotones();
 
@@ -171,8 +248,32 @@ public class ShopWindowController implements Initializable {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
+            
         } catch (IOException ex) {
             Logger.getLogger(ShopWindowController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    // Método auxiliar para cargar items al controlador del carrito
+    private void loadCartItemsToController(CartController cartController) {
+        for (CartItem item : sharedCart) {
+            if (item.getIdUsuario() == profile.getUserCode()) {
+                // Buscar nombre del videojuego
+                String gameName = "Unknown Game";
+                for (Videogame game : gamesList) {
+                    if (game.getIdVideogame() == item.getIdVideojuego()) {
+                        gameName = game.getName();
+                        break;
+                    }
+                }
+                
+                cartController.agregarItemCarrito(
+                    profile.getUsername(),
+                    gameName,
+                    item.getCantidad(),
+                    item.getPrecio()
+                );
+            }
         }
     }
 
@@ -256,9 +357,72 @@ public class ShopWindowController implements Initializable {
 
     @FXML
     private void toggleFavorite(ActionEvent event) {
+        if (profile == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("User not logged in");
+            alert.setContentText("You must be logged in to add games to favorites.");
+            alert.showAndWait();
+            return;
+        }
+        
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No game selected");
+            alert.setHeaderText("Please select a game");
+            alert.setContentText("You need to select a game from the table before adding it to favorites.");
+            alert.showAndWait();
+            return;
+        }
+
+        int gameId = selected.getIdVideogame();
+        
+        if (favoriteGameIds.contains(gameId)) {
+            // Remove from favorites
+            favoriteGameIds.remove(Integer.valueOf(gameId));
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Favorite Removed");
+            alert.setHeaderText("Game removed from favorites");
+            alert.setContentText(selected.getName() + " has been removed from your favorites!");
+            alert.showAndWait();
+        } else {
+            // Add to favorites
+            favoriteGameIds.add(gameId);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Favorite Added");
+            alert.setHeaderText("Game added to favorites");
+            alert.setContentText(selected.getName() + " has been added to your favorites!");
+            alert.showAndWait();
+        }
+        
+        // Refresh the table to update highlighting
+        tableViewGames.refresh();
     }
 
     @FXML
     private void viewGameDetails(ActionEvent event) {
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No game selected");
+            alert.setHeaderText("Please select a game");
+            alert.setContentText("You need to select a game from the table before viewing its details.");
+            alert.showAndWait();
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Details - " + selected.getName());
+        alert.setHeaderText(selected.getName());
+        
+        String details = "Company: " + selected.getCompanyName() + "\n" +
+                        "Genre: " + selected.getGameGenre() + "\n" +
+                        "Platform: " + selected.getPlatforms() + "\n" +
+                        "Price: €" + String.format("%.2f", selected.getPrice()) + "\n" +
+                        "PEGI Rating: " + selected.getPegi() + "\n" +
+                        "Stock: " + selected.getStock() + " units\n" +
+                        "Release Date: " + selected.getReleaseDate();
+        
+        alert.setContentText(details);
+        alert.showAndWait();
     }
 }

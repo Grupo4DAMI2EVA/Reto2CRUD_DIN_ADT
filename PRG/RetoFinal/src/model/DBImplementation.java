@@ -461,16 +461,6 @@ public class DBImplementation implements ClassDAO {
         Transaction transaction = null;
 
         try {
-            // Verificar si el juego ya existe
-            String checkHql = "SELECT COUNT(u) FROM VIDEOGAME_ v WHERE v.name = :name";
-            Query<Long> checkQuery = session.createQuery(checkHql, Long.class);
-            checkQuery.setParameter("name", game.getName());
-            Long count = checkQuery.uniqueResult();
-
-            if (count > 0) {
-                System.out.println("Game already exists.");
-                return false;
-            }
 
             transaction = session.beginTransaction();
             session.update(game);
