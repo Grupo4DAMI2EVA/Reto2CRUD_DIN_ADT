@@ -3,17 +3,17 @@ CREATE DATABASE VIDEOGAME_STORE;
 
 -- Insert a regular user
 INSERT INTO PROFILE_ (USERNAME, PASSWORD, EMAIL, USER_CODE, NAME, TELEPHONE, SURNAME)
-VALUES ('user1', '1234', 'gamer123@example.com', 1, 'Alex', '612345678', 'Gamer');
+VALUES ('user1', '1234', 'gamer123@example.com', 2, 'Alex', '612345678', 'Gamer');
 
 INSERT INTO USER_ (USER_CODE, GENDER, CARD_NUMBER)
-VALUES ('1', 'other', 'ES1234567890123456789012');
+VALUES ('2', 'other', 'ES1234567890123456789012');
 
 -- Insert an admin
 INSERT INTO PROFILE_ (USERNAME, PASSWORD, EMAIL, USER_CODE, NAME, TELEPHONE, SURNAME)
-VALUES ('admin1', '1234', 'admin1@example.com', 107, 'Admin', '600000001', 'System');
+VALUES ('admin1', '1234', 'admin1@example.com', 3, 'Admin', '600000001', 'System');
 
 INSERT INTO ADMIN_ (USER_CODE, CURRENT_ACCOUNT)
-VALUES ('1', '12312312455');
+VALUES ('3', '12312312455');
 
 -- Insert sample data with proper PEGI values
 INSERT INTO VIDEOGAME_ (company_name, genre, name, platform, pegi, price, stock, release_date) VALUES

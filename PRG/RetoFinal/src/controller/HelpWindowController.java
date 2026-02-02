@@ -59,23 +59,51 @@ public class HelpWindowController implements Initializable {
                     + "Importante:\n"
                     + "Debes seleccionar un videojuego antes de poder modificarlo o eliminarlo. La eliminación es permanente.");
         } else {
-            info.setText("Bienvenido a Game Store. Esta página te permite explorar y comprar videojuegos disponibles.\n"
-                    + "\n"
-                    + " Pasos para comprar:\n"
-                    + "\n"
-                    + "Selecciona un videojuego: Haz clic en cualquier fila de la tabla para seleccionar el juego\n"
-                    + "Verifica los detalles: El juego seleccionado aparecerá en la sección 'Selected game'\n"
-                    + "Añade a carrito: Usa el botón 'Add to Cart' para agregar el juego a tu carrito de compras\n"
-                    + "Escribe una reseña: Usa el botón 'Review' para acceder a la sección de reseñas\n"
-                    + "\n"
-                    + "Filtros disponibles:\n"
-                    + "\n"
-                    + "Search game: Busca por nombre del videojuego\n"
-                    + "Genre: Filtra por género (Acción, RPG, etc.)\n"
-                    + "Platform:</strong> Filtra por plataforma (PC, PlayStation, Xbox, etc.)\n"
-                    + "\n"
-                    + "Tu saldo:\n"
-                    + "Consulta tu balance actual en la esquina superior izquierda. Puedes añadir saldo usando el botón 'Añadir saldo'.");
+            info.setText("Bienvenido a Game Store - Tienda de Videojuegos\n"
+                + "===============================================\n\n"
+                + "🛍️ COMPRA DE VIDEOJUEGOS:\n"
+                + "• Selecciona un juego: Haz clic en cualquier fila de la tabla\n"
+                + "• Ver detalles: El juego seleccionado aparece en 'Selected game'\n"
+                + "• Añadir al carrito: Botón 'Add to Cart' para agregar a tu carrito\n"
+                + "• Escribir reseña: Botón 'Review' para opinar sobre el juego\n"
+                + "• Ver carrito: Botón 'Cart' o menú Cart → View Cart\n\n"
+                
+                + "⭐ GESTIÓN DE FAVORITOS:\n"
+                + "• Añadir a favoritos: Menú contextual (clic derecho) → Add to Favorites\n"
+                + "• Ver favoritos: Menú View → Favorites\n"
+                + "• Los juegos favoritos aparecen resaltados en amarillo\n"
+                + "• Quitar de favoritos: Clic derecho → Remove from Favorites\n\n"
+                
+                + "🔍 BÚSQUEDA AVANZADA:\n"
+                + "• Search game: Busca por nombre exacto o parcial\n"
+                + "• Genre: Filtra por género (Acción, RPG, Estrategia, Deportes, etc.)\n"
+                + "• Platform: Filtra por plataforma (PC, PS5, Xbox, Nintendo Switch)\n"
+                + "• Mostrar todos: View → All Games para ver catálogo completo\n\n"
+                
+                + "📋 NAVEGACIÓN POR MENÚ:\n"
+                + "• File → Main Menu: Volver al menú principal con opciones de usuario\n"
+                + "• File → Modify Profile: Editar tu información personal\n"
+                
+                + "❓ MENÚ HELP:\n"
+                + "• Help → Help: Mostrar esta guía de ayuda\n"
+                + "• Help → About: Información sobre la tienda\n\n"
+                
+                + "🎮 DETALLES DEL JUEGO (clic derecho):\n"
+                + "• Add to Favorites: Marcar como favorito\n"
+                + "• View Details: Ver información completa del juego\n"
+                + "• Add to Cart: Añadir directamente al carrito\n"
+                + "• Write Review: Escribir una reseña\n\n"
+                
+                + "💰 TU CUENTA:\n"
+                + "• Nombre de usuario visible en 'Welcome, [usuario]!'\n"
+                + "• Stock disponible se muestra para cada juego\n\n"
+                
+                + "⚠️ NOTAS IMPORTANTES:\n"
+                + "• Necesitas estar logueado para añadir al carrito o favoritos\n"
+                + "• Revisa el stock disponible antes de comprar\n"
+                + "• Los juegos sin stock no se pueden añadir al carrito\n"
+                + "• Puedes tener múltiples copias del mismo juego en el carrito\n"
+                + "• Las reseñas ayudan a otros usuarios a decidir\n");
         }
     }
 
