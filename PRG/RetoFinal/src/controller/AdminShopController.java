@@ -11,8 +11,6 @@ import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.*;
 import model.*;
 
@@ -83,6 +81,10 @@ public class AdminShopController implements Initializable {
     private Button buttonDelete;
     @FXML
     private MenuItem menuHelp;
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private Menu menu;
     private ObservableList<Videogame> gamesList;
 
     /**
@@ -315,14 +317,14 @@ public class AdminShopController implements Initializable {
     private void helpWindow(ActionEvent event) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/HelpWindow.fxml"));
+            Parent root = fxmlLoader.load();
             HelpWindowController hCont = fxmlLoader.getController();
             hCont.setUsuario(profile);
-            Parent root = fxmlLoader.load();
             Stage stage = new Stage();
             stage.setTitle("Help Window");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+            stage.initOwner(menuBar.getScene().getWindow());
             stage.show();
         } catch (IOException ex) {
             Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
