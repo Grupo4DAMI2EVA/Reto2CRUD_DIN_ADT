@@ -11,26 +11,17 @@ import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.*;
 import model.*;
 
-/**
- * Controller class for the Admin window.
- *
- * @author Jagoba
- */
 public class AdminShopController implements Initializable {
 
     @FXML
     private Label labelWelcome;
-    /**
-     * Label to display the balance of the admin.
-     */
     @FXML
     private Label labelBalance;
-    /**
-     * Table containing all games (and displaying them).
-     */
     @FXML
     private TableView<Videogame> tableViewGames;
     @FXML
@@ -49,26 +40,14 @@ public class AdminShopController implements Initializable {
     private TableColumn<Videogame, String> colCompanyName;
     @FXML
     private TableColumn<Videogame, LocalDate> colReleaseDate;
-    /**
-     * Text field used to for filtering games by name.
-     */
     @FXML
     private TextField textFieldSearch;
-    /**
-     * Text field used for filtering games by genre.
-     */
     @FXML
     private TextField textFieldGenre;
-    /**
-     * Text field used for filtering games by platform.
-     */
     @FXML
     private TextField textFieldPlatform;
     @FXML
     private Button buttonSearch;
-    /**
-     * Label displaying some information about a videogame selected by the admin.
-     */
     @FXML
     private Label labelGameInfo;
     @FXML
@@ -79,26 +58,13 @@ public class AdminShopController implements Initializable {
     private Button buttonModify;
     @FXML
     private Button buttonDelete;
+
+    private Profile profile;
+    private Controller cont;
+    private Videogame selected;
     @FXML
     private MenuItem menuHelp;
-    @FXML
-    private MenuBar menuBar;
-    @FXML
-    private Menu menu;
     private ObservableList<Videogame> gamesList;
-
-    /**
-     * The admin profile.
-     */
-    private Profile profile;
-    /**
-     * The controller used for calling database methods.
-     */
-    private Controller cont;
-    /**
-     * The currently selected videogame from the table.
-     */
-    private Videogame selected;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -137,11 +103,6 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    /**
-     * Method called from a different controller to set up the Admin profile ahead of time.
-     *
-     * @param profile The admin profile
-     */
     public void setUsuario(Profile profile) {
         this.profile = profile;
         labelWelcome.setText("Welcome, " + profile.getUsername());
@@ -160,37 +121,11 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    /**
-     * Method called from a different controller to set up the controller ahead of time.
-     *
-     * @param cont The controller instance
-     */
     public void setCont(Controller cont) {
         this.cont = cont;
         loadAllGames();
     }
 
-    /**
-     * Used for two things: If any filters are applied, it calls the Search method, otherwise it calls the method to reload the game list.
-     */
-    private void refreshGamesList() {
-        String name = textFieldSearch.getText();
-        String genre = textFieldGenre.getText();
-        String platform = textFieldPlatform.getText();
-
-        // Si hay filtros aplicados, mantenerlos
-        if (!name.isEmpty() || !genre.isEmpty() || !platform.isEmpty()) {
-            search(null);
-        } else {
-            loadAllGames();
-        }
-    }
-
-    /**
-     * Opens the Add Game window, setting up the controller ahead of time.
-     *
-     * @param event
-     */
     @FXML
     private void addGame(ActionEvent event) {
         try {
@@ -212,11 +147,6 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    /**
-     * Calls for the method to modify the selected game.
-     *
-     * @param event
-     */
     @FXML
     private void modifyGame(ActionEvent event) {
         if (selected == null) {
@@ -251,11 +181,6 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    /**
-     * Calls for the method to delete the selected game.
-     *
-     * @param event
-     */
     @FXML
     private void deleteGame(ActionEvent event) {
         if (selected == null) {
@@ -292,11 +217,6 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    /**
-     * Searches for videogames by calling a method, which uses the provided filters.
-     *
-     * @param event the action event triggered by the search button
-     */
     @FXML
     private void search(ActionEvent event) {
         String name = textFieldSearch.getText();
@@ -308,34 +228,22 @@ public class AdminShopController implements Initializable {
         tableViewGames.refresh();
     }
 
-    /**
-     * Opens the Help window, setting up the admin profile ahead of time.
-     *
-     * @param event
-     */
     @FXML
     private void helpWindow(ActionEvent event) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/HelpWindow.fxml"));
             Parent root = fxmlLoader.load();
-            HelpWindowController hCont = fxmlLoader.getController();
-            hCont.setUsuario(profile);
             Stage stage = new Stage();
             stage.setTitle("Help Window");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(menuBar.getScene().getWindow());
+            stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
         } catch (IOException ex) {
             Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    /**
-     * Closes the curret window and opens the menu window.
-     *
-     * @param event
-     */
     @FXML
     private void exit(ActionEvent event) {
         try {
@@ -351,11 +259,9 @@ public class AdminShopController implements Initializable {
             stage.setScene(new Scene(root));
             stage.show();
 
-            // Cerrar la ventana actual
-            Stage currentStage = (Stage) buttonExit.getScene().getWindow();
-            currentStage.close();
-        } catch (IOException ex) {
-            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
+
 }
