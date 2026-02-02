@@ -66,7 +66,6 @@ public class ShopWindowController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        cont = new Controller();
         gamesList = FXCollections.observableArrayList();
         favoriteGameIds = FXCollections.observableArrayList();
         sharedCart = FXCollections.observableArrayList();
@@ -117,10 +116,6 @@ public class ShopWindowController implements Initializable {
 
     public void setCont(Controller cont) {
         this.cont = cont;
-    }
-
-    public Controller getCont() {
-        return cont;
     }
 
     private void configureTableColumns() {
