@@ -38,7 +38,7 @@ public class LogInWindowController implements Initializable {
     private Label labelIncorrecto; // Label to show error messages
 
     // Controller handling business logic
-    private Controller cont = new Controller();
+    Controller cont = new Controller();
 
     /**
      * Opens the SignUp window.
