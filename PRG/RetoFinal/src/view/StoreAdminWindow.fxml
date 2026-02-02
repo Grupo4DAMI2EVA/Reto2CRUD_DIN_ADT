@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -12,15 +19,24 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="610.0" prefWidth="913.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AdminShopController">
+<AnchorPane id="AnchorPane" prefHeight="610.0" prefWidth="913.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AdminShopController">
     <children>
-        <Label layoutX="300.0" layoutY="20.0" prefHeight="44.0" prefWidth="354.0" text="GAME STORE - ADMIN" textAlignment="CENTER">
+        <Label layoutX="284.0" layoutY="29.0" prefHeight="44.0" prefWidth="354.0" text="GAME STORE - ADMIN" textAlignment="CENTER">
             <font>
                 <Font name="Arial Black" size="28.0" />
             </font>
         </Label>
+        <MenuBar fx:id="menuBar" layoutY="1.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="913.0">
+            <menus>
+                <Menu fx:id="menu" mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem fx:id="menuHelp" mnemonicParsing="false" onAction="#helpWindow" text="Help Window" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
       
-        <Label fx:id="labelWelcome" layoutX="25.0" layoutY="20.0" prefHeight="25.0" prefWidth="300.0" text="Welcome, Admin" />
+        <Label fx:id="labelWelcome" layoutX="14.0" layoutY="38.0" prefHeight="25.0" prefWidth="300.0" text="Welcome, Admin" />
       
         <Label layoutX="25.0" layoutY="80.0" prefHeight="25.0" prefWidth="200.0" style="-fx-font-weight: bold;" text="Available Games" />
         <TableView id="tableViewGames" fx:id="tableViewGames" layoutX="25.0" layoutY="110.0" prefHeight="350.0" prefWidth="872.0">
@@ -57,12 +73,6 @@
       
         <Label layoutX="25.0" layoutY="520.0" prefHeight="25.0" prefWidth="150.0" style="-fx-font-weight: bold;" text="Selected game:" />
         <Label fx:id="labelGameInfo" layoutX="180.0" layoutY="520.0" prefHeight="25.0" prefWidth="400.0" style="-fx-text-fill: #5084C1;" text="Select a game" />
-      
-        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="850.0" layoutY="15.0">
-            <image>
-                <Image url="@../images/sports_esports_32dp_5084C1_FILL0_wght400_GRAD0_opsz40.png" />
-            </image>
-        </ImageView>
         
         <!-- Admin buttons: Add Game, Modify Game, Delete Game -->
         <Button fx:id="buttonAddGame" layoutX="24.0" layoutY="555.0" mnemonicParsing="false" onAction="#addGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 90EE90; -fx-border-color: #000000;" text="Add Game" />
