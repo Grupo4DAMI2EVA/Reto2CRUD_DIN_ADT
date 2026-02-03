@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="610.0" prefWidth="913.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ShopWindowController">
+<AnchorPane id="AnchorPane" prefHeight="602.0" prefWidth="1043.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ShopWindowController">
     <children>
-        <Label layoutX="350.0" layoutY="20.0" prefHeight="44.0" prefWidth="207.0" text="GAME STORE">
+        <Label fx:id="labelTitle" layoutX="419.0" layoutY="29.0" prefHeight="44.0" prefWidth="207.0" text="GAME STORE">
             <font>
                 <Font name="Arial Black" size="28.0" />
             </font>
         </Label>
+        <MenuBar fx:id="menuBar" layoutY="1.0" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="1043.0">
+            <menus>
+                <Menu fx:id="menuHelp" mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem fx:id="menuHelpWindow" mnemonicParsing="false" onAction="#helpWindow" text="Help Window" />
+                    </items>
+                </Menu>
+            <Menu fx:id="menuWindow" mnemonicParsing="false" text="Windows">
+               <items>
+                  <MenuItem fx:id="menuUserWindow" mnemonicParsing="false" onAction="#menuUserWindow" text="User Window" />
+                  <MenuItem fx:id="menuMainWindow" mnemonicParsing="false" onAction="#menuMainWIndow" text="Menu Window" />
+               </items>
+            </Menu>
+            </menus>
+        </MenuBar>
       
-        <Label fx:id="labelWelcome" layoutX="25.0" layoutY="20.0" prefHeight="25.0" prefWidth="300.0" text="Welcome, [User]" />
-        <Label fx:id="labelBalance" layoutX="25.0" layoutY="45.0" prefHeight="20.0" prefWidth="300.0" style="-fx-text-fill: #5084C1;" text="Balance: 0.00€" />
+        <Label fx:id="labelWelcome" layoutX="14.0" layoutY="38.0" prefHeight="25.0" prefWidth="300.0" text="Welcome, [User]" />
       
-        <Label layoutX="25.0" layoutY="80.0" prefHeight="25.0" prefWidth="200.0" style="-fx-font-weight: bold;" text="Available Games" />
-        <TableView id="tableViewGames" fx:id="tableViewGames" layoutX="25.0" layoutY="110.0" prefHeight="350.0" prefWidth="872.0">
+        <Label fx:id="labelAvaliable" layoutX="25.0" layoutY="80.0" prefHeight="25.0" prefWidth="200.0" style="-fx-font-weight: bold;" text="Available Games" />
+        <TableView id="tableViewGames" fx:id="tableViewGames" layoutX="14.0" layoutY="113.0" prefHeight="350.0" prefWidth="1016.0">
             <columns>
                 <TableColumn fx:id="colTitle" prefWidth="250.0" text="Title" />
                 <TableColumn id="col" fx:id="colGenre" prefWidth="120.0" text="Genre" />
@@ -41,44 +52,38 @@
                 <TableColumn id="colReleaseDate" fx:id="colReleaseDate" prefWidth="107.0" text="ReleaseDate" />
             </columns>
          <contextMenu>
-    <ContextMenu>
+    <ContextMenu fx:id="tableContextMenu">
         <items>
-            <MenuItem mnemonicParsing="false" onAction="#toggleFavorite" text="Añadir a Favoritos" />
-            <MenuItem mnemonicParsing="false" onAction="#viewGameDetails" text="Ver Detalles" />
+            <MenuItem fx:id="contextMenuFav" mnemonicParsing="false" onAction="#toggleFavorite" text="Añadir a Favoritos" />
+            <MenuItem fx:id="contextMenuDetails" mnemonicParsing="false" onAction="#viewGameDetails" text="Ver Detalles" />
             <SeparatorMenuItem />
-            <MenuItem mnemonicParsing="false" onAction="#addToCart" text="Añadir al Carrito" />
+            <MenuItem fx:id="contextMenuCart" mnemonicParsing="false" onAction="#addToCart" text="Añadir al Carrito" />
         </items>
     </ContextMenu>
 </contextMenu>
         </TableView>
       
-        <Label layoutX="25.0" layoutY="480.0" prefHeight="17.0" prefWidth="100.0" text="Search game:" />
+        <Label fx:id="labelSearch" layoutX="25.0" layoutY="480.0" prefHeight="17.0" prefWidth="100.0" text="Search game:" />
         <TextField fx:id="textFieldSearch" layoutX="116.0" layoutY="475.0" prefHeight="25.0" prefWidth="200.0" promptText="Game name..." />
       
-        <Label layoutX="320.0" layoutY="480.0" prefHeight="17.0" prefWidth="60.0" text="Genre:" />
+        <Label fx:id="labelGenre" layoutX="320.0" layoutY="480.0" prefHeight="17.0" prefWidth="60.0" text="Genre:" />
         <ComboBox fx:id="comboBoxGenre" layoutX="380.0" layoutY="475.0" prefWidth="120.0" promptText="All" />
       
-        <Label layoutX="510.0" layoutY="480.0" prefHeight="17.0" prefWidth="80.0" text="Platform:" />
+        <Label fx:id="labelPlatform" layoutX="510.0" layoutY="480.0" prefHeight="17.0" prefWidth="80.0" text="Platform:" />
         <ComboBox fx:id="comboBoxPlatform" layoutX="590.0" layoutY="475.0" prefWidth="120.0" promptText="All" />
       
         <!-- Añadir onAction al botón Search -->
-        <Button fx:id="buttonSearch" layoutX="720.0" layoutY="475.0" mnemonicParsing="false" onAction="#searchGames" prefHeight="25.0" prefWidth="80.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000;" text="Search" />
+        <Button fx:id="buttonSearch" layoutX="743.0" layoutY="474.0" mnemonicParsing="false" onAction="#search" prefHeight="27.0" prefWidth="134.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000;" text="Search" />
       
-        <Label layoutX="25.0" layoutY="520.0" prefHeight="25.0" prefWidth="150.0" style="-fx-font-weight: bold;" text="Selected game:" />
+        <Label fx:id="labelSelectedGame" layoutX="25.0" layoutY="520.0" prefHeight="25.0" prefWidth="150.0" style="-fx-font-weight: bold;" text="Selected game:" />
         <Label fx:id="labelGameInfo" layoutX="180.0" layoutY="520.0" prefHeight="25.0" prefWidth="400.0" style="-fx-text-fill: #5084C1;" text="Select a game" />
         
         <!-- Añadir onAction al botón Add to Cart -->
-        <Button fx:id="buttonAddToCart" layoutX="603.0" layoutY="554.0" mnemonicParsing="false" onAction="#addToCart" prefHeight="35.0" prefWidth="140.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000;" text="Add to Cart" />
-      
-        <ImageView fitHeight="35.0" fitWidth="35.0" layoutX="850.0" layoutY="15.0">
-            <image>
-                <Image url="@../images/sports_esports_32dp_5084C1_FILL0_wght400_GRAD0_opsz40.png" />
-            </image>
-        </ImageView>
+        <Button fx:id="buttonAddToCart" layoutX="743.0" layoutY="552.0" mnemonicParsing="false" onAction="#addToCart" prefHeight="35.0" prefWidth="140.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000;" text="Add to Cart" />
         
         <!-- Añadir onAction a los demás botones -->
-        <Button fx:id="buttonCart" layoutX="24.0" layoutY="555.0" mnemonicParsing="false" onAction="#openCart" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Cart" />
-        <Button fx:id="buttonExit" layoutX="755.0" layoutY="555.0" mnemonicParsing="false" onAction="#handleExitButton" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: F08080; -fx-border-color: #000000;" text="Exit" />
+        <Button fx:id="buttonCart" layoutX="24.0" layoutY="555.0" mnemonicParsing="false" onAction="#openCart" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: FFD700; -fx-border-color: #000000;" text="Cart" />
+        <Button fx:id="buttonExit" layoutX="895.0" layoutY="553.0" mnemonicParsing="false" onAction="#handleExitButton" prefHeight="35.0" prefWidth="134.0" style="-fx-background-color: F08080; -fx-border-color: #000000;" text="Exit" />
         <Button fx:id="buttonReview" layoutX="156.0" layoutY="555.0" mnemonicParsing="false" onAction="#handleReviewButton" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 789DE5; -fx-border-color: #000000;" text="Review" />
     </children>
 </AnchorPane>
