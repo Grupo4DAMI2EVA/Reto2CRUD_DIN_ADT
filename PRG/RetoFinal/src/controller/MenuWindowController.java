@@ -62,7 +62,7 @@ public class MenuWindowController implements Initializable {
                 logsFolder.mkdirs();
             }
             
-            FileHandler fileHandler = new FileHandler("logs/LogInWindow.log", true);
+            FileHandler fileHandler = new FileHandler("logs/MenuWindow.log", true);
             
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
