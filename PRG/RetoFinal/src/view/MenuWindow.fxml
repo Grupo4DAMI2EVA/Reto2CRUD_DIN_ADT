@@ -45,7 +45,7 @@
                 <Image url="@../images/person_23dp_789DE5_FILL0_wght400_GRAD0_opsz24.png" />
             </image>
         </ImageView>
-      <Button id="ShopBtn" fx:id="Button_Store" layoutX="66.0" layoutY="246.0" mnemonicParsing="false" onAction="#StoreWindow" prefHeight="36.0" prefWidth="330.0" style="-fx-border-color: #000000; -fx-background-color: A7C4E5;" text="Store">
+      <Button id="Button_Store" fx:id="Button_Store" layoutX="66.0" layoutY="246.0" mnemonicParsing="false" onAction="#StoreWindow" prefHeight="36.0" prefWidth="330.0" style="-fx-border-color: #000000; -fx-background-color: A7C4E5;" text="Store">
          <font>
             <Font size="16.0" />
          </font>
