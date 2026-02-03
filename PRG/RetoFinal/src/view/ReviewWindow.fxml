@@ -21,13 +21,6 @@
             </font>
         </Label>
         
-        <!-- Ícono de estrella para rating -->
-        <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="50.0" layoutY="70.0">
-            <image>
-                <Image url="@../images/star_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png" />
-            </image>
-        </ImageView>
-        
         <!-- Label para puntuación -->
         <Label layoutX="69.0" layoutY="86.0" text="Puntuación:" />
         
@@ -37,21 +30,11 @@
         <!-- Label que muestra el valor actual del slider -->
         <Label fx:id="labelPuntuacion" layoutX="339.0" layoutY="85.0" prefHeight="20.0" prefWidth="40.0" style="-fx-background-color: #F0F0F0; -fx-border-color: #CCCCCC; -fx-border-radius: 3px; -fx-alignment: center;" text="2.5" />
         
-        <!-- Ícono de comentario -->
-        <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="50.0" layoutY="120.0">
-            <image>
-                <Image url="@../images/comment_32dp_2196F3_FILL0_wght400_GRAD0_opsz40.png" />
-            </image>
-        </ImageView>
-        
         <!-- Label para comentario -->
         <Label layoutX="90.0" layoutY="125.0" text="Comentario:" />
         
         <!-- TextArea para el comentario/review -->
         <TextArea fx:id="textAreaComentario" layoutX="50.0" layoutY="160.0" prefHeight="150.0" prefWidth="300.0" promptText="Escribe tu reseña aquí..." wrapText="true" />
-        
-        <!-- Contador de caracteres -->
-        <Label fx:id="labelContadorCaracteres" layoutX="50.0" layoutY="320.0" prefHeight="20.0" prefWidth="300.0" style="-fx-text-fill: #666666;" text="0/500 caracteres" />
         
         <!-- Botones -->
         <Button fx:id="buttonEnviar" layoutX="100.0" layoutY="377.0" mnemonicParsing="false" onAction="#enviarReview" prefHeight="35.0" prefWidth="100.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-color: #388E3C; -fx-font-size: 14px;" text="Enviar" />
