@@ -73,14 +73,14 @@ public class ShopWindowControllerTest extends ApplicationTest {
             System.out.println("Error preparando test: " + e.getMessage());
         }
     }
-    
+
     @Test
     public void test01_ElementosTiendaBasicos() {
         System.out.println("=== Test 1: Elementos Tienda Básicos ===");
-        
+
         // Primero hacer login para llegar a la tienda
         hacerLoginParaTienda();
-        
+
         // Verificar elementos básicos de la tienda
         verificarElemento("#labelTitle", "Título GAME STORE");
         verificarElemento("#labelWelcome", "Label de bienvenida");
@@ -100,18 +100,13 @@ public class ShopWindowControllerTest extends ApplicationTest {
         verificarElemento("#buttonExit", "Botón Exit");
         verificarElemento("#buttonReview", "Botón Review");
         verificarElemento("#menuBar", "Menu bar");
-        
+
         System.out.println("✓ Test elementos básicos de tienda completado");
     }
 
-
-
-    
-
-    
     private void hacerLoginParaTienda() {
         System.out.println("Realizando login para acceder a tienda...");
-        
+
         try {
             // Asegurarse de estar en LoginWindow
             // Limpiar campos si existen
@@ -119,20 +114,20 @@ public class ShopWindowControllerTest extends ApplicationTest {
                 clickOn("#TextField_Username");
                 write(usuarioUnico);
             }
-            
+
             if (verificarElementoExistente("#PasswordField_Password")) {
                 clickOn("#PasswordField_Password");
                 write("1234");
             }
-            
+
             // Hacer login
             if (verificarElementoExistente("#Button_LogIn")) {
                 clickOn("#Button_LogIn");
                 sleep(3000);
-                
+
                 // Manejar alert si aparece
                 manejarAlertConBoton("OK", "Resultado login");
-                
+
                 // Ir a tienda desde MenuWindow
                 sleep(2000);
                 if (verificarElementoExistente("#Button_Store")) {
@@ -141,19 +136,19 @@ public class ShopWindowControllerTest extends ApplicationTest {
                     System.out.println("✓ Llegado a tienda desde MenuWindow");
                 }
             }
-            
+
         } catch (Exception e) {
             System.out.println("Error en login para tienda: " + e.getMessage());
         }
     }
-    
+
     private boolean manejarAlertConBoton(String textoBoton, String tipoAlert) {
         try {
             System.out.println("Buscando alert: " + tipoAlert);
-            
+
             // Esperar a que aparezca el alert
             sleep(2000);
-            
+
             // Buscar el botón específico en el DialogPane
             try {
                 // Buscar por texto del botón
@@ -161,7 +156,7 @@ public class ShopWindowControllerTest extends ApplicationTest {
                 System.out.println("✓ Alert manejado - Clic en: " + textoBoton);
                 sleep(1000);
                 return true;
-                
+
             } catch (Exception e1) {
                 // Si no encuentra por texto, buscar en DialogPane
                 try {
@@ -171,7 +166,7 @@ public class ShopWindowControllerTest extends ApplicationTest {
                     System.out.println("✓ Alert manejado - Clic en botón del dialog");
                     sleep(1000);
                     return true;
-                    
+
                 } catch (Exception e2) {
                     // Último intento - buscar cualquier botón en dialog
                     try {
@@ -180,20 +175,20 @@ public class ShopWindowControllerTest extends ApplicationTest {
                         System.out.println("✓ Alert manejado - Clic en cualquier botón del dialog");
                         sleep(1000);
                         return true;
-                        
+
                     } catch (Exception e3) {
                         System.out.println("✗ No se pudo encontrar el botón del alert");
                         return false;
                     }
                 }
             }
-            
+
         } catch (Exception e) {
             System.out.println("Error manejando alert: " + e.getMessage());
             return false;
         }
     }
-    
+
     private boolean verificarElementoExistente(String selector) {
         try {
             Object node = lookup(selector).query();
