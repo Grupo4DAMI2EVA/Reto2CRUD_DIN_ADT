@@ -19,8 +19,6 @@ public class ShopWindowController implements Initializable {
     @FXML
     private Label labelWelcome;
     @FXML
-    private Label labelBalance;
-    @FXML
     private TableView<Videogame> tableViewGames;
     @FXML
     private TableColumn<Videogame, String> colTitle;
@@ -63,9 +61,42 @@ public class ShopWindowController implements Initializable {
     private ObservableList<Videogame> gamesList;
     private ObservableList<Integer> favoriteGameIds;
     private static ObservableList<CartItem> sharedCart;
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private MenuItem menuHelp;
+    @FXML
+    private Label labelTitle;
+    @FXML
+    private MenuItem menuHelpWindow;
+    @FXML
+    private Menu menuWindow;
+    @FXML
+    private MenuItem menuUserWindow;
+    @FXML
+    private MenuItem menuMainWindow;
+    @FXML
+    private Label labelAvaliable;
+    @FXML
+    private ContextMenu tableContextMenu;
+    @FXML
+    private MenuItem contextMenuFav;
+    @FXML
+    private MenuItem contextMenuDetails;
+    @FXML
+    private MenuItem contextMenuCart;
+    @FXML
+    private Label labelSearch;
+    @FXML
+    private Label labelGenre;
+    @FXML
+    private Label labelPlatform;
+    @FXML
+    private Label labelSelectedGame;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        cont = new Controller();
         gamesList = FXCollections.observableArrayList();
         favoriteGameIds = FXCollections.observableArrayList();
         sharedCart = FXCollections.observableArrayList();
@@ -73,40 +104,41 @@ public class ShopWindowController implements Initializable {
         // Configurar las columnas de la tabla
         configureTableColumns();
 
-        // Inicializar ComboBoxes
-        comboBoxGenre.getItems().addAll(GameGenre.values());
-        comboBoxPlatform.getItems().addAll(Platform.values());
-
-        // Agregar opción "All" a los ComboBoxes
-        comboBoxGenre.getItems().add(0, null);
-        comboBoxPlatform.getItems().add(0, null);
-        comboBoxGenre.setValue(null);
-        comboBoxPlatform.setValue(null);
-
         // Cargar todos los juegos inicialmente
-        loadAllGames();
+        tableViewGames.setItems(gamesList);
 
         // Configurar listener para selección de fila
         tableViewGames.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> getSelectedTableItem()
         );
-        
-        // Configurar resaltado para juegos favoritos
+
         tableViewGames.setRowFactory(tv -> new TableRow<Videogame>() {
             @Override
             protected void updateItem(Videogame game, boolean empty) {
                 super.updateItem(game, empty);
-                if (empty || game == null) {
-                    setStyle("");
-                } else {
-                    if (favoriteGameIds.contains(game.getIdVideogame())) {
+
+                // Primero resetear el estilo
+                setStyle("");
+
+                // Solo aplicar estilo si no está vacío y el juego no es null
+                if (!empty && game != null) {
+                    // Usar una copia local para evitar problemas de concurrencia
+                    ObservableList<Integer> favIdsCopy = FXCollections.observableArrayList(favoriteGameIds);
+
+                    if (favIdsCopy.contains(game.getIdVideogame())) {
                         setStyle("-fx-background-color: #ffeb3b; -fx-font-weight: bold;");
-                    } else {
-                        setStyle("");
                     }
                 }
             }
         });
+
+        comboBoxGenre.getItems().setAll(GameGenre.values());
+        comboBoxGenre.setValue(GameGenre.ALL);
+
+        comboBoxPlatform.getItems().setAll(Platform.values());
+        comboBoxPlatform.setValue(Platform.ALL);
+
+        gamesList.setAll(cont.getAllGames());
     }
 
     public void setUsuario(Profile profile) {
@@ -116,6 +148,10 @@ public class ShopWindowController implements Initializable {
 
     public void setCont(Controller cont) {
         this.cont = cont;
+    }
+
+    public Controller getCont() {
+        return cont;
     }
 
     private void configureTableColumns() {
@@ -130,9 +166,7 @@ public class ShopWindowController implements Initializable {
     }
 
     private void loadAllGames() {
-        gamesList.clear();
-        gamesList.addAll(cont.getAllGames());
-        tableViewGames.setItems(gamesList);
+        gamesList.setAll(cont.getAllGames());
     }
 
     private void getSelectedTableItem() {
@@ -143,14 +177,21 @@ public class ShopWindowController implements Initializable {
     }
 
     @FXML
-    private void searchGames(ActionEvent event) {
-        String name = textFieldSearch.getText();
-        String genre = comboBoxGenre.getValue() != null ? comboBoxGenre.getValue().name() : "";
-        String platform = comboBoxPlatform.getValue() != null ? comboBoxPlatform.getValue().name() : "";
+    private void search(ActionEvent event) {
 
-        gamesList.clear();
-        gamesList.addAll(cont.getGamesFiltered(name, genre, platform));
-        tableViewGames.setItems(gamesList);
+        GameGenre genre = comboBoxGenre.getValue();
+        Platform platform = comboBoxPlatform.getValue();
+
+        String genreFilter = (genre == GameGenre.ALL) ? "" : genre.name();
+        String platformFilter = (platform == Platform.ALL) ? "" : platform.name();
+
+        gamesList.setAll(
+                cont.getGamesFiltered(
+                        textFieldSearch.getText(),
+                        genreFilter,
+                        platformFilter
+                )
+        );
     }
 
     @FXML
@@ -163,7 +204,7 @@ public class ShopWindowController implements Initializable {
             success.showAndWait();
             return;
         }
-        
+
         if (profile == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
@@ -172,7 +213,7 @@ public class ShopWindowController implements Initializable {
             alert.showAndWait();
             return;
         }
-        
+
         if (selected.getStock() <= 0) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Out of Stock");
@@ -181,7 +222,7 @@ public class ShopWindowController implements Initializable {
             alert.showAndWait();
             return;
         }
-        
+
         // Check if game already in cart
         boolean gameInCart = false;
         for (CartItem item : sharedCart) {
@@ -190,7 +231,7 @@ public class ShopWindowController implements Initializable {
                 break;
             }
         }
-        
+
         if (gameInCart) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Already in Cart");
@@ -199,17 +240,17 @@ public class ShopWindowController implements Initializable {
             alert.showAndWait();
             return;
         }
-        
+
         // Add to cart
         CartItem cartItem = new CartItem(
-            profile.getUserCode(),
-            selected.getIdVideogame(),
-            1,
-            selected.getPrice()
+                profile.getUserCode(),
+                selected.getIdVideogame(),
+                1,
+                selected.getPrice()
         );
-        
+
         sharedCart.add(cartItem);
-        
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Added to Cart");
         alert.setHeaderText("Game added successfully");
@@ -221,7 +262,7 @@ public class ShopWindowController implements Initializable {
         return sharedCart;
     }
 
-     @FXML
+    @FXML
     private void openCart(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CartWindow.fxml"));
@@ -230,10 +271,10 @@ public class ShopWindowController implements Initializable {
 
             // PRIMERO llamar setup() para inicializar carritoData
             cartC.setup();
-            
+
             // Cargar los items del carrito compartido
             loadCartItemsToController(cartC);
-            
+
             cartC.actualizarTotales();
             cartC.actualizarEstadoBotones();
 
@@ -243,7 +284,7 @@ public class ShopWindowController implements Initializable {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
-            
+
         } catch (IOException ex) {
             Logger.getLogger(ShopWindowController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -261,27 +302,39 @@ public class ShopWindowController implements Initializable {
                         break;
                     }
                 }
-                
+
                 cartController.agregarItemCarrito(
-                    profile.getUsername(),
-                    gameName,
-                    item.getCantidad(),
-                    item.getPrecio()
+                        profile.getUsername(),
+                        gameName,
+                        item.getCantidad(),
+                        item.getPrecio()
                 );
             }
         }
     }
 
     private void refreshGamesList() {
-        String name = textFieldSearch.getText();
-        String genre = comboBoxGenre.getValue() != null ? comboBoxGenre.getValue().name() : "";
-        String platform = comboBoxPlatform.getValue() != null ? comboBoxPlatform.getValue().name() : "";
 
-        // Si hay filtros aplicados, mantenerlos
-        if (!name.isEmpty() || !genre.isEmpty() || !platform.isEmpty()) {
-            searchGames(null);
+        String name = textFieldSearch.getText();
+
+        GameGenre genre = comboBoxGenre.getValue();
+        Platform platform = comboBoxPlatform.getValue();
+
+        boolean hasFilters
+                = (name != null)
+                || genre != GameGenre.ALL
+                || platform != Platform.ALL;
+
+        if (hasFilters) {
+            gamesList.setAll(
+                    cont.getGamesFiltered(
+                            name,
+                            genre == GameGenre.ALL ? "" : genre.name(),
+                            platform == Platform.ALL ? "" : platform.name()
+                    )
+            );
         } else {
-            loadAllGames();
+            gamesList.setAll(cont.getAllGames());
         }
     }
 
@@ -360,7 +413,7 @@ public class ShopWindowController implements Initializable {
             alert.showAndWait();
             return;
         }
-        
+
         if (selected == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("No game selected");
@@ -371,7 +424,7 @@ public class ShopWindowController implements Initializable {
         }
 
         int gameId = selected.getIdVideogame();
-        
+
         if (favoriteGameIds.contains(gameId)) {
             // Remove from favorites
             favoriteGameIds.remove(Integer.valueOf(gameId));
@@ -389,7 +442,7 @@ public class ShopWindowController implements Initializable {
             alert.setContentText(selected.getName() + " has been added to your favorites!");
             alert.showAndWait();
         }
-        
+
         // Refresh the table to update highlighting
         tableViewGames.refresh();
     }
@@ -408,16 +461,112 @@ public class ShopWindowController implements Initializable {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game Details - " + selected.getName());
         alert.setHeaderText(selected.getName());
-        
-        String details = "Company: " + selected.getCompanyName() + "\n" +
-                        "Genre: " + selected.getGameGenre() + "\n" +
-                        "Platform: " + selected.getPlatforms() + "\n" +
-                        "Price: €" + String.format("%.2f", selected.getPrice()) + "\n" +
-                        "PEGI Rating: " + selected.getPegi() + "\n" +
-                        "Stock: " + selected.getStock() + " units\n" +
-                        "Release Date: " + selected.getReleaseDate();
-        
+
+        String details = "Company: " + selected.getCompanyName() + "\n"
+                + "Genre: " + selected.getGameGenre() + "\n"
+                + "Platform: " + selected.getPlatforms() + "\n"
+                + "Price: €" + String.format("%.2f", selected.getPrice()) + "\n"
+                + "PEGI Rating: " + selected.getPegi() + "\n"
+                + "Stock: " + selected.getStock() + " units\n"
+                + "Release Date: " + selected.getReleaseDate();
+
         alert.setContentText(details);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void helpWindow(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/HelpWindow.fxml"));
+            Parent root = fxmlLoader.load();
+            HelpWindowController hCont = fxmlLoader.getController();
+            hCont.setUsuario(profile);
+            Stage stage = new Stage();
+            stage.setTitle("Help Window");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(menuBar.getScene().getWindow());
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @FXML
+    private void menuUserWindow(ActionEvent event) {
+        // Este va a ModifyWindow.fxml (modificar perfil)
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
+            Parent root = loader.load();
+
+            ModifyWindowController controller = loader.getController();
+
+            // Pasar el perfil y controlador
+            if (controller != null) {
+                if (profile != null) {
+                    controller.setProfile(profile);
+                }
+                if (cont != null) {
+                    controller.setCont(cont);
+                }
+            }
+
+            // Cerrar la ventana actual (StoreWindow)
+            Stage currentStage = (Stage) menuBar.getScene().getWindow();
+            currentStage.close();
+
+            // Abrir ModifyWindow como ventana principal (NO modal)
+            Stage stage = new Stage();
+            stage.setTitle("Modify Profile - " + profile.getUsername());
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException ex) {
+            Logger.getLogger(ShopWindowController.class.getName()).log(Level.SEVERE, "Error loading ModifyWindow", ex);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Cannot open Modify Window");
+            alert.setContentText("An error occurred while trying to open the modify window.");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    private void menuMainWIndow(ActionEvent event) {
+        // Este va a MenuWindow.fxml (ventana principal con botones)
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
+            Parent root = loader.load();
+
+            MenuWindowController controller = loader.getController();
+
+            // Pasar el perfil y controlador
+            if (controller != null) {
+                if (profile != null) {
+                    controller.setUsuario(profile);
+                }
+                if (cont != null) {
+                    controller.setCont(cont);
+                }
+            }
+
+            // Obtener la ventana actual
+            Stage currentStage = (Stage) menuBar.getScene().getWindow();
+
+            // Reemplazar la escena actual
+            currentStage.setTitle("Main Menu");
+            currentStage.setScene(new Scene(root));
+            currentStage.show();
+
+        } catch (IOException ex) {
+            Logger.getLogger(ShopWindowController.class.getName()).log(Level.SEVERE, "Error loading MenuWindow", ex);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Cannot open Main Window");
+            alert.setContentText("An error occurred while trying to open the main window.");
+            alert.showAndWait();
+        }
     }
 }

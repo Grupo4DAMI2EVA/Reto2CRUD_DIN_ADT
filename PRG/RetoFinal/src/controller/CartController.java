@@ -255,7 +255,7 @@ public class CartController {
                         totalPagar += precio * cantidad;
                     }
                 }
-            } catch (NumberFormatException e) {
+            } catch (Exception e) {
                 System.err.println("Error procesando item: " + item);
                 e.printStackTrace(); // Añadir stack trace para mejor depuración
             }

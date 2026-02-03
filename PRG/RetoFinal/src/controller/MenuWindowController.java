@@ -50,6 +50,10 @@ public class MenuWindowController implements Initializable {
         this.cont = cont;
     }
 
+    public Controller getCont() {
+        return cont;
+    }
+
     /**
      * Opens the Modify window.
      */
@@ -61,7 +65,7 @@ public class MenuWindowController implements Initializable {
 
             controller.ModifyWindowController controllerWindow = fxmlLoader.getController();
             controllerWindow.setProfile(profile);
-            controllerWindow.setCont(cont);
+            controllerWindow.setCont(this.cont);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
@@ -136,7 +140,7 @@ public class MenuWindowController implements Initializable {
         try {
             if (profile instanceof Admin) {
                 // ADMIN: Va a la ventana de administrador de tienda
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/AdminWindow.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/StoreAdminWindow.fxml"));
                 Parent root = fxmlLoader.load();
 
                 AdminShopController controllerWindow = fxmlLoader.getController();
@@ -150,7 +154,7 @@ public class MenuWindowController implements Initializable {
                 stage.show();
             } else {
                 // USER: Va a la ventana normal de tienda
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/StoreWindow.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/StoreWindow.fxml")); // <-- CAMBIADO A shopWindow.fxml
                 Parent root = fxmlLoader.load();
 
                 ShopWindowController controllerWindow = fxmlLoader.getController();
