@@ -1,6 +1,7 @@
 package controller;
 
 import java.util.concurrent.TimeoutException;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import main.Main;
 import org.junit.BeforeClass;
@@ -37,7 +38,7 @@ public class AdminShopControllerTest extends ApplicationTest {
     }
 
     @Test
-    public void testDeleteGame() {
+    public void tests() {
         performLogin("admin1", "1234");
         try {
             verifyThat("#label_Username", hasText("admin1"));
@@ -50,6 +51,41 @@ public class AdminShopControllerTest extends ApplicationTest {
             clickOn("OK");
             Thread.sleep(2000);
             clickOn("OK");
+            Thread.sleep(2000);
+
+            clickOn("#textFieldSearch");
+            write("test");
+            clickOn("#buttonSearch");
+            Thread.sleep(2000);
+
+            doubleClickOn("#textFieldSearch");
+            push(KeyCode.DELETE);
+            Thread.sleep(200);
+
+            clickOn("#comboBoxGenre");
+            Thread.sleep(500);
+            clickOn("ACTION");
+            Thread.sleep(1000);
+            clickOn("#buttonSearch");
+            Thread.sleep(2000);
+
+            clickOn("#comboBoxGenre");
+            Thread.sleep(500);
+            clickOn("ALL");
+
+            clickOn("#comboBoxPlatform");
+            Thread.sleep(500);
+            clickOn("PC");
+            Thread.sleep(1000);
+            clickOn("#buttonSearch");
+            Thread.sleep(2000);
+            System.out.println("✓ Filtro PC aplicado");
+
+            clickOn("#comboBoxPlatform");
+            Thread.sleep(500);
+            clickOn("ALL");
+
+            clickOn("#buttonSearch");
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();

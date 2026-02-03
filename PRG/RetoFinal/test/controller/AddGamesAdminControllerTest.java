@@ -47,13 +47,13 @@ public class AddGamesAdminControllerTest extends ApplicationTest {
             clickOn("#buttonAdd");
             Thread.sleep(2000);
             clickOn("#comboBoxPlatforms");
-            clickOn("");
+            clickOn("PC");
             clickOn("#textFieldCompany");
             write("e");
             clickOn("#spinnerStock");
             write("10");
             clickOn("#comboBoxGenre");
-            clickOn("");
+            clickOn("ADVENTURE");
             clickOn("#spinnerPrice");
             write("10.40");
             clickOn("#comboBoxPEGI");

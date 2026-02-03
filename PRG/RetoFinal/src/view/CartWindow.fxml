@@ -20,23 +20,23 @@
         </Label>
         
         <!-- ListView para mostrar los items del carrito -->
-        <ListView fx:id="listViewCarrito" layoutX="50.0" layoutY="80.0" prefHeight="280.0" prefWidth="500.0" />
+        <ListView id="listViewCarrito" fx:id="listViewCarrito" layoutX="50.0" layoutY="80.0" prefHeight="280.0" prefWidth="500.0" />
         
         <!-- Controles para modificar cantidad -->
         <Label layoutX="350.0" layoutY="370.0" text="Ajustar cantidad:" />
         
         <!-- Botón - (disminuir) -->
-        <Button fx:id="buttonMenos" layoutX="350.0" layoutY="395.0" mnemonicParsing="false" onAction="#disminuirCantidad" prefHeight="30.0" prefWidth="40.0" style="-fx-background-color: #FF6B6B; -fx-border-color: #000000; -fx-font-size: 16px;" text="-" />
+        <Button id="buttonMenos" fx:id="buttonMenos" layoutX="350.0" layoutY="395.0" mnemonicParsing="false" onAction="#disminuirCantidad" prefHeight="30.0" prefWidth="40.0" style="-fx-background-color: #FF6B6B; -fx-border-color: #000000; -fx-font-size: 16px;" text="-" />
         
         <!-- Label que muestra la cantidad actual -->
-        <Label fx:id="labelCantidadActual" layoutX="400.0" layoutY="400.0" prefHeight="25.0" prefWidth="60.0" style="-fx-alignment: center; -fx-font-size: 16px; -fx-border-color: #CCCCCC; -fx-border-width: 1px;" text="0">
+        <Label id="labelCantidadActual" fx:id="labelCantidadActual" layoutX="400.0" layoutY="400.0" prefHeight="25.0" prefWidth="60.0" style="-fx-alignment: center; -fx-font-size: 16px; -fx-border-color: #CCCCCC; -fx-border-width: 1px;" text="0">
             <font>
                 <Font size="16.0" />
             </font>
         </Label>
         
         <!-- Botón + (aumentar) -->
-        <Button fx:id="buttonMas" layoutX="470.0" layoutY="395.0" mnemonicParsing="false" onAction="#aumentarCantidad" prefHeight="30.0" prefWidth="40.0" style="-fx-background-color: #4CAF50; -fx-border-color: #000000; -fx-font-size: 16px;" text="+" />
+        <Button id="buttonMas" fx:id="buttonMas" layoutX="470.0" layoutY="395.0" mnemonicParsing="false" onAction="#aumentarCantidad" prefHeight="30.0" prefWidth="40.0" style="-fx-background-color: #4CAF50; -fx-border-color: #000000; -fx-font-size: 16px;" text="+" />
         
         <!-- Íconos e información -->
         <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="50.0" layoutY="380.0">
@@ -50,7 +50,7 @@
                 <Font size="15.0" />
             </font>
         </Label>
-        <Label fx:id="labelTotalItems" layoutX="170.0" layoutY="382.0" prefWidth="60.0" text="0">
+        <Label id="labelTotalItems" fx:id="labelTotalItems" layoutX="170.0" layoutY="382.0" prefWidth="60.0" text="0">
             <font>
                 <Font size="15.0" />
             </font>
@@ -69,9 +69,9 @@
         </Label>
         
         <!-- Botones principales -->
-        <Button fx:id="buttonComprar" layoutX="316.0" layoutY="450.0" mnemonicParsing="false" onAction="#comprar" prefHeight="35.0" prefWidth="130.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000; -fx-font-size: 14px;" text="Realizar Compra" />
+        <Button id="buttonComprar" fx:id="buttonComprar" layoutX="316.0" layoutY="450.0" mnemonicParsing="false" onAction="#comprar" prefHeight="35.0" prefWidth="130.0" style="-fx-background-color: A7C4E5; -fx-border-color: #000000; -fx-font-size: 14px;" text="Realizar Compra" />
         
-        <Button fx:id="buttonEliminar" layoutX="470.0" layoutY="449.0" mnemonicParsing="false" onAction="#eliminarItem" prefHeight="35.0" prefWidth="110.0" style="-fx-background-color: #FF9800; -fx-border-color: #000000; -fx-font-size: 14px;" text="Eliminar" />
+        <Button id="buttonEliminar" fx:id="buttonEliminar" layoutX="470.0" layoutY="449.0" mnemonicParsing="false" onAction="#eliminarItem" prefHeight="35.0" prefWidth="110.0" style="-fx-background-color: #FF9800; -fx-border-color: #000000; -fx-font-size: 14px;" text="Eliminar" />
         
         <!-- Información adicional -->
         <Label layoutX="50.0" layoutY="43.0" prefHeight="35.0" prefWidth="130.0" text="Items en el carrito:">
@@ -81,12 +81,12 @@
         </Label>
         
         <!-- Indicador de item seleccionado -->
-        <Label fx:id="labelItemSeleccionado" layoutX="149.0" layoutY="449.0" prefHeight="35.0" prefWidth="141.0" style="-fx-text-fill: #666666;" text="Selecciona un item">
+        <Label id="labelItemSeleccionado" fx:id="labelItemSeleccionado" layoutX="149.0" layoutY="449.0" prefHeight="35.0" prefWidth="141.0" style="-fx-text-fill: #666666;" text="Selecciona un item">
             <font>
                 <Font size="15.0" />
             </font>
         </Label>
-        <Label fx:id="labelTotalPagar" layoutX="170.0" layoutY="416.0" prefWidth="60.0" text="0">
+        <Label id="labelTotalPagar" fx:id="labelTotalPagar" layoutX="170.0" layoutY="416.0" prefWidth="60.0" text="0">
             <font>
                 <Font size="15.0" />
             </font>
