@@ -107,13 +107,11 @@ public class AddGamesAdminController implements Initializable {
         comboBoxPlatforms.getItems().addAll(Platform.values());
         comboBoxPEGI.getItems().addAll(PEGI.values());
         
-        // Initialize Spinner for Stock (0 to 1000, step 1, initial value 0)
         SpinnerValueFactory<Integer> stockValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000, 0, 1);
         spinnerStock.setValueFactory(stockValueFactory);
         spinnerStock.setEditable(true);
         
-        // Initialize Spinner for Price (0.0 to 1000.0, step 0.01, initial value 0.0)
-        SpinnerValueFactory<Double> priceValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1000.0, 0.0, 0.01);
+        SpinnerValueFactory<Double> priceValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1000.0, 0.0, 1.0);
         spinnerPrice.setValueFactory(priceValueFactory);
         spinnerPrice.setEditable(true);
     }

@@ -75,7 +75,7 @@
         <Label fx:id="labelGameInfo" layoutX="180.0" layoutY="520.0" prefHeight="25.0" prefWidth="400.0" style="-fx-text-fill: #5084C1;" text="Select a game" />
         
         <!-- Admin buttons: Add Game, Modify Game, Delete Game -->
-        <Button fx:id="buttonAddGame" layoutX="24.0" layoutY="555.0" mnemonicParsing="false" onAction="#addGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: 90EE90; -fx-border-color: #000000;" text="Add Game" />
+        <Button fx:id="buttonAddGame" layoutX="24.0" layoutY="555.0" mnemonicParsing="false" onAction="#addGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: #90EE90; -fx-border-color: #000000;" text="Add Game" />
         <Button fx:id="buttonModifyGame" layoutX="156.0" layoutY="555.0" mnemonicParsing="false" onAction="#modifyGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: FFD700; -fx-border-color: #000000;" text="Modify Game" />
         <Button fx:id="buttonDeleteGame" layoutX="288.0" layoutY="555.0" mnemonicParsing="false" onAction="#deleteGame" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: FF6347; -fx-border-color: #000000;" text="Delete Game" />
         <Button fx:id="buttonExit" layoutX="755.0" layoutY="555.0" mnemonicParsing="false" onAction="#exit" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: F08080; -fx-border-color: #000000;" text="Exit" />

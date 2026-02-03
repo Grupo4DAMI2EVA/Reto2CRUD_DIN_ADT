@@ -240,7 +240,12 @@ public class AdminShopController implements Initializable {
                 stage.setTitle("Modify Game Window");
                 stage.setScene(new Scene(root));
                 stage.initModality(Modality.WINDOW_MODAL);
-                stage.initOwner(((Node) event.getSource()).getScene().getWindow());
+                
+                if (event != null && event.getSource() instanceof Node) {
+                    Window ownerWindow = ((Node) event.getSource()).getScene().getWindow();
+                    stage.initOwner(ownerWindow);
+                }
+                
                 stage.showAndWait();
 
                 // Recargar juegos después de cerrar la ventana
