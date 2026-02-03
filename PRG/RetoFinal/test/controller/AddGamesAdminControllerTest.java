@@ -10,7 +10,10 @@ import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 import static org.testfx.matcher.control.LabeledMatchers.hasText;
 
-public class AdminShopControllerTest extends ApplicationTest {
+public class AddGamesAdminControllerTest extends ApplicationTest {
+
+    public AddGamesAdminControllerTest() {
+    }
 
     @BeforeClass
     public static void setUpClass() throws TimeoutException {
@@ -37,19 +40,27 @@ public class AdminShopControllerTest extends ApplicationTest {
     }
 
     @Test
-    public void testDeleteGame() {
+    public void testAddGame() {
         performLogin("admin1", "1234");
         try {
             verifyThat("#label_Username", hasText("admin1"));
-            clickOn("#Button_Store");
+            clickOn("#buttonAdd");
             Thread.sleep(2000);
-            clickOn("Grand Theft Auto V");
-            verifyThat("#labelGameInfo", hasText("Grand Theft Auto V"));
-            clickOn("#buttonDelete");
-            Thread.sleep(2000);
-            clickOn("OK");
-            Thread.sleep(2000);
-            clickOn("OK");
+            clickOn("#comboBoxPlatforms");
+            clickOn("");
+            clickOn("#textFieldCompany");
+            write("e");
+            clickOn("#spinnerStock");
+            write("10");
+            clickOn("#comboBoxGenre");
+            clickOn("");
+            clickOn("#spinnerPrice");
+            write("10.40");
+            clickOn("#comboBoxPEGI");
+            write("e");
+            clickOn("#datePickerReleaseDate");
+            write("e");
+            clickOn("#buttonAddGame");
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
