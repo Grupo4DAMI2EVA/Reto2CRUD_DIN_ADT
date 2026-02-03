@@ -56,7 +56,7 @@ public class AddGamesAdminController implements Initializable {
                 logsFolder.mkdirs();
             }
             
-            FileHandler fileHandler = new FileHandler("logs/LogInWindow.log", true);
+            FileHandler fileHandler = new FileHandler("logs/AddGamesAdmin.log", true);
             
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override

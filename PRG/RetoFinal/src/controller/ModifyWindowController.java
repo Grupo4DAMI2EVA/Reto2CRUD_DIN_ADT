@@ -64,7 +64,7 @@ public class ModifyWindowController implements Initializable {
                 logsFolder.mkdirs();
             }
             
-            FileHandler fileHandler = new FileHandler("logs/LogInWindow.log", true);
+            FileHandler fileHandler = new FileHandler("logs/ModifyWindow.log", true);
             
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
