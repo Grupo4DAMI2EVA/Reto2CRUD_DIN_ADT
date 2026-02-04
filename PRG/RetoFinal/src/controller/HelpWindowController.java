@@ -48,7 +48,7 @@ public class HelpWindowController implements Initializable {
                 logsFolder.mkdirs();
             }
             
-            FileHandler fileHandler = new FileHandler("logs/LogInWindow.log", true);
+            FileHandler fileHandler = new FileHandler("logs/HelpWindow.log", true);
             
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override

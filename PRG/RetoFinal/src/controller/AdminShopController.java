@@ -118,9 +118,9 @@ public class AdminShopController implements Initializable {
             if (!logsFolder.exists()) {
                 logsFolder.mkdirs();
             }
-
-            FileHandler fileHandler = new FileHandler("logs/LogInWindow.log", true);
-
+            
+            FileHandler fileHandler = new FileHandler("logs/AdminShopWindow.log", true);
+            
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
                 public String format(LogRecord record) {

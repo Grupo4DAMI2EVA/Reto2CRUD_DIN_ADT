@@ -59,7 +59,7 @@ public class ModifyGameAdminController implements Initializable {
                 logsFolder.mkdirs();
             }
             
-            FileHandler fileHandler = new FileHandler("logs/LogInWindow.log", true);
+            FileHandler fileHandler = new FileHandler("logs/ModifyGameAdmin.log", true);
             
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
