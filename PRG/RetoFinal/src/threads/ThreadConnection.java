@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import model.ConnectionPool;
 
 /**
  * Thread class to obtain a database connection asynchronously. Useful to avoid blocking the main GUI thread.
@@ -46,7 +45,7 @@ public class ThreadConnection extends Thread {
         this.interrupt();
     }
 
-    @Override
+    /*@Override
     public void run() {
         try {
             try {
@@ -81,5 +80,5 @@ public class ThreadConnection extends Thread {
                 }
             }
         }
-    }
+    }*/
 }

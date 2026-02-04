@@ -14,104 +14,91 @@ import javafx.stage.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.*;
 
+/**
+ * Controlador principal para la ventana de la tienda de videojuegos.
+ * Maneja la interfaz de usuario donde los usuarios pueden buscar, ver,
+ * agregar al carrito y gestionar sus juegos favoritos.
+ * 
+ * @author Igor
+ * @version 1.0
+ */
 public class ShopWindowController implements Initializable {
 
     private static final Logger logger = Logger.getLogger(ShopWindowController.class.getName());
     private static boolean loggerInitialized = false;
+    
+    // Elementos FXML de la interfaz
+    @FXML private Label labelWelcome;
+    @FXML private TableView<Videogame> tableViewGames;
+    @FXML private TableColumn<Videogame, String> colTitle;
+    @FXML private TableColumn<Videogame, GameGenre> colGenre;
+    @FXML private TableColumn<Videogame, Platform> colPlatform;
+    @FXML private TableColumn<Videogame, Integer> colPrice;
+    @FXML private TableColumn<Videogame, String> colPegi;
+    @FXML private TableColumn<Videogame, PEGI> colStock;
+    @FXML private TableColumn<Videogame, String> colCompanyName;
+    @FXML private TableColumn<Videogame, LocalDate> colReleaseDate;
+    @FXML private TextField textFieldSearch;
+    @FXML private ComboBox<GameGenre> comboBoxGenre;
+    @FXML private ComboBox<Platform> comboBoxPlatform;
+    @FXML private Button buttonSearch;
+    @FXML private Label labelGameInfo;
+    @FXML private Button buttonAddToCart;
+    @FXML private Button buttonCart;
+    @FXML private Button buttonExit;
+    @FXML private Button buttonReview;
+    @FXML private MenuBar menuBar;
+    @FXML private MenuItem menuHelp;
+    @FXML private Label labelTitle;
+    @FXML private Menu menuWindow;
+    @FXML private MenuItem menuUserWindow;
+    @FXML private MenuItem menuMainWindow;
+    @FXML private Label labelAvaliable;
+    @FXML private ContextMenu tableContextMenu;
+    @FXML private MenuItem contextMenuFav;
+    @FXML private MenuItem contextMenuDetails;
+    @FXML private MenuItem contextMenuCart;
+    @FXML private Label labelSearch;
+    @FXML private Label labelGenre;
+    @FXML private Label labelPlatform;
+    @FXML private Label labelSelectedGame;
+    @FXML private MenuItem menuHelpManual;
+    @FXML private MenuItem menuHelpReport;
 
-    @FXML
-    private Label labelWelcome;
-    @FXML
-    private TableView<Videogame> tableViewGames;
-    @FXML
-    private TableColumn<Videogame, String> colTitle;
-    @FXML
-    private TableColumn<Videogame, GameGenre> colGenre;
-    @FXML
-    private TableColumn<Videogame, Platform> colPlatform;
-    @FXML
-    private TableColumn<Videogame, Integer> colPrice;
-    @FXML
-    private TableColumn<Videogame, String> colPegi;
-    @FXML
-    private TableColumn<Videogame, PEGI> colStock;
-    @FXML
-    private TableColumn<Videogame, String> colCompanyName;
-    @FXML
-    private TableColumn<Videogame, LocalDate> colReleaseDate;
-    @FXML
-    private TextField textFieldSearch;
-    @FXML
-    private ComboBox<GameGenre> comboBoxGenre;
-    @FXML
-    private ComboBox<Platform> comboBoxPlatform;
-    @FXML
-    private Button buttonSearch;
-    @FXML
-    private Label labelGameInfo;
-    @FXML
-    private Button buttonAddToCart;
-    @FXML
-    private Button buttonCart;
-    @FXML
-    private Button buttonExit;
-    @FXML
-    private Button buttonReview;
-
+    // Variables de estado
     private Videogame selected;
     private Profile profile;
     private Controller cont;
     private ObservableList<Videogame> gamesList;
     private ObservableList<Integer> favoriteGameIds;
     private static ObservableList<CartItem> sharedCart;
-    @FXML
-    private MenuBar menuBar;
-    @FXML
-    private MenuItem menuHelp;
-    @FXML
-    private Label labelTitle;
-    @FXML
-    private Menu menuWindow;
-    @FXML
-    private MenuItem menuUserWindow;
-    @FXML
-    private MenuItem menuMainWindow;
-    @FXML
-    private Label labelAvaliable;
-    @FXML
-    private ContextMenu tableContextMenu;
-    @FXML
-    private MenuItem contextMenuFav;
-    @FXML
-    private MenuItem contextMenuDetails;
-    @FXML
-    private MenuItem contextMenuCart;
-    @FXML
-    private Label labelSearch;
-    @FXML
-    private Label labelGenre;
-    @FXML
-    private Label labelPlatform;
-    @FXML
-    private Label labelSelectedGame;
 
+    /**
+     * Bloque estático para inicializar el sistema de logging.
+     * Crea el directorio de logs si no existe y configura el FileHandler
+     * para escribir logs en un archivo específico.
+     */
     static {
         initializeLogger();
     }
-
+    
+    /**
+     * Inicializa el sistema de logging de manera sincronizada para evitar
+     * múltiples inicializaciones en entornos multi-hilo.
+     */
     private static synchronized void initializeLogger() {
         if (loggerInitialized) {
             return;
         }
-
+        
         try {
             java.io.File logsFolder = new java.io.File("logs");
             if (!logsFolder.exists()) {
                 logsFolder.mkdirs();
             }
-
+            
             FileHandler fileHandler = new FileHandler("logs/ShopWindow.log", true);
-
+            
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
                 public String format(LogRecord record) {
@@ -124,29 +111,34 @@ public class ShopWindowController implements Initializable {
                     return "";
                 }
             });
-
+            
             fileHandler.setLevel(Level.INFO);
             logger.addHandler(fileHandler);
             logger.setLevel(Level.INFO);
             logger.setUseParentHandlers(false);
-
+            
             loggerInitialized = true;
             logger.info("AdminShopController logger initialized");
-
+            
         } catch (Exception e) {
             System.err.println("ERROR initializing logger: " + e.getMessage());
             loggerInitialized = true;
         }
     }
-    @FXML
-    private MenuItem menuHelpManual;
-    @FXML
-    private MenuItem menuHelpReport;
-
+    
+    /**
+     * Método de inicialización llamado automáticamente por JavaFX
+     * después de cargar el archivo FXML.
+     * Configura la tabla, carga los juegos, establece los listeners
+     * y prepara los componentes de la interfaz.
+     *
+     * @param url Ubicación utilizada para resolver rutas relativas para el objeto raíz
+     * @param rb Recursos utilizados para localizar el objeto raíz
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         logger.info("Initializing ShopWindowController");
-
+        
         try {
             cont = new Controller();
             gamesList = FXCollections.observableArrayList();
@@ -164,6 +156,7 @@ public class ShopWindowController implements Initializable {
                     (observable, oldValue, newValue) -> getSelectedTableItem()
             );
 
+            // Configurar fábrica de filas para resaltar juegos favoritos
             tableViewGames.setRowFactory(tv -> new TableRow<Videogame>() {
                 @Override
                 protected void updateItem(Videogame game, boolean empty) {
@@ -184,23 +177,32 @@ public class ShopWindowController implements Initializable {
                 }
             });
 
+            // Configurar ComboBox de géneros
             comboBoxGenre.getItems().setAll(GameGenre.values());
             comboBoxGenre.setValue(GameGenre.ALL);
 
+            // Configurar ComboBox de plataformas
             comboBoxPlatform.getItems().setAll(Platform.values());
             comboBoxPlatform.setValue(Platform.ALL);
 
+            // Cargar todos los juegos
             gamesList.setAll(cont.getAllGames());
-
+            
             logger.info("ShopWindowController initialized successfully");
             logger.info("Loaded " + gamesList.size() + " games, genres and platforms configured");
-
+            
         } catch (Exception e) {
             logger.severe("Error initializing ShopWindowController: " + e.getMessage());
             throw e;
         }
     }
 
+    /**
+     * Establece el perfil del usuario actual en la ventana de la tienda.
+     * Actualiza la etiqueta de bienvenida con el nombre de usuario.
+     *
+     * @param profile Perfil del usuario que inició sesión
+     */
     public void setUsuario(Profile profile) {
         logger.info("Setting user profile: " + (profile != null ? profile.getUsername() : "null"));
         this.profile = profile;
@@ -208,14 +210,28 @@ public class ShopWindowController implements Initializable {
         logger.info("User set successfully: " + this.profile.getUsername() + " (ID: " + this.profile.getUserCode() + ")");
     }
 
+    /**
+     * Establece el controlador principal de la aplicación.
+     *
+     * @param cont Controlador principal de la aplicación
+     */
     public void setCont(Controller cont) {
         this.cont = cont;
     }
 
+    /**
+     * Obtiene el controlador principal de la aplicación.
+     *
+     * @return Controlador principal de la aplicación
+     */
     public Controller getCont() {
         return cont;
     }
 
+    /**
+     * Configura las columnas de la tabla de videojuegos.
+     * Asocia cada columna con su propiedad correspondiente en la clase Videogame.
+     */
     private void configureTableColumns() {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("name"));
         colGenre.setCellValueFactory(new PropertyValueFactory<>("gameGenre"));
@@ -227,10 +243,17 @@ public class ShopWindowController implements Initializable {
         colReleaseDate.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
     }
 
+    /**
+     * Carga todos los videojuegos disponibles desde la base de datos.
+     */
     private void loadAllGames() {
         gamesList.setAll(cont.getAllGames());
     }
 
+    /**
+     * Maneja la selección de un elemento en la tabla.
+     * Actualiza el videojuego seleccionado y muestra su información.
+     */
     private void getSelectedTableItem() {
         selected = tableViewGames.getSelectionModel().getSelectedItem();
         if (selected != null) {
@@ -239,11 +262,17 @@ public class ShopWindowController implements Initializable {
         }
     }
 
+    /**
+     * Realiza una búsqueda de videojuegos basada en los filtros especificados.
+     * Los filtros incluyen texto de búsqueda, género y plataforma.
+     *
+     * @param event Evento de acción del botón de búsqueda
+     */
     @FXML
     private void search(ActionEvent event) {
         logger.info("Search button clicked");
         logger.info("Search filters - Text: '" + textFieldSearch.getText() + "', Genre: " + comboBoxGenre.getValue() + ", Platform: " + comboBoxPlatform.getValue());
-
+        
         try {
             GameGenre genre = comboBoxGenre.getValue();
             Platform platform = comboBoxPlatform.getValue();
@@ -258,22 +287,29 @@ public class ShopWindowController implements Initializable {
                             platformFilter
                     )
             );
-
+            
             logger.info("Search completed. Found " + gamesList.size() + " games matching criteria");
-
+            
         } catch (Exception e) {
             logger.severe("Error in search operation: " + e.getMessage());
             showAlert("Search Error", "An error occurred while searching. Please try again.");
         }
     }
 
+    /**
+     * Agrega el videojuego seleccionado al carrito de compras del usuario.
+     * Verifica que el usuario esté autenticado, que haya stock disponible
+     * y que el juego no esté ya en el carrito.
+     *
+     * @param event Evento de acción del botón "Agregar al carrito"
+     */
     @FXML
     private void addToCart(ActionEvent event) {
         logger.info("Add to cart button clicked");
-
-        try {
-            logger.info("Attempting to add game to cart");
-
+        
+        try{ 
+            logger.info("Attempting to add game to cart");  
+        
             if (selected == null) {
                 logger.warning("Add to cart attempted without game selection");
                 Alert success = new Alert(Alert.AlertType.WARNING);
@@ -303,7 +339,7 @@ public class ShopWindowController implements Initializable {
                 alert.showAndWait();
                 return;
             }
-        } catch (Exception e) {
+        } catch(Exception e){
             logger.severe(String.format("Error in addToCart: %s", e.getMessage()));
             showAlert("Error", "Could not add the game to the cart.");
             return;
@@ -337,7 +373,7 @@ public class ShopWindowController implements Initializable {
         );
 
         sharedCart.add(cartItem);
-
+        
         logger.info("Game added to cart successfully - User: " + profile.getUsername() + ", Game: " + selected.getName() + " (ID: " + selected.getIdVideogame() + ")");
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -347,14 +383,27 @@ public class ShopWindowController implements Initializable {
         alert.showAndWait();
     }
 
+    /**
+     * Obtiene el carrito de compras compartido entre ventanas.
+     * Este es un carrito estático que mantiene los items entre diferentes
+     * instancias del controlador.
+     *
+     * @return Lista observable con los items del carrito
+     */
     public static ObservableList<CartItem> getSharedCart() {
         return sharedCart;
     }
 
+    /**
+     * Abre la ventana del carrito de compras.
+     * Carga la interfaz del carrito y pasa los items actuales.
+     *
+     * @param event Evento de acción del botón del carrito
+     */
     @FXML
     private void openCart(ActionEvent event) {
         logger.info("Opening cart window for user: " + (profile != null ? profile.getUsername() : "unknown"));
-
+        
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CartWindow.fxml"));
             Parent root = loader.load();
@@ -375,7 +424,7 @@ public class ShopWindowController implements Initializable {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
-
+            
             logger.info("Cart window opened successfully");
 
         } catch (IOException ex) {
@@ -384,7 +433,12 @@ public class ShopWindowController implements Initializable {
         }
     }
 
-    // Método auxiliar para cargar items al controlador del carrito
+    /**
+     * Método auxiliar para cargar los items del carrito compartido
+     * al controlador del carrito.
+     *
+     * @param cartController Controlador de la ventana del carrito
+     */
     private void loadCartItemsToController(CartController cartController) {
         for (CartItem item : sharedCart) {
             if (item.getIdUsuario() == profile.getUserCode()) {
@@ -407,9 +461,14 @@ public class ShopWindowController implements Initializable {
         }
     }
 
+    /**
+     * Refresca la lista de videojuegos aplicando los filtros actuales.
+     * Si hay filtros activos, aplica la búsqueda filtrada; de lo contrario,
+     * carga todos los juegos.
+     */
     private void refreshGamesList() {
         logger.info("Refreshing games list");
-
+        
         String name = textFieldSearch.getText();
         GameGenre genre = comboBoxGenre.getValue();
         Platform platform = comboBoxPlatform.getValue();
@@ -431,14 +490,20 @@ public class ShopWindowController implements Initializable {
             logger.info("Loading all games (no filters)");
             gamesList.setAll(cont.getAllGames());
         }
-
+        
         logger.info("Games list refreshed. Total games: " + gamesList.size());
     }
 
+    /**
+     * Maneja el evento del botón de salida.
+     * Cierra la ventana actual y regresa a la ventana principal del menú.
+     *
+     * @param event Evento de acción del botón de salida
+     */
     @FXML
     private void handleExitButton(ActionEvent event) {
         logger.info("Exit button clicked - Returning to main menu");
-
+        
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
             Parent root = loader.load();
@@ -451,7 +516,7 @@ public class ShopWindowController implements Initializable {
             stage.setTitle("Main Window");
             stage.setScene(new Scene(root));
             stage.show();
-
+            
             logger.info("Successfully returned to Main Menu");
 
         } catch (IOException e) {
@@ -460,10 +525,16 @@ public class ShopWindowController implements Initializable {
         }
     }
 
+    /**
+     * Maneja el evento del botón de reseñas.
+     * Abre una ventana para escribir una reseña sobre el videojuego seleccionado.
+     *
+     * @param event Evento de acción del botón de reseñas
+     */
     @FXML
     private void handleReviewButton(ActionEvent event) {
         logger.info("Review button clicked");
-
+        
         if (selected == null) {
             logger.warning("Review button clicked without game selection");
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -476,7 +547,7 @@ public class ShopWindowController implements Initializable {
 
         try {
             logger.info("Opening review window for game: " + selected.getName() + " (ID: " + selected.getIdVideogame() + ")");
-
+            
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ReviewWindow.fxml"));
             Parent root = loader.load();
 
@@ -499,7 +570,7 @@ public class ShopWindowController implements Initializable {
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.setResizable(false);
             stage.show();
-
+            
             logger.info("Review window opened successfully for game: " + selected.getName());
 
         } catch (IOException e) {
@@ -514,10 +585,16 @@ public class ShopWindowController implements Initializable {
         }
     }
 
+    /**
+     * Alterna el estado de favorito del videojuego seleccionado.
+     * Agrega o remueve el juego de la lista de favoritos del usuario.
+     *
+     * @param event Evento de acción del menú contextual de favoritos
+     */
     @FXML
     private void toggleFavorite(ActionEvent event) {
         logger.info("Toggle favorite action triggered");
-
+        
         if (profile == null) {
             logger.warning("Attempted to toggle favorite without user logged in");
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -565,10 +642,16 @@ public class ShopWindowController implements Initializable {
         logger.info("Favorites updated. Total favorites: " + favoriteGameIds.size());
     }
 
+    /**
+     * Muestra los detalles completos del videojuego seleccionado en una ventana de diálogo.
+     * Incluye información como compañía, género, plataforma, precio, PEGI, stock y fecha de lanzamiento.
+     *
+     * @param event Evento de acción del menú contextual de detalles
+     */
     @FXML
     private void viewGameDetails(ActionEvent event) {
         logger.info("View game details action triggered");
-
+        
         if (selected == null) {
             logger.warning("Attempted to view details without game selection");
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -580,7 +663,7 @@ public class ShopWindowController implements Initializable {
         }
 
         logger.info("Showing details for game: " + selected.getName() + " (ID: " + selected.getIdVideogame() + ")");
-
+        
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game Details - " + selected.getName());
         alert.setHeaderText(selected.getName());
@@ -597,10 +680,16 @@ public class ShopWindowController implements Initializable {
         alert.showAndWait();
     }
 
+    /**
+     * Abre la ventana de modificación del perfil de usuario.
+     * Permite al usuario actualizar su información personal.
+     *
+     * @param event Evento de acción del menú "User Window"
+     */
     @FXML
     private void menuUserWindow(ActionEvent event) {
         logger.info("Opening user profile modification window for: " + (profile != null ? profile.getUsername() : "unknown"));
-
+        
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
             Parent root = loader.load();
@@ -620,7 +709,7 @@ public class ShopWindowController implements Initializable {
             // Cerrar la ventana actual (StoreWindow)
             Stage currentStage = (Stage) menuBar.getScene().getWindow();
             currentStage.close();
-
+            
             logger.info("Closing ShopWindow and opening ModifyWindow");
 
             // Abrir ModifyWindow como ventana principal (NO modal)
@@ -631,7 +720,7 @@ public class ShopWindowController implements Initializable {
 
         } catch (IOException ex) {
             logger.severe("Error loading ModifyWindow for user: " + (profile != null ? profile.getUsername() : "unknown") + " - " + ex.getMessage());
-
+            
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Cannot open Modify Window");
@@ -640,10 +729,16 @@ public class ShopWindowController implements Initializable {
         }
     }
 
+    /**
+     * Regresa a la ventana principal del menú desde la tienda.
+     * Reemplaza la escena actual con la del menú principal.
+     *
+     * @param event Evento de acción del menú "Main Window"
+     */
     @FXML
     private void menuMainWIndow(ActionEvent event) {
         logger.info("Returning to main menu from ShopWindow");
-
+        
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
             Parent root = loader.load();
@@ -668,12 +763,12 @@ public class ShopWindowController implements Initializable {
             currentStage.setTitle("Main Menu");
             currentStage.setScene(new Scene(root));
             currentStage.show();
-
+            
             logger.info("Successfully returned to Main Menu");
 
         } catch (IOException ex) {
             logger.severe("Error loading MenuWindow: " + ex.getMessage());
-
+            
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Cannot open Main Window");
@@ -681,37 +776,50 @@ public class ShopWindowController implements Initializable {
             alert.showAndWait();
         }
     }
-
+    
+    /**
+     * Muestra una ventana de alerta con el título y mensaje especificados.
+     *
+     * @param title Título de la alerta
+     * @param message Mensaje a mostrar en la alerta
+     */
     private void showAlert(String title, String message) {
         try {
             logger.info("Showing alert: " + title + " - " + message);
-
+            
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.showAndWait();
-
+            
         } catch (Exception e) {
             logger.severe("Error showing alert: " + e.getMessage());
         }
     }
 
+    /**
+     * Abre el manual de usuario en formato PDF.
+     * Busca el archivo PDF en varias ubicaciones posibles y lo abre
+     * con el visor de PDF predeterminado del sistema.
+     *
+     * @param event Evento de acción del menú "Help Manual"
+     */
     @FXML
     private void manualPdf(ActionEvent event) {
         logger.info("Opening user manual PDF");
-
+        
         try {
             // Ruta relativa al PDF del manual
             String pdfFileName = "Manual de Usuario - Tienda de Videojuegos.pdf";
             String pdfPath = "pdf/" + pdfFileName;
-
+            
             // Obtener la ruta absoluta del archivo
             java.io.File pdfFile = new java.io.File(pdfPath);
-
+            
             if (!pdfFile.exists()) {
                 logger.warning("User manual PDF not found at: " + pdfFile.getAbsolutePath());
-
+                
                 // Intentar buscar en diferentes ubicaciones comunes
                 String[] possiblePaths = {
                     pdfPath,
@@ -720,7 +828,7 @@ public class ShopWindowController implements Initializable {
                     "../pdf/" + pdfFileName,
                     "./pdf/" + pdfFileName
                 };
-
+                
                 boolean found = false;
                 for (String path : possiblePaths) {
                     pdfFile = new java.io.File(path);
@@ -730,14 +838,14 @@ public class ShopWindowController implements Initializable {
                         break;
                     }
                 }
-
+                
                 if (!found) {
-                    showAlert("File Not Found",
-                            "User manual PDF not found. Please ensure 'Manual de Usuario - Tienda de Videojuegos.pdf' exists in the 'pdf' folder.");
+                    showAlert("File Not Found", 
+                        "User manual PDF not found. Please ensure 'Manual de Usuario - Tienda de Videojuegos.pdf' exists in the 'pdf' folder.");
                     return;
                 }
             }
-
+            
             // Abrir el PDF con el programa predeterminado del sistema
             if (java.awt.Desktop.isDesktopSupported()) {
                 java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
@@ -750,37 +858,44 @@ public class ShopWindowController implements Initializable {
             } else {
                 throw new IOException("Desktop not supported on this platform");
             }
-
+            
         } catch (IOException ex) {
             logger.severe("Error opening user manual PDF: " + ex.getMessage());
-
+            
             // Mostrar instrucciones alternativas
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error Opening PDF");
             alert.setHeaderText("Could not open user manual automatically");
-            alert.setContentText("Error: " + ex.getMessage()
-                    + "\n\nPlease open the PDF manually from the 'pdf' folder:\n"
-                    + "1. Navigate to the 'pdf' folder in the application directory\n"
-                    + "2. Open 'Manual de Usuario - Tienda de Videojuegos.pdf'");
+            alert.setContentText("Error: " + ex.getMessage() + 
+                               "\n\nPlease open the PDF manually from the 'pdf' folder:\n" +
+                               "1. Navigate to the 'pdf' folder in the application directory\n" +
+                               "2. Open 'Manual de Usuario - Tienda de Videojuegos.pdf'");
             alert.showAndWait();
         }
     }
 
+    /**
+     * Abre el informe del proyecto en formato PDF.
+     * Busca el archivo PDF en varias ubicaciones posibles y lo abre
+     * con el visor de PDF predeterminado del sistema.
+     *
+     * @param event Evento de acción del menú "Help Report"
+     */
     @FXML
     private void reportPdf(ActionEvent event) {
         logger.info("Opening project report PDF");
-
+        
         try {
             // Ruta relativa al PDF del informe
             String pdfFileName = "Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf";
             String pdfPath = "pdf/" + pdfFileName;
-
+            
             // Obtener la ruta absoluta del archivo
             java.io.File pdfFile = new java.io.File(pdfPath);
-
+            
             if (!pdfFile.exists()) {
                 logger.warning("Project report PDF not found at: " + pdfFile.getAbsolutePath());
-
+                
                 // Intentar buscar en diferentes ubicaciones comunes
                 String[] possiblePaths = {
                     pdfPath,
@@ -789,7 +904,7 @@ public class ShopWindowController implements Initializable {
                     "../pdf/" + pdfFileName,
                     "./pdf/" + pdfFileName
                 };
-
+                
                 boolean found = false;
                 for (String path : possiblePaths) {
                     pdfFile = new java.io.File(path);
@@ -799,46 +914,46 @@ public class ShopWindowController implements Initializable {
                         break;
                     }
                 }
-
+                
                 if (!found) {
-                    showAlert("File Not Found",
-                            "Project report PDF not found. Please ensure 'Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf' exists in the 'pdf' folder.");
+                    showAlert("File Not Found", 
+                        "Project report PDF not found. Please ensure 'Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf' exists in the 'pdf' folder.");
                     return;
                 }
             }
-
+            
             // Abrir el PDF con el programa predeterminado del sistema
             if (java.awt.Desktop.isDesktopSupported()) {
                 java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                 if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
                     desktop.open(pdfFile);
                     logger.info("Successfully opened project report PDF: " + pdfFile.getName());
-
+                    
                     // Mostrar confirmación
                     Alert info = new Alert(Alert.AlertType.INFORMATION);
                     info.setTitle("PDF Opened");
                     info.setHeaderText("Project report opened successfully");
                     info.setContentText("The project report PDF has been opened in your default PDF viewer.");
                     info.showAndWait();
-
+                    
                 } else {
                     throw new IOException("OPEN action not supported on this platform");
                 }
             } else {
                 throw new IOException("Desktop not supported on this platform");
             }
-
+            
         } catch (IOException ex) {
             logger.severe("Error opening project report PDF: " + ex.getMessage());
-
+            
             // Mostrar instrucciones alternativas
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error Opening PDF");
             alert.setHeaderText("Could not open project report automatically");
-            alert.setContentText("Error: " + ex.getMessage()
-                    + "\n\nPlease open the PDF manually from the 'pdf' folder:\n"
-                    + "1. Navigate to the 'pdf' folder in the application directory\n"
-                    + "2. Open 'Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf'");
+            alert.setContentText("Error: " + ex.getMessage() + 
+                               "\n\nPlease open the PDF manually from the 'pdf' folder:\n" +
+                               "1. Navigate to the 'pdf' folder in the application directory\n" +
+                               "2. Open 'Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf'");
             alert.showAndWait();
         }
     }
