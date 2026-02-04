@@ -155,6 +155,20 @@ public class ShopWindowControllerTest extends ApplicationTest {
             // Seleccionar primera fila
             clickOn("#tableViewGames .table-row-cell");
             sleep(1000);
+            
+            rightClickOn("#tableViewGames .table-row-cell");
+            sleep(1000);
+            clickOn("#contextMenuFav");
+            sleep(1000);
+            manejarAlertConBoton("OK", "Resultado agregar al carrito");
+            sleep(1000);
+            
+            rightClickOn("#tableViewGames .table-row-cell");
+            sleep(1000);
+            clickOn("#contextMenuDetails");
+            sleep(1000);
+            manejarAlertConBoton("OK", "Resultado agregar al carrito");
+            sleep(1000);
 
             // Verificar que se actualizó el label
             verificarElemento("#labelGameInfo", "Label de juego actualizado");

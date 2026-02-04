@@ -25,7 +25,8 @@
             <menus>
                 <Menu fx:id="menuHelp" mnemonicParsing="false" text="Help">
                     <items>
-                        <MenuItem fx:id="menuHelpWindow" mnemonicParsing="false" onAction="#helpWindow" text="Help Window" />
+                        <MenuItem fx:id="menuHelpManual" mnemonicParsing="false" onAction="#manualPdf" text="Manuals" />
+                  <MenuItem fx:id="menuHelpReport" mnemonicParsing="false" onAction="#reportPdf" text="Report" />
                     </items>
                 </Menu>
             <Menu fx:id="menuWindow" mnemonicParsing="false" text="Windows">

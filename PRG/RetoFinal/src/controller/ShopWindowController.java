@@ -8,7 +8,7 @@ import java.util.logging.*;
 import javafx.collections.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
-import javafx.scene.*;  
+import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.stage.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -18,7 +18,7 @@ public class ShopWindowController implements Initializable {
 
     private static final Logger logger = Logger.getLogger(ShopWindowController.class.getName());
     private static boolean loggerInitialized = false;
-    
+
     @FXML
     private Label labelWelcome;
     @FXML
@@ -71,8 +71,6 @@ public class ShopWindowController implements Initializable {
     @FXML
     private Label labelTitle;
     @FXML
-    private MenuItem menuHelpWindow;
-    @FXML
     private Menu menuWindow;
     @FXML
     private MenuItem menuUserWindow;
@@ -100,20 +98,20 @@ public class ShopWindowController implements Initializable {
     static {
         initializeLogger();
     }
-    
+
     private static synchronized void initializeLogger() {
         if (loggerInitialized) {
             return;
         }
-        
+
         try {
             java.io.File logsFolder = new java.io.File("logs");
             if (!logsFolder.exists()) {
                 logsFolder.mkdirs();
             }
-            
+
             FileHandler fileHandler = new FileHandler("logs/ShopWindow.log", true);
-            
+
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
                 public String format(LogRecord record) {
@@ -126,25 +124,29 @@ public class ShopWindowController implements Initializable {
                     return "";
                 }
             });
-            
+
             fileHandler.setLevel(Level.INFO);
             logger.addHandler(fileHandler);
             logger.setLevel(Level.INFO);
             logger.setUseParentHandlers(false);
-            
+
             loggerInitialized = true;
             logger.info("AdminShopController logger initialized");
-            
+
         } catch (Exception e) {
             System.err.println("ERROR initializing logger: " + e.getMessage());
             loggerInitialized = true;
         }
     }
-    
+    @FXML
+    private MenuItem menuHelpManual;
+    @FXML
+    private MenuItem menuHelpReport;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         logger.info("Initializing ShopWindowController");
-        
+
         try {
             cont = new Controller();
             gamesList = FXCollections.observableArrayList();
@@ -189,10 +191,10 @@ public class ShopWindowController implements Initializable {
             comboBoxPlatform.setValue(Platform.ALL);
 
             gamesList.setAll(cont.getAllGames());
-            
+
             logger.info("ShopWindowController initialized successfully");
             logger.info("Loaded " + gamesList.size() + " games, genres and platforms configured");
-            
+
         } catch (Exception e) {
             logger.severe("Error initializing ShopWindowController: " + e.getMessage());
             throw e;
@@ -241,7 +243,7 @@ public class ShopWindowController implements Initializable {
     private void search(ActionEvent event) {
         logger.info("Search button clicked");
         logger.info("Search filters - Text: '" + textFieldSearch.getText() + "', Genre: " + comboBoxGenre.getValue() + ", Platform: " + comboBoxPlatform.getValue());
-        
+
         try {
             GameGenre genre = comboBoxGenre.getValue();
             Platform platform = comboBoxPlatform.getValue();
@@ -256,9 +258,9 @@ public class ShopWindowController implements Initializable {
                             platformFilter
                     )
             );
-            
+
             logger.info("Search completed. Found " + gamesList.size() + " games matching criteria");
-            
+
         } catch (Exception e) {
             logger.severe("Error in search operation: " + e.getMessage());
             showAlert("Search Error", "An error occurred while searching. Please try again.");
@@ -268,10 +270,10 @@ public class ShopWindowController implements Initializable {
     @FXML
     private void addToCart(ActionEvent event) {
         logger.info("Add to cart button clicked");
-        
-        try{ 
-            logger.info("Attempting to add game to cart");  
-        
+
+        try {
+            logger.info("Attempting to add game to cart");
+
             if (selected == null) {
                 logger.warning("Add to cart attempted without game selection");
                 Alert success = new Alert(Alert.AlertType.WARNING);
@@ -301,7 +303,7 @@ public class ShopWindowController implements Initializable {
                 alert.showAndWait();
                 return;
             }
-        } catch(Exception e){
+        } catch (Exception e) {
             logger.severe(String.format("Error in addToCart: %s", e.getMessage()));
             showAlert("Error", "Could not add the game to the cart.");
             return;
@@ -335,7 +337,7 @@ public class ShopWindowController implements Initializable {
         );
 
         sharedCart.add(cartItem);
-        
+
         logger.info("Game added to cart successfully - User: " + profile.getUsername() + ", Game: " + selected.getName() + " (ID: " + selected.getIdVideogame() + ")");
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -352,7 +354,7 @@ public class ShopWindowController implements Initializable {
     @FXML
     private void openCart(ActionEvent event) {
         logger.info("Opening cart window for user: " + (profile != null ? profile.getUsername() : "unknown"));
-        
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CartWindow.fxml"));
             Parent root = loader.load();
@@ -373,7 +375,7 @@ public class ShopWindowController implements Initializable {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.show();
-            
+
             logger.info("Cart window opened successfully");
 
         } catch (IOException ex) {
@@ -407,7 +409,7 @@ public class ShopWindowController implements Initializable {
 
     private void refreshGamesList() {
         logger.info("Refreshing games list");
-        
+
         String name = textFieldSearch.getText();
         GameGenre genre = comboBoxGenre.getValue();
         Platform platform = comboBoxPlatform.getValue();
@@ -429,14 +431,14 @@ public class ShopWindowController implements Initializable {
             logger.info("Loading all games (no filters)");
             gamesList.setAll(cont.getAllGames());
         }
-        
+
         logger.info("Games list refreshed. Total games: " + gamesList.size());
     }
 
     @FXML
     private void handleExitButton(ActionEvent event) {
         logger.info("Exit button clicked - Returning to main menu");
-        
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
             Parent root = loader.load();
@@ -449,7 +451,7 @@ public class ShopWindowController implements Initializable {
             stage.setTitle("Main Window");
             stage.setScene(new Scene(root));
             stage.show();
-            
+
             logger.info("Successfully returned to Main Menu");
 
         } catch (IOException e) {
@@ -461,7 +463,7 @@ public class ShopWindowController implements Initializable {
     @FXML
     private void handleReviewButton(ActionEvent event) {
         logger.info("Review button clicked");
-        
+
         if (selected == null) {
             logger.warning("Review button clicked without game selection");
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -474,7 +476,7 @@ public class ShopWindowController implements Initializable {
 
         try {
             logger.info("Opening review window for game: " + selected.getName() + " (ID: " + selected.getIdVideogame() + ")");
-            
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ReviewWindow.fxml"));
             Parent root = loader.load();
 
@@ -497,7 +499,7 @@ public class ShopWindowController implements Initializable {
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
             stage.setResizable(false);
             stage.show();
-            
+
             logger.info("Review window opened successfully for game: " + selected.getName());
 
         } catch (IOException e) {
@@ -515,7 +517,7 @@ public class ShopWindowController implements Initializable {
     @FXML
     private void toggleFavorite(ActionEvent event) {
         logger.info("Toggle favorite action triggered");
-        
+
         if (profile == null) {
             logger.warning("Attempted to toggle favorite without user logged in");
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -566,7 +568,7 @@ public class ShopWindowController implements Initializable {
     @FXML
     private void viewGameDetails(ActionEvent event) {
         logger.info("View game details action triggered");
-        
+
         if (selected == null) {
             logger.warning("Attempted to view details without game selection");
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -578,7 +580,7 @@ public class ShopWindowController implements Initializable {
         }
 
         logger.info("Showing details for game: " + selected.getName() + " (ID: " + selected.getIdVideogame() + ")");
-        
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game Details - " + selected.getName());
         alert.setHeaderText(selected.getName());
@@ -596,33 +598,9 @@ public class ShopWindowController implements Initializable {
     }
 
     @FXML
-    private void helpWindow(ActionEvent event) {
-        logger.info("Opening help window");
-        
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/HelpWindow.fxml"));
-            Parent root = fxmlLoader.load();
-            HelpWindowController hCont = fxmlLoader.getController();
-            hCont.setUsuario(profile);
-            Stage stage = new Stage();
-            stage.setTitle("Help Window");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(menuBar.getScene().getWindow());
-            stage.show();
-            
-            logger.info("Help window opened successfully");
-            
-        } catch (IOException ex) {
-            logger.severe("Error opening help window: " + ex.getMessage());
-            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    @FXML
     private void menuUserWindow(ActionEvent event) {
         logger.info("Opening user profile modification window for: " + (profile != null ? profile.getUsername() : "unknown"));
-        
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ModifyWindow.fxml"));
             Parent root = loader.load();
@@ -642,7 +620,7 @@ public class ShopWindowController implements Initializable {
             // Cerrar la ventana actual (StoreWindow)
             Stage currentStage = (Stage) menuBar.getScene().getWindow();
             currentStage.close();
-            
+
             logger.info("Closing ShopWindow and opening ModifyWindow");
 
             // Abrir ModifyWindow como ventana principal (NO modal)
@@ -653,7 +631,7 @@ public class ShopWindowController implements Initializable {
 
         } catch (IOException ex) {
             logger.severe("Error loading ModifyWindow for user: " + (profile != null ? profile.getUsername() : "unknown") + " - " + ex.getMessage());
-            
+
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Cannot open Modify Window");
@@ -665,7 +643,7 @@ public class ShopWindowController implements Initializable {
     @FXML
     private void menuMainWIndow(ActionEvent event) {
         logger.info("Returning to main menu from ShopWindow");
-        
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MenuWindow.fxml"));
             Parent root = loader.load();
@@ -690,12 +668,12 @@ public class ShopWindowController implements Initializable {
             currentStage.setTitle("Main Menu");
             currentStage.setScene(new Scene(root));
             currentStage.show();
-            
+
             logger.info("Successfully returned to Main Menu");
 
         } catch (IOException ex) {
             logger.severe("Error loading MenuWindow: " + ex.getMessage());
-            
+
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Cannot open Main Window");
@@ -703,19 +681,165 @@ public class ShopWindowController implements Initializable {
             alert.showAndWait();
         }
     }
-    
+
     private void showAlert(String title, String message) {
         try {
             logger.info("Showing alert: " + title + " - " + message);
-            
+
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(title);
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.showAndWait();
-            
+
         } catch (Exception e) {
             logger.severe("Error showing alert: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void manualPdf(ActionEvent event) {
+        logger.info("Opening user manual PDF");
+
+        try {
+            // Ruta relativa al PDF del manual
+            String pdfFileName = "Manual de Usuario - Tienda de Videojuegos.pdf";
+            String pdfPath = "pdf/" + pdfFileName;
+
+            // Obtener la ruta absoluta del archivo
+            java.io.File pdfFile = new java.io.File(pdfPath);
+
+            if (!pdfFile.exists()) {
+                logger.warning("User manual PDF not found at: " + pdfFile.getAbsolutePath());
+
+                // Intentar buscar en diferentes ubicaciones comunes
+                String[] possiblePaths = {
+                    pdfPath,
+                    "src/pdf/" + pdfFileName,
+                    "resources/pdf/" + pdfFileName,
+                    "../pdf/" + pdfFileName,
+                    "./pdf/" + pdfFileName
+                };
+
+                boolean found = false;
+                for (String path : possiblePaths) {
+                    pdfFile = new java.io.File(path);
+                    if (pdfFile.exists()) {
+                        found = true;
+                        logger.info("Found manual PDF at: " + pdfFile.getAbsolutePath());
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    showAlert("File Not Found",
+                            "User manual PDF not found. Please ensure 'Manual de Usuario - Tienda de Videojuegos.pdf' exists in the 'pdf' folder.");
+                    return;
+                }
+            }
+
+            // Abrir el PDF con el programa predeterminado del sistema
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+                    desktop.open(pdfFile);
+                    logger.info("Successfully opened user manual PDF: " + pdfFile.getName());
+                } else {
+                    throw new IOException("OPEN action not supported on this platform");
+                }
+            } else {
+                throw new IOException("Desktop not supported on this platform");
+            }
+
+        } catch (IOException ex) {
+            logger.severe("Error opening user manual PDF: " + ex.getMessage());
+
+            // Mostrar instrucciones alternativas
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Opening PDF");
+            alert.setHeaderText("Could not open user manual automatically");
+            alert.setContentText("Error: " + ex.getMessage()
+                    + "\n\nPlease open the PDF manually from the 'pdf' folder:\n"
+                    + "1. Navigate to the 'pdf' folder in the application directory\n"
+                    + "2. Open 'Manual de Usuario - Tienda de Videojuegos.pdf'");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    private void reportPdf(ActionEvent event) {
+        logger.info("Opening project report PDF");
+
+        try {
+            // Ruta relativa al PDF del informe
+            String pdfFileName = "Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf";
+            String pdfPath = "pdf/" + pdfFileName;
+
+            // Obtener la ruta absoluta del archivo
+            java.io.File pdfFile = new java.io.File(pdfPath);
+
+            if (!pdfFile.exists()) {
+                logger.warning("Project report PDF not found at: " + pdfFile.getAbsolutePath());
+
+                // Intentar buscar en diferentes ubicaciones comunes
+                String[] possiblePaths = {
+                    pdfPath,
+                    "src/pdf/" + pdfFileName,
+                    "resources/pdf/" + pdfFileName,
+                    "../pdf/" + pdfFileName,
+                    "./pdf/" + pdfFileName
+                };
+
+                boolean found = false;
+                for (String path : possiblePaths) {
+                    pdfFile = new java.io.File(path);
+                    if (pdfFile.exists()) {
+                        found = true;
+                        logger.info("Found report PDF at: " + pdfFile.getAbsolutePath());
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    showAlert("File Not Found",
+                            "Project report PDF not found. Please ensure 'Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf' exists in the 'pdf' folder.");
+                    return;
+                }
+            }
+
+            // Abrir el PDF con el programa predeterminado del sistema
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+                    desktop.open(pdfFile);
+                    logger.info("Successfully opened project report PDF: " + pdfFile.getName());
+
+                    // Mostrar confirmación
+                    Alert info = new Alert(Alert.AlertType.INFORMATION);
+                    info.setTitle("PDF Opened");
+                    info.setHeaderText("Project report opened successfully");
+                    info.setContentText("The project report PDF has been opened in your default PDF viewer.");
+                    info.showAndWait();
+
+                } else {
+                    throw new IOException("OPEN action not supported on this platform");
+                }
+            } else {
+                throw new IOException("Desktop not supported on this platform");
+            }
+
+        } catch (IOException ex) {
+            logger.severe("Error opening project report PDF: " + ex.getMessage());
+
+            // Mostrar instrucciones alternativas
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Opening PDF");
+            alert.setHeaderText("Could not open project report automatically");
+            alert.setContentText("Error: " + ex.getMessage()
+                    + "\n\nPlease open the PDF manually from the 'pdf' folder:\n"
+                    + "1. Navigate to the 'pdf' folder in the application directory\n"
+                    + "2. Open 'Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf'");
+            alert.showAndWait();
         }
     }
 }
