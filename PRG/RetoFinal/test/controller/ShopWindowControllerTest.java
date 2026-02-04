@@ -1,30 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
-import java.net.URL;
-import java.util.HashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Button;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import main.Main;
-import model.CartItem;
-import model.Profile;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 import static org.testfx.api.FxAssert.verifyThat;
@@ -65,196 +45,194 @@ public class ShopWindowControllerTest extends ApplicationTest {
     public void testCompletoTienda() {
         System.out.println("=== TEST COMPLETO DE TIENDA ===");
 
-        
-            // ========== FASE 1: LOGIN ==========
-            System.out.println("\n--- Fase 1: Login ---");
-            hacerLoginDesdeCero();
+        // ========== FASE 1: LOGIN ==========
+        System.out.println("\n--- Fase 1: Login ---");
+        hacerLoginDesdeCero();
 
-            // ========== FASE 2: VERIFICAR ELEMENTOS ==========
-            System.out.println("\n--- Fase 2: Verificar Elementos ---");
-            verificarElemento("#labelTitle", "Título GAME STORE");
-            verificarElemento("#labelWelcome", "Label de bienvenida");
-            verificarElemento("#labelAvaliable", "Label Available Games");
-            verificarElemento("#tableViewGames", "Tabla de juegos");
-            verificarElemento("#labelSearch", "Label Search game");
-            verificarElemento("#textFieldSearch", "Campo de búsqueda");
-            verificarElemento("#labelGenre", "Label Genre");
-            verificarElemento("#comboBoxGenre", "ComboBox de género");
-            verificarElemento("#labelPlatform", "Label Platform");
-            verificarElemento("#comboBoxPlatform", "ComboBox de plataforma");
-            verificarElemento("#buttonSearch", "Botón Search");
-            verificarElemento("#labelSelectedGame", "Label Selected game");
-            verificarElemento("#labelGameInfo", "Label Game info");
-            verificarElemento("#buttonAddToCart", "Botón Add to Cart");
-            verificarElemento("#buttonCart", "Botón Cart");
-            verificarElemento("#buttonExit", "Botón Exit");
-            verificarElemento("#buttonReview", "Botón Review");
-            verificarElemento("#menuBar", "Menu bar");
+        // ========== FASE 2: VERIFICAR ELEMENTOS ==========
+        System.out.println("\n--- Fase 2: Verificar Elementos ---");
+        verificarElemento("#labelTitle", "Título GAME STORE");
+        verificarElemento("#labelWelcome", "Label de bienvenida");
+        verificarElemento("#labelAvaliable", "Label Available Games");
+        verificarElemento("#tableViewGames", "Tabla de juegos");
+        verificarElemento("#labelSearch", "Label Search game");
+        verificarElemento("#textFieldSearch", "Campo de búsqueda");
+        verificarElemento("#labelGenre", "Label Genre");
+        verificarElemento("#comboBoxGenre", "ComboBox de género");
+        verificarElemento("#labelPlatform", "Label Platform");
+        verificarElemento("#comboBoxPlatform", "ComboBox de plataforma");
+        verificarElemento("#buttonSearch", "Botón Search");
+        verificarElemento("#labelSelectedGame", "Label Selected game");
+        verificarElemento("#labelGameInfo", "Label Game info");
+        verificarElemento("#buttonAddToCart", "Botón Add to Cart");
+        verificarElemento("#buttonCart", "Botón Cart");
+        verificarElemento("#buttonExit", "Botón Exit");
+        verificarElemento("#buttonReview", "Botón Review");
+        verificarElemento("#menuBar", "Menu bar");
 
-            // Verificar estado de botones
-            System.out.println("\nVerificando estado de botones...");
-            verificarEstadoBoton("#buttonAddToCart", true, "Botón Add to Cart habilitado");
-            verificarEstadoBoton("#buttonSearch", true, "Botón Search habilitado");
-            verificarEstadoBoton("#buttonCart", true, "Botón Cart habilitado");
-            verificarEstadoBoton("#buttonExit", true, "Botón Exit habilitado");
-            verificarEstadoBoton("#buttonReview", true, "Botón Review habilitado");
+        // Verificar estado de botones
+        System.out.println("\nVerificando estado de botones...");
+        verificarEstadoBoton("#buttonAddToCart", true, "Botón Add to Cart habilitado");
+        verificarEstadoBoton("#buttonSearch", true, "Botón Search habilitado");
+        verificarEstadoBoton("#buttonCart", true, "Botón Cart habilitado");
+        verificarEstadoBoton("#buttonExit", true, "Botón Exit habilitado");
+        verificarEstadoBoton("#buttonReview", true, "Botón Review habilitado");
 
-            // ========== FASE 3: BUSQUEDA ==========
-            System.out.println("\n--- Fase 3: Búsqueda ---");
+        // ========== FASE 3: BUSQUEDA ==========
+        System.out.println("\n--- Fase 3: Búsqueda ---");
 
-            // Probar búsqueda con texto
-            llenarCampo("#textFieldSearch", "test", "Campo búsqueda con 'test'");
+        // Probar búsqueda con texto
+        llenarCampo("#textFieldSearch", "test", "Campo búsqueda con 'test'");
+        clickOn("#buttonSearch");
+        sleep(2000);
+        System.out.println("✓ Búsqueda con texto ejecutada");
+
+        // Limpiar búsqueda
+        limpiarCampo("#textFieldSearch");
+
+        // Probar filtro de género
+        clickOn("#comboBoxGenre");
+        sleep(500);
+        try {
+            clickOn("ACTION");
+            sleep(1000);
             clickOn("#buttonSearch");
             sleep(2000);
-            System.out.println("✓ Búsqueda con texto ejecutada");
+            System.out.println("✓ Filtro ACTION aplicado");
+        } catch (Exception e) {
+            System.out.println("⚠ No se pudo seleccionar filtro ACTION");
+        }
 
-            // Limpiar búsqueda
-            limpiarCampo("#textFieldSearch");
+        // Resetear filtro género
+        clickOn("#comboBoxGenre");
+        sleep(500);
+        try {
+            clickOn("ALL");
+        } catch (Exception e) {
+        }
 
-            // Probar filtro de género
-            clickOn("#comboBoxGenre");
-            sleep(500);
-            try {
-                clickOn("ACTION");
-                sleep(1000);
-                clickOn("#buttonSearch");
-                sleep(2000);
-                System.out.println("✓ Filtro ACTION aplicado");
-            } catch (Exception e) {
-                System.out.println("⚠ No se pudo seleccionar filtro ACTION");
-            }
-
-            // Resetear filtro género
-            clickOn("#comboBoxGenre");
-            sleep(500);
-            try {
-                clickOn("ALL");
-            } catch (Exception e) {
-            }
-
-            // Probar filtro de plataforma
-            clickOn("#comboBoxPlatform");
-            sleep(500);
-            try {
-                clickOn("PC");
-                sleep(1000);
-                clickOn("#buttonSearch");
-                sleep(2000);
-                System.out.println("✓ Filtro PC aplicado");
-            } catch (Exception e) {
-                System.out.println("⚠ No se pudo seleccionar filtro PC");
-            }
-
-            // Resetear filtro plataforma
-            clickOn("#comboBoxPlatform");
-            sleep(500);
-            try {
-                clickOn("ALL");
-            } catch (Exception e) {
-            }
-
-            // Búsqueda final sin filtros
+        // Probar filtro de plataforma
+        clickOn("#comboBoxPlatform");
+        sleep(500);
+        try {
+            clickOn("PC");
+            sleep(1000);
             clickOn("#buttonSearch");
             sleep(2000);
-            System.out.println("✓ Búsqueda sin filtros ejecutada");
+            System.out.println("✓ Filtro PC aplicado");
+        } catch (Exception e) {
+            System.out.println("⚠ No se pudo seleccionar filtro PC");
+        }
 
-            // ========== FASE 4: SELECCIÓN DE JUEGO ==========
-            System.out.println("\n--- Fase 4: Selección de Juego ---");
+        // Resetear filtro plataforma
+        clickOn("#comboBoxPlatform");
+        sleep(500);
+        try {
+            clickOn("ALL");
+        } catch (Exception e) {
+        }
 
-            // Verificar label inicial
-            try {
-                verifyThat("#labelGameInfo", hasText("Select a game"));
-                System.out.println("✓ Label inicial correcto: 'Select a game'");
-            } catch (Exception e) {
-                System.out.println("⚠ Label inicial no muestra 'Select a game'");
-            }
+        // Búsqueda final sin filtros
+        clickOn("#buttonSearch");
+        sleep(2000);
+        System.out.println("✓ Búsqueda sin filtros ejecutada");
 
-            // Intentar seleccionar un juego si existe
-            if (verificarElementoExistente("#tableViewGames .table-row-cell")) {
-                System.out.println("✓ Hay juegos en la tabla");
+        // ========== FASE 4: SELECCIÓN DE JUEGO ==========
+        System.out.println("\n--- Fase 4: Selección de Juego ---");
 
-                // Seleccionar primera fila
-                clickOn("#tableViewGames .table-row-cell");
-                sleep(1000);
+        // Verificar label inicial
+        try {
+            verifyThat("#labelGameInfo", hasText("Select a game"));
+            System.out.println("✓ Label inicial correcto: 'Select a game'");
+        } catch (Exception e) {
+            System.out.println("⚠ Label inicial no muestra 'Select a game'");
+        }
 
-                // Verificar que se actualizó el label
-                verificarElemento("#labelGameInfo", "Label de juego actualizado");
+        // Intentar seleccionar un juego si existe
+        if (verificarElementoExistente("#tableViewGames .table-row-cell")) {
+            System.out.println("✓ Hay juegos en la tabla");
 
-                // ========== FASE 5: AGREGAR AL CARRITO ==========
+            // Seleccionar primera fila
+            clickOn("#tableViewGames .table-row-cell");
+            sleep(1000);
+
+            // Verificar que se actualizó el label
+            verificarElemento("#labelGameInfo", "Label de juego actualizado");
+
+            // ========== FASE 5: AGREGAR AL CARRITO ==========
             System.out.println("\n--- Fase 5: Agregar al Carrito ---");
-            
+
             // Intentar agregar al carrito
             clickOn("#buttonAddToCart");
             sleep(1000);
-            
+
             // Manejar posibles alerts
             manejarAlertConBoton("OK", "Resultado agregar al carrito");
-            
+
             // ========== FASE 6: ABRIR CARRITO Y COMPRAR ==========
             System.out.println("\n--- Fase 6: Abrir Carrito y Comprar ---");
-            
+
             clickOn("#buttonCart");
             sleep(2000);
-            
+
             // Verificar que se abrió el carrito
-            boolean carritoAbierto = verificarElementoExistente(".dialog-pane") || 
-                                   verificarElementoExistente("#listViewCarrito") ||
-                                   verificarElementoExistente("Your Cart") ||
-                                   verificarElementoExistente("#buttonComprar"); // Botón de compra
-            
+            boolean carritoAbierto = verificarElementoExistente(".dialog-pane")
+                    || verificarElementoExistente("#listViewCarrito")
+                    || verificarElementoExistente("Your Cart")
+                    || verificarElementoExistente("#buttonComprar"); // Botón de compra
+
             if (carritoAbierto) {
                 System.out.println("✓ Carrito abierto");
-                
+
                 // INTENTAR COMPRAR
                 System.out.println("Intentando comprar...");
-                
+
                 // Método 1: Buscar botón de compra por ID
                 try {
                     clickOn("#buttonComprar");
                     System.out.println("✓ Clic en botón de compra por ID");
                     sleep(2000);
-                    
+
                     // Manejar confirmación de compra si aparece
                     manejarAlertConBoton("Sí", "Confirmación de compra");
                     manejarAlertConBoton("Aceptar", "Confirmación de compra");
-                    
-                    
+
                 } catch (Exception e1) {
                     // Método 2: Buscar botón de compra por texto
                     try {
                         clickOn("Purchase");
                         System.out.println("✓ Clic en botón de compra por texto");
                         sleep(2000);
-                        
+
                         // Manejar confirmación
                         manejarAlertConBoton("OK", "Confirmación de compra");
                         manejarAlertConBoton("Yes", "Confirmación de compra");
-                        
+
                     } catch (Exception e2) {
                         // Método 3: Buscar botón de compra por texto en español
                         try {
                             clickOn("Comprar");
                             System.out.println("✓ Clic en botón de compra por texto español");
                             sleep(2000);
-                            
+
                             // Manejar confirmación
                             manejarAlertConBoton("Aceptar", "Confirmación de compra");
                             manejarAlertConBoton("Sí", "Confirmación de compra");
-                            
+
                         } catch (Exception e3) {
                             // Método 4: Buscar cualquier botón que pueda ser de compra
                             try {
                                 // Buscar botones con textos relacionados a compra
                                 String[] textosCompra = {"Buy", "Checkout", "Pay", "Finalizar", "Confirmar"};
                                 boolean comprado = false;
-                                
+
                                 for (String texto : textosCompra) {
                                     try {
                                         clickOn(texto);
                                         System.out.println("✓ Clic en botón: " + texto);
                                         sleep(2000);
                                         comprado = true;
-                                        
+
                                         // Manejar confirmación
                                         manejarAlertConBoton("OK", "Confirmación");
                                         break;
@@ -262,35 +240,35 @@ public class ShopWindowControllerTest extends ApplicationTest {
                                         // Continuar con siguiente texto
                                     }
                                 }
-                                
+
                                 if (!comprado) {
                                     System.out.println("⚠ No se encontró botón de compra");
                                 }
-                                
+
                             } catch (Exception e4) {
                                 System.out.println("✗ Error buscando botón de compra");
                             }
                         }
                     }
                 }
-                
+
                 // Esperar a que se procese la compra
                 sleep(3000);
-                
+
                 // Verificar si la ventana se cerró automáticamente
-                boolean ventanaCerrada = !verificarElementoExistente(".dialog-pane") &&
-                                       !verificarElementoExistente("#cartTableView");
-                
+                boolean ventanaCerrada = !verificarElementoExistente(".dialog-pane")
+                        && !verificarElementoExistente("#cartTableView");
+
                 if (ventanaCerrada) {
                     System.out.println("✓ Compra completada, ventana cerrada automáticamente");
                 } else {
                     // Si no se cerró, cerrarla manualmente
                     System.out.println("Cerrando ventana de carrito manualmente...");
-                    
+
                 }
-                
+
                 sleep(1000);
-                
+
             } else {
                 System.out.println("⚠ No se pudo verificar apertura de carrito");
             }
@@ -301,11 +279,9 @@ public class ShopWindowControllerTest extends ApplicationTest {
             // Probar menú Help
             clickOn("#menuHelp");
             sleep(500);
-            
 
             // Verificar ventana de ayuda
             verificarElementoExistente("Help Window");
-
 
             // Probar menú Windows
             clickOn("#menuWindow");
@@ -328,12 +304,8 @@ public class ShopWindowControllerTest extends ApplicationTest {
             sleep(1000);
             manejarAlertConBoton("OK", "Warning sin selección");
 
-           
-
             clickOn("#buttonCancelar");
             sleep(2000);
-
-         
         }
     }
 

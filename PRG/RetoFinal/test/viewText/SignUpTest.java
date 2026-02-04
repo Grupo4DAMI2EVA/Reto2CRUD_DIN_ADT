@@ -1,12 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package viewText;
 
 import java.util.concurrent.TimeoutException;
-import javafx.stage.Stage;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -16,7 +10,6 @@ import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
 import static org.testfx.matcher.base.NodeMatchers.isVisible;
-import static org.testfx.matcher.control.TextInputControlMatchers.hasText;
 
 /**
  * Integration test for SignUp window starting from Login window. Usa la base de datos real MySQL.
