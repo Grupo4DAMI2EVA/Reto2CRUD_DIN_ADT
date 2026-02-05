@@ -19,7 +19,7 @@ import javafx.event.ActionEvent;
  * Controller class for managing the shopping cart functionality.
  * Handles adding, removing, and modifying items in the cart, as well as processing purchases.
  * 
- * @author [Your Name]
+ * @author Victor
  */
 public class CartController {
 
