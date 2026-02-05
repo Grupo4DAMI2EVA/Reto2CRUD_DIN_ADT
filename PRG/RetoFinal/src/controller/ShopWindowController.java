@@ -15,7 +15,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import model.*;
 
 /**
- * Controlador principal para la ventana de la tienda de videojuegos. Maneja la interfaz de usuario donde los usuarios pueden buscar, ver, agregar al carrito y gestionar sus juegos favoritos.
+ * Controlador principal para la ventana de la tienda de videojuegos. Maneja la
+ * interfaz de usuario donde los usuarios pueden buscar, ver, agregar al carrito
+ * y gestionar sus juegos favoritos.
  *
  * @author Igor
  * @version 1.0
@@ -108,7 +110,9 @@ public class ShopWindowController implements Initializable {
     private static ObservableList<CartItem> sharedCart;
 
     /**
-     * Bloque estático para inicializar el sistema de logging. Crea el directorio de logs si no existe y configura el FileHandler para escribir logs en un archivo específico.
+     * Bloque estático para inicializar el sistema de logging. Crea el
+     * directorio de logs si no existe y configura el FileHandler para escribir
+     * logs en un archivo específico.
      */
     static {
         initializeLogger();
@@ -158,9 +162,12 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Método de inicialización llamado automáticamente por JavaFX después de cargar el archivo FXML. Configura la tabla, carga los juegos, establece los listeners y prepara los componentes de la interfaz.
+     * Método de inicialización llamado automáticamente por JavaFX después de
+     * cargar el archivo FXML. Configura la tabla, carga los juegos, establece
+     * los listeners y prepara los componentes de la interfaz.
      *
-     * @param url Ubicación utilizada para resolver rutas relativas para el objeto raíz
+     * @param url Ubicación utilizada para resolver rutas relativas para el
+     * objeto raíz
      * @param rb Recursos utilizados para localizar el objeto raíz
      */
     @Override
@@ -256,7 +263,8 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Configura las columnas de la tabla de videojuegos. Asocia cada columna con su propiedad correspondiente en la clase Videogame.
+     * Configura las columnas de la tabla de videojuegos. Asocia cada columna
+     * con su propiedad correspondiente en la clase Videogame.
      */
     private void configureTableColumns() {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -277,7 +285,8 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Maneja la selección de un elemento en la tabla. Actualiza el videojuego seleccionado y muestra su información.
+     * Maneja la selección de un elemento en la tabla. Actualiza el videojuego
+     * seleccionado y muestra su información.
      */
     private void getSelectedTableItem() {
         selected = tableViewGames.getSelectionModel().getSelectedItem();
@@ -321,7 +330,9 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Agrega el videojuego seleccionado al carrito de compras del usuario. Verifica que el usuario esté autenticado, que haya stock disponible y que el juego no esté ya en el carrito.
+     * Agrega el videojuego seleccionado al carrito de compras del usuario.
+     * Verifica que el usuario esté autenticado, que haya stock disponible y que
+     * el juego no esté ya en el carrito.
      *
      * @param event Evento de acción del botón "Agregar al carrito"
      */
@@ -406,7 +417,9 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Obtiene el carrito de compras compartido entre ventanas. Este es un carrito estático que mantiene los items entre diferentes instancias del controlador.
+     * Obtiene el carrito de compras compartido entre ventanas. Este es un
+     * carrito estático que mantiene los items entre diferentes instancias del
+     * controlador.
      *
      * @return Lista observable con los items del carrito
      */
@@ -415,7 +428,8 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Abre la ventana del carrito de compras. Carga la interfaz del carrito y pasa los items actuales.
+     * Abre la ventana del carrito de compras. Carga la interfaz del carrito y
+     * pasa los items actuales.
      *
      * @param event Evento de acción del botón del carrito
      */
@@ -428,17 +442,21 @@ public class ShopWindowController implements Initializable {
             Parent root = loader.load();
             CartController cartC = loader.getController();
 
-            // PRIMERO llamar setup() para inicializar carritoData
+            // PRIMERO llamar setup() para inicializar
             cartC.setup();
 
-            // Cargar los items del carrito compartido
+            // Configurar usuario y controlador
+            cartC.setUsuario(profile);
+            cartC.setCont(cont);
+
+            // Cargar los items del carrito compartido CON VIDEOJUEGOS COMPLETOS
             loadCartItemsToController(cartC);
 
             cartC.actualizarTotales();
             cartC.actualizarEstadoBotones();
 
             Stage stage = new Stage();
-            stage.setTitle("Your Cart");
+            stage.setTitle("Your Cart - " + profile.getUsername());
             stage.setScene(new Scene(root));
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
@@ -453,34 +471,39 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Método auxiliar para cargar los items del carrito compartido al controlador del carrito.
+     * Método auxiliar para cargar los items del carrito compartido al
+     * controlador del carrito.
      *
      * @param cartController Controlador de la ventana del carrito
      */
     private void loadCartItemsToController(CartController cartController) {
         for (CartItem item : sharedCart) {
             if (item.getIdUsuario() == profile.getUserCode()) {
-                // Buscar nombre del videojuego
-                String gameName = "Unknown Game";
+                // Buscar el videojuego completo en la lista
+                Videogame videojuegoCompleto = null;
                 for (Videogame game : gamesList) {
                     if (game.getIdVideogame() == item.getIdVideojuego()) {
-                        gameName = game.getName();
+                        videojuegoCompleto = game;
                         break;
                     }
                 }
 
-                cartController.agregarItemCarrito(
-                        profile.getUsername(),
-                        gameName,
-                        item.getCantidad(),
-                        item.getPrecio()
-                );
+                if (videojuegoCompleto != null) {
+                    cartController.agregarItemCarrito(
+                            profile.getUsername(),
+                            videojuegoCompleto,
+                            item.getCantidad(),
+                            item.getPrecio()
+                    );
+                }
             }
         }
     }
 
     /**
-     * Refresca la lista de videojuegos aplicando los filtros actuales. Si hay filtros activos, aplica la búsqueda filtrada; de lo contrario, carga todos los juegos.
+     * Refresca la lista de videojuegos aplicando los filtros actuales. Si hay
+     * filtros activos, aplica la búsqueda filtrada; de lo contrario, carga
+     * todos los juegos.
      */
     private void refreshGamesList() {
         logger.info("Refreshing games list");
@@ -511,7 +534,8 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Maneja el evento del botón de salida. Cierra la ventana actual y regresa a la ventana principal del menú.
+     * Maneja el evento del botón de salida. Cierra la ventana actual y regresa
+     * a la ventana principal del menú.
      *
      * @param event Evento de acción del botón de salida
      */
@@ -541,7 +565,8 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Maneja el evento del botón de reseñas. Abre una ventana para escribir una reseña sobre el videojuego seleccionado.
+     * Maneja el evento del botón de reseñas. Abre una ventana para escribir una
+     * reseña sobre el videojuego seleccionado.
      *
      * @param event Evento de acción del botón de reseñas
      */
@@ -567,12 +592,13 @@ public class ShopWindowController implements Initializable {
 
             ReviewController controller = loader.getController();
 
-            // Configurar el videojuego seleccionado
-            controller.setVideojuego(selected.getName(), selected.getIdVideogame());
+            // Configurar el videojuego completo
+            controller.setVideojuegoCompleto(selected); // Nuevo método
 
-            // Configurar usuario si es necesario
+            // Configurar usuario y controlador
             if (profile != null) {
-                controller.setUsuario(profile.getUserCode());
+                controller.setUsuario(profile);
+                controller.setCont(cont);
                 logger.info("Setting user for review: " + profile.getUsername() + " (ID: " + profile.getUserCode() + ")");
             }
 
@@ -600,7 +626,8 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Alterna el estado de favorito del videojuego seleccionado. Agrega o remueve el juego de la lista de favoritos del usuario.
+     * Alterna el estado de favorito del videojuego seleccionado. Agrega o
+     * remueve el juego de la lista de favoritos del usuario.
      *
      * @param event Evento de acción del menú contextual de favoritos
      */
@@ -656,7 +683,9 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Muestra los detalles completos del videojuego seleccionado en una ventana de diálogo. Incluye información como compañía, género, plataforma, precio, PEGI, stock y fecha de lanzamiento.
+     * Muestra los detalles completos del videojuego seleccionado en una ventana
+     * de diálogo. Incluye información como compañía, género, plataforma,
+     * precio, PEGI, stock y fecha de lanzamiento.
      *
      * @param event Evento de acción del menú contextual de detalles
      */
@@ -693,7 +722,8 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Abre la ventana de modificación del perfil de usuario. Permite al usuario actualizar su información personal.
+     * Abre la ventana de modificación del perfil de usuario. Permite al usuario
+     * actualizar su información personal.
      *
      * @param event Evento de acción del menú "User Window"
      */
@@ -741,7 +771,8 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Regresa a la ventana principal del menú desde la tienda. Reemplaza la escena actual con la del menú principal.
+     * Regresa a la ventana principal del menú desde la tienda. Reemplaza la
+     * escena actual con la del menú principal.
      *
      * @param event Evento de acción del menú "Main Window"
      */
@@ -809,7 +840,9 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Abre el manual de usuario en formato PDF. Busca el archivo PDF en varias ubicaciones posibles y lo abre con el visor de PDF predeterminado del sistema.
+     * Abre el manual de usuario en formato PDF. Busca el archivo PDF en varias
+     * ubicaciones posibles y lo abre con el visor de PDF predeterminado del
+     * sistema.
      *
      * @param event Evento de acción del menú "Help Manual"
      */
@@ -883,7 +916,9 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Abre el informe del proyecto en formato PDF. Busca el archivo PDF en varias ubicaciones posibles y lo abre con el visor de PDF predeterminado del sistema.
+     * Abre el informe del proyecto en formato PDF. Busca el archivo PDF en
+     * varias ubicaciones posibles y lo abre con el visor de PDF predeterminado
+     * del sistema.
      *
      * @param event Evento de acción del menú "Help Report"
      */

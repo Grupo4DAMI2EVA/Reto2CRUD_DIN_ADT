@@ -8,7 +8,8 @@ import org.hibernate.query.Query;
 import java.util.List;
 
 /**
- * Implementation of ClassDAO using Hibernate ORM. Handles all database interactions for users and admins.
+ * Implementation of ClassDAO using Hibernate ORM. Handles all database
+ * interactions for users and admins.
  *
  * Author: acer
  */
@@ -490,10 +491,10 @@ public class DBImplementation implements ClassDAO {
 
         try {
             transaction = session.beginTransaction();
-            
+
             // Cargar el videojuego desde la base de datos para asegurar que está asociado a la sesión
             Videogame videogameToDelete = session.get(Videogame.class, game.getIdVideogame());
-            
+
             if (videogameToDelete != null) {
                 session.delete(videogameToDelete);
                 transaction.commit();
@@ -677,6 +678,89 @@ public class DBImplementation implements ClassDAO {
             }
             System.out.println("Database error on creating admin: " + e.getMessage());
             e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
+    }
+
+    @Override
+    public boolean createOrder(Order order) {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Guardar el pedido en la base de datos
+            session.save(order);
+
+            transaction.commit();
+
+            System.out.println("Order created successfully: OrderCode=" + order.getOrderCode());
+            return true;
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on creating order: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
+    }
+
+    @Override
+    public boolean createReview(Review review) {
+        Session session = HibernateSession.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Guardar la reseña en la base de datos
+            session.save(review);
+
+            transaction.commit();
+
+            System.out.println("Review created successfully: ReviewCode=" + review.getReviewCode());
+            return true;
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            System.out.println("Database error on creating review: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
+    }
+
+    @Override
+    public boolean reviewExists(int userId, int videogameId) {
+        Session session = HibernateSession.getSessionFactory().openSession();
+
+        try {
+            String hql = "SELECT COUNT(r) FROM Review r WHERE r.user.userCode = :userId AND r.videogame.idVideogame = :videogameId";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("userId", userId);
+            query.setParameter("videogameId", videogameId);
+
+            Long count = query.uniqueResult();
+            return count > 0;
+
+        } catch (Exception e) {
+            System.out.println("Error checking if review exists: " + e.getMessage());
             return false;
         } finally {
             if (session != null && session.isOpen()) {

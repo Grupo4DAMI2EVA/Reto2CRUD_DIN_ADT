@@ -2,10 +2,8 @@ package controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import model.Profile;
+import model.*;
 
 public class ReviewController {
 
@@ -14,9 +12,6 @@ public class ReviewController {
 
     @FXML
     private Label labelPuntuacion;
-
-    @FXML
-    private Label labelContadorCaracteres;
 
     @FXML
     private Label labelVideojuego;
@@ -30,50 +25,60 @@ public class ReviewController {
     @FXML
     private Button buttonCancelar;
 
-    @FXML
-    private ImageView estrella1, estrella2, estrella3, estrella4, estrella5;
-
     private Stage stage;
     private String nombreVideojuego = "";
     private int idUsuario = 0;
     private int idVideojuego = 0;
     private Profile profile;
     private Controller cont;
+    private Videogame videojuegoCompleto;
 
-    // Imágenes para las estrellas
-    private Image estrellaLlena;
-    private Image estrellaVacia;
-    private Image estrellaMedia;
-
+    @FXML
     private void initialize() {
         // Configurar el slider
-        try {
-            // Cargar imágenes en initialize() que se llama después de que FXML está listo
-            // estrellaLlena = new Image(getClass().getResourceAsStream("/images/star_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
-            // estrellaVacia = new Image(getClass().getResourceAsStream("/images/star_border_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
-            // estrellaMedia = new Image(getClass().getResourceAsStream("/images/star_half_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
-        } catch (Exception e) {
-            //  System.err.println("Error cargando imágenes: " + e.getMessage());
-        }
-
         configurarSlider();
 
-        // Configurar el TextArea con contador de caracteres
-        configurarTextArea();
-
-        // Actualizar estrellas visuales inicialmente
-        actualizarEstrellasVisuales(sliderPuntuacion.getValue());
-
-        // Deshabilitar botón enviar si no hay comentario
+        // Deshabilitar botón enviar inicialmente
         actualizarEstadoBotonEnviar();
+
+        // Configurar listener para habilitar botón cuando haya texto
+        textAreaComentario.textProperty().addListener((observable, oldValue, newValue) -> {
+            actualizarEstadoBotonEnviar();
+        });
     }
 
     public void setUsuario(Profile profile) {
         this.profile = profile;
+        if (profile != null) {
+            this.idUsuario = profile.getUserCode();
+        }
     }
 
     public void setCont(Controller cont) {
         this.cont = cont;
+    }
+
+    public Controller getCont() {
+        return cont;
+    }
+
+    // Método para establecer el videojuego completo
+    public void setVideojuegoCompleto(Videogame videojuego) {
+        this.videojuegoCompleto = videojuego;
+        this.nombreVideojuego = videojuego.getName();
+        this.idVideojuego = videojuego.getIdVideogame();
+        if (labelVideojuego != null) {
+            labelVideojuego.setText("Videojuego: " + nombreVideojuego);
+        }
+    }
+
+    // Método original para compatibilidad
+    public void setVideojuego(String nombre, int idVideojuego) {
+        this.nombreVideojuego = nombre;
+        this.idVideojuego = idVideojuego;
+        if (labelVideojuego != null) {
+            labelVideojuego.setText("Videojuego: " + nombre);
+        }
     }
 
     private void configurarSlider() {
@@ -91,61 +96,15 @@ public class ReviewController {
         // Actualizar label cuando cambia el slider
         sliderPuntuacion.valueProperty().addListener((observable, oldValue, newValue) -> {
             double valor = Math.round(newValue.doubleValue() * 2) / 2.0;
-            labelPuntuacion.setText(String.format("%.1f", valor));
-            actualizarEstrellasVisuales(valor);
-        });
-    }
-
-    private void actualizarEstrellasVisuales(double puntuacion) {
-        // Actualizar las estrellas visuales según la puntuación
-        ImageView[] estrellas = {estrella1, estrella2, estrella3, estrella4, estrella5};
-
-        for (int i = 0; i < estrellas.length; i++) {
-            if (puntuacion >= i + 1) {
-                // Estrella completa
-                estrellas[i].setImage(estrellaLlena);
-            } else if (puntuacion >= i + 0.5) {
-                // Media estrella
-                estrellas[i].setImage(estrellaMedia);
-            } else {
-                // Estrella vacía
-                estrellas[i].setImage(estrellaVacia);
-            }
-        }
-    }
-
-    private void configurarTextArea() {
-        // Configurar límite de caracteres
-        final int MAX_CARACTERES = 500;
-
-        textAreaComentario.textProperty().addListener((observable, oldValue, newValue) -> {
-            // Actualizar contador
-            int caracteres = newValue.length();
-            labelContadorCaracteres.setText(caracteres + "/" + MAX_CARACTERES + " caracteres");
-
-            // Cambiar color si se acerca al límite
-            if (caracteres > MAX_CARACTERES * 0.9) {
-                labelContadorCaracteres.setStyle("-fx-text-fill: #FF5722;");
-            } else if (caracteres > MAX_CARACTERES * 0.75) {
-                labelContadorCaracteres.setStyle("-fx-text-fill: #FF9800;");
-            } else {
-                labelContadorCaracteres.setStyle("-fx-text-fill: #666666;");
-            }
-
-            // Limitar caracteres
-            if (newValue.length() > MAX_CARACTERES) {
-                textAreaComentario.setText(oldValue);
-            }
-
-            // Actualizar estado del botón enviar
-            actualizarEstadoBotonEnviar();
+            labelPuntuacion.setText(String.format("%.1f/5.0", valor));
         });
     }
 
     private void actualizarEstadoBotonEnviar() {
-        // Habilitar botón solo si hay comentario
-        boolean tieneComentario = !textAreaComentario.getText().trim().isEmpty();
-        buttonEnviar.setDisable(!tieneComentario);
+        // Habilitar botón solo si hay comentario (al menos 10 caracteres)
+        String comentario = textAreaComentario.getText().trim();
+        boolean tieneComentarioValido = comentario.length() >= 10;
+        buttonEnviar.setDisable(!tieneComentarioValido);
     }
 
     @FXML
@@ -171,18 +130,20 @@ public class ReviewController {
 
         confirmacion.showAndWait().ifPresent(response -> {
             if (response == buttonTypeSi) {
-                // Aquí iría la lógica para guardar en la base de datos
-                guardarReviewEnBD(puntuacion, comentario);
+                // Guardar en la base de datos
+                boolean exito = guardarReviewEnBD(puntuacion, comentario);
 
-                // Mostrar confirmación
-                Alert exito = new Alert(Alert.AlertType.INFORMATION);
-                exito.setTitle("Valoración Enviada");
-                exito.setHeaderText("¡Gracias por tu valoración!");
-                exito.setContentText("Tu reseña ha sido publicada correctamente.");
-                exito.showAndWait();
+                if (exito) {
+                    // Mostrar confirmación
+                    Alert exitoAlert = new Alert(Alert.AlertType.INFORMATION);
+                    exitoAlert.setTitle("Valoración Enviada");
+                    exitoAlert.setHeaderText("¡Gracias por tu valoración!");
+                    exitoAlert.setContentText("Tu reseña ha sido publicada correctamente.");
+                    exitoAlert.showAndWait();
 
-                // Cerrar ventana
-                cancelar();
+                    // Cerrar ventana
+                    cerrarVentana();
+                }
             }
         });
     }
@@ -210,21 +171,49 @@ public class ReviewController {
         return true;
     }
 
-    private void guardarReviewEnBD(double puntuacion, String comentario) {
-        // Aquí iría el código para guardar en tu base de datos
-        // Por ejemplo:
-        // Review review = new Review(idUsuario, idVideojuego, puntuacion, comentario);
-        // reviewDAO.guardar(review);
+    private boolean guardarReviewEnBD(double puntuacion, String comentario) {
+        try {
+            // Verificar que tenemos todos los datos necesarios
+            if (profile == null || cont == null || videojuegoCompleto == null) {
+                mostrarAlerta("Error", "No se puede guardar la reseña: datos incompletos.");
+                return false;
+            }
 
-        System.out.println("Guardando review en BD:");
-        System.out.println("Usuario ID: " + idUsuario);
-        System.out.println("Videojuego ID: " + idVideojuego);
-        System.out.println("Videojuego: " + nombreVideojuego);
-        System.out.println("Puntuación: " + puntuacion);
-        System.out.println("Comentario: " + comentario);
+            // Obtener el usuario completo de la base de datos
+            User usuario = cont.getUserByUsername(profile.getUsername());
+            if (usuario == null) {
+                mostrarAlerta("Error", "Usuario no encontrado en la base de datos.");
+                return false;
+            }
 
-        // Simulación de guardado en BD
-        // TODO: Implementar conexión real a BD
+            // Verificar si el usuario ya ha reseñado este videojuego
+            if (cont.reviewExists(usuario.getUserCode(), videojuegoCompleto.getIdVideogame())) {
+                mostrarAlerta("Reseña duplicada", "Ya has reseñado este videojuego anteriormente.");
+                return false;
+            }
+
+            // Crear y guardar la reseña
+            Review review = new Review(usuario, videojuegoCompleto, puntuacion, comentario);
+            boolean resultado = cont.createReview(review);
+
+            if (resultado) {
+                System.out.println("Reseña guardada exitosamente:");
+                System.out.println("Usuario: " + usuario.getUsername());
+                System.out.println("Videojuego: " + videojuegoCompleto.getName());
+                System.out.println("Puntuación: " + puntuacion);
+                System.out.println("Comentario: " + comentario);
+                return true;
+            } else {
+                mostrarAlerta("Error", "No se pudo guardar la reseña en la base de datos.");
+                return false;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al guardar la reseña: " + e.getMessage());
+            e.printStackTrace();
+            mostrarAlerta("Error", "Ocurrió un error al guardar la reseña: " + e.getMessage());
+            return false;
+        }
     }
 
     @FXML
@@ -251,8 +240,8 @@ public class ReviewController {
     }
 
     private void cerrarVentana() {
-        stage = (Stage) buttonCancelar.getScene().getWindow();
-        stage.close();
+        Stage currentStage = (Stage) buttonCancelar.getScene().getWindow();
+        currentStage.close();
     }
 
     private void mostrarAlerta(String titulo, String mensaje) {
@@ -263,21 +252,10 @@ public class ReviewController {
         alert.showAndWait();
     }
 
-    // Métodos para configurar datos desde fuera
-    public void setVideojuego(String nombre, int idVideojuego) {
-        this.nombreVideojuego = nombre;
-        this.idVideojuego = idVideojuego;
-        labelVideojuego.setText("Videojuego: " + nombre);
-    }
-
-    public void setUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
     // Método para cargar una review existente (para editar)
     public void cargarReviewExistente(double puntuacion, String comentario) {
         sliderPuntuacion.setValue(puntuacion);
         textAreaComentario.setText(comentario);
-        actualizarEstrellasVisuales(puntuacion);
+        labelPuntuacion.setText(String.format("%.1f/5.0", puntuacion));
     }
 }
