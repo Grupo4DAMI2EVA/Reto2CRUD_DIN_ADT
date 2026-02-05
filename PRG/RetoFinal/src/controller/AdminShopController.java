@@ -86,6 +86,10 @@ public class AdminShopController implements Initializable {
     @FXML
     private MenuItem menuHelp;
     @FXML
+    private MenuItem menuHelpManual;
+    @FXML
+    private MenuItem menuHelpReport;
+    @FXML
     private MenuBar menuBar;
     @FXML
     private Menu menu;
@@ -492,31 +496,162 @@ public class AdminShopController implements Initializable {
     }
 
     /**
-     * Opens the Help window, setting up the admin profile ahead of time.
+     * Abre el manual de usuario en formato PDF.
+     * Busca el archivo PDF en varias ubicaciones posibles y lo abre
+     * con el visor de PDF predeterminado del sistema.
      *
-     * @param event
+     * @param event Evento de acción del menú "Help"
      */
     @FXML
     private void helpWindow(ActionEvent event) {
-        logger.info("Help menu item clicked");
-
+        logger.info("Opening user manual PDF");
+        
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/HelpWindow.fxml"));
-            Parent root = fxmlLoader.load();
-            HelpWindowController hCont = fxmlLoader.getController();
-            hCont.setUsuario(profile);
-            Stage stage = new Stage();
-            stage.setTitle("Help Window");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(menuBar.getScene().getWindow());
-            stage.show();
-
-            logger.info("Help window opened successfully");
-
+            // Ruta relativa al PDF del manual
+            String pdfFileName = "Manual de Usuario - Tienda de Videojuegos.pdf";
+            String pdfPath = "pdf/" + pdfFileName;
+            
+            // Obtener la ruta absoluta del archivo
+            java.io.File pdfFile = new java.io.File(pdfPath);
+            
+            if (!pdfFile.exists()) {
+                logger.warning("User manual PDF not found at: " + pdfFile.getAbsolutePath());
+                
+                // Intentar buscar en diferentes ubicaciones comunes
+                String[] possiblePaths = {
+                    pdfPath,
+                    "src/pdf/" + pdfFileName,
+                    "resources/pdf/" + pdfFileName,
+                    "../pdf/" + pdfFileName,
+                    "./pdf/" + pdfFileName
+                };
+                
+                boolean found = false;
+                for (String path : possiblePaths) {
+                    pdfFile = new java.io.File(path);
+                    if (pdfFile.exists()) {
+                        found = true;
+                        logger.info("Found manual PDF at: " + pdfFile.getAbsolutePath());
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    showAlert("File Not Found", 
+                        "User manual PDF not found. Please ensure 'Manual de Usuario - Tienda de Videojuegos.pdf' exists in the 'pdf' folder.");
+                    return;
+                }
+            }
+            
+            // Abrir el PDF con el programa predeterminado del sistema
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+                    desktop.open(pdfFile);
+                    logger.info("Successfully opened user manual PDF: " + pdfFile.getName());
+                } else {
+                    throw new IOException("OPEN action not supported on this platform");
+                }
+            } else {
+                throw new IOException("Desktop not supported on this platform");
+            }
+            
         } catch (IOException ex) {
-            logger.severe("Error opening Help window: " + ex.getMessage());
-            Logger.getLogger(AdminShopController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.severe("Error opening user manual PDF: " + ex.getMessage());
+            
+            // Mostrar instrucciones alternativas
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Opening PDF");
+            alert.setHeaderText("Could not open user manual automatically");
+            alert.setContentText("Error: " + ex.getMessage() + 
+                               "\n\nPlease open the PDF manually from the 'pdf' folder:\n" +
+                               "1. Navigate to the 'pdf' folder in the application directory\n" +
+                               "2. Open 'Manual de Usuario - Tienda de Videojuegos.pdf'");
+            alert.showAndWait();
+        }
+    }
+
+    /**
+     * Abre el informe del proyecto en formato PDF.
+     * Busca el archivo PDF en varias ubicaciones posibles y lo abre
+     * con el visor de PDF predeterminado del sistema.
+     *
+     * @param event Evento de acción del menú "Help Report"
+     */
+    @FXML
+    private void reportPdf(ActionEvent event) {
+        logger.info("Opening project report PDF");
+        
+        try {
+            // Ruta relativa al PDF del informe
+            String pdfFileName = "Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf";
+            String pdfPath = "pdf/" + pdfFileName;
+            
+            // Obtener la ruta absoluta del archivo
+            java.io.File pdfFile = new java.io.File(pdfPath);
+            
+            if (!pdfFile.exists()) {
+                logger.warning("Project report PDF not found at: " + pdfFile.getAbsolutePath());
+                
+                // Intentar buscar en diferentes ubicaciones comunes
+                String[] possiblePaths = {
+                    pdfPath,
+                    "src/pdf/" + pdfFileName,
+                    "resources/pdf/" + pdfFileName,
+                    "../pdf/" + pdfFileName,
+                    "./pdf/" + pdfFileName
+                };
+                
+                boolean found = false;
+                for (String path : possiblePaths) {
+                    pdfFile = new java.io.File(path);
+                    if (pdfFile.exists()) {
+                        found = true;
+                        logger.info("Found report PDF at: " + pdfFile.getAbsolutePath());
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    showAlert("File Not Found", 
+                        "Project report PDF not found. Please ensure 'Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf' exists in the 'pdf' folder.");
+                    return;
+                }
+            }
+            
+            // Abrir el PDF con el programa predeterminado del sistema
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+                    desktop.open(pdfFile);
+                    logger.info("Successfully opened project report PDF: " + pdfFile.getName());
+                    
+                    // Mostrar confirmación
+                    Alert info = new Alert(Alert.AlertType.INFORMATION);
+                    info.setTitle("PDF Opened");
+                    info.setHeaderText("Project report opened successfully");
+                    info.setContentText("The project report PDF has been opened in your default PDF viewer.");
+                    info.showAndWait();
+                    
+                } else {
+                    throw new IOException("OPEN action not supported on this platform");
+                }
+            } else {
+                throw new IOException("Desktop not supported on this platform");
+            }
+            
+        } catch (IOException ex) {
+            logger.severe("Error opening project report PDF: " + ex.getMessage());
+            
+            // Mostrar instrucciones alternativas
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Opening PDF");
+            alert.setHeaderText("Could not open project report automatically");
+            alert.setContentText("Error: " + ex.getMessage() + 
+                               "\n\nPlease open the PDF manually from the 'pdf' folder:\n" +
+                               "1. Navigate to the 'pdf' folder in the application directory\n" +
+                               "2. Open 'Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf'");
+            alert.showAndWait();
         }
     }
 
