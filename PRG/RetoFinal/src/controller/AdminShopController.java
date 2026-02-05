@@ -160,6 +160,9 @@ public class AdminShopController implements Initializable {
             // Configurar las columnas de la tabla
             configureTableColumns();
 
+            // Configurar los ComboBoxes
+            configureComboBoxes();
+
             // Configurar listener para selección de fila
             tableViewGames.getSelectionModel().selectedItemProperty().addListener(
                     (observable, oldValue, newValue) -> getSelectedTableItem(newValue)
@@ -190,6 +193,26 @@ public class AdminShopController implements Initializable {
 
         } catch (Exception e) {
             logger.severe("Error configuring table columns: " + e.getMessage());
+        }
+    }
+
+    // AÑADIR: Método para configurar ComboBoxes
+    private void configureComboBoxes() {
+        logger.info("Configuring ComboBoxes");
+
+        try {
+            // Configurar ComboBox de géneros
+            comboBoxGenre.getItems().setAll(GameGenre.values());
+            comboBoxGenre.setValue(GameGenre.ALL);
+
+            // Configurar ComboBox de plataformas
+            comboBoxPlatform.getItems().setAll(Platform.values());
+            comboBoxPlatform.setValue(Platform.ALL);
+
+            logger.info("ComboBoxes configured successfully");
+
+        } catch (Exception e) {
+            logger.severe("Error configuring ComboBoxes: " + e.getMessage());
         }
     }
 
