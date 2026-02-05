@@ -41,23 +41,21 @@ public class ReviewController {
     private Controller cont;
 
     // Imágenes para las estrellas
-    private  Image estrellaLlena;
-    private  Image estrellaVacia ;
-    private  Image estrellaMedia ;
-    
-    
+    private Image estrellaLlena;
+    private Image estrellaVacia;
+    private Image estrellaMedia;
 
     private void initialize() {
         // Configurar el slider
-         try {
-        // Cargar imágenes en initialize() que se llama después de que FXML está listo
-       // estrellaLlena = new Image(getClass().getResourceAsStream("/images/star_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
-       // estrellaVacia = new Image(getClass().getResourceAsStream("/images/star_border_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
-       // estrellaMedia = new Image(getClass().getResourceAsStream("/images/star_half_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
-    } catch (Exception e) {
-      //  System.err.println("Error cargando imágenes: " + e.getMessage());
-    }
-        
+        try {
+            // Cargar imágenes en initialize() que se llama después de que FXML está listo
+            // estrellaLlena = new Image(getClass().getResourceAsStream("/images/star_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
+            // estrellaVacia = new Image(getClass().getResourceAsStream("/images/star_border_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
+            // estrellaMedia = new Image(getClass().getResourceAsStream("/images/star_half_32dp_FFC107_FILL0_wght400_GRAD0_opsz40.png"));
+        } catch (Exception e) {
+            //  System.err.println("Error cargando imágenes: " + e.getMessage());
+        }
+
         configurarSlider();
 
         // Configurar el TextArea con contador de caracteres
@@ -69,17 +67,13 @@ public class ReviewController {
         // Deshabilitar botón enviar si no hay comentario
         actualizarEstadoBotonEnviar();
     }
-    
+
     public void setUsuario(Profile profile) {
         this.profile = profile;
     }
 
     public void setCont(Controller cont) {
         this.cont = cont;
-    }
-
-    public Controller getCont() {
-        return cont;
     }
 
     private void configurarSlider() {
@@ -278,10 +272,6 @@ public class ReviewController {
 
     public void setUsuario(int idUsuario) {
         this.idUsuario = idUsuario;
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
     }
 
     // Método para cargar una review existente (para editar)

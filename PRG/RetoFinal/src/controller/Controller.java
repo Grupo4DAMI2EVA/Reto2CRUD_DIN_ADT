@@ -11,7 +11,7 @@ import model.*;
  */
 public class Controller {
 
-    ClassDAO dao = new DBImplementation();
+    private ClassDAO dao = new DBImplementation();
 
     /**
      * Attempts to log in a user or admin.

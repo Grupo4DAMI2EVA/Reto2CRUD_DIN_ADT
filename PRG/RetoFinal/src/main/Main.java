@@ -14,7 +14,6 @@ public class Main extends Application {
 
     private static void CreateTableHibernate() {
         try {
-
             SessionFactory sessionFactory = model.HibernateSession.getSessionFactory();
             Session session = sessionFactory.openSession();
             session.close();

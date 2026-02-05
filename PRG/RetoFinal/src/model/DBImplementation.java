@@ -650,7 +650,7 @@ public class DBImplementation implements ClassDAO {
             Long count = checkQuery.uniqueResult();
 
             if (count > 0) {
-                System.out.println("Username ya existe: " + username);
+                System.out.println("Admin ya existe: " + username);
                 return false;
             }
 

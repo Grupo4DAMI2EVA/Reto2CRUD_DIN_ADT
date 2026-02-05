@@ -29,7 +29,7 @@ public class SignUpWindowController implements Initializable {
     // Logger para esta clase
     private static final Logger logger = Logger.getLogger(ShopWindowController.class.getName());
     private static boolean loggerInitialized = false;
-    
+
     @FXML
     private TextField textFieldEmail, textFieldName, textFieldSurname, textFieldTelephone;
     @FXML
@@ -41,24 +41,24 @@ public class SignUpWindowController implements Initializable {
 
     private Controller cont;
     private ToggleGroup grupOp;
-    
+
     static {
         initializeLogger();
     }
-    
+
     private static synchronized void initializeLogger() {
         if (loggerInitialized) {
             return;
         }
-        
+
         try {
             java.io.File logsFolder = new java.io.File("logs");
             if (!logsFolder.exists()) {
                 logsFolder.mkdirs();
             }
-            
+
             FileHandler fileHandler = new FileHandler("logs/SignUpWindow.log", true);
-            
+
             fileHandler.setFormatter(new SimpleFormatter() {
                 @Override
                 public String format(LogRecord record) {
@@ -71,15 +71,15 @@ public class SignUpWindowController implements Initializable {
                     return "";
                 }
             });
-            
+
             fileHandler.setLevel(Level.INFO);
             logger.addHandler(fileHandler);
             logger.setLevel(Level.INFO);
             logger.setUseParentHandlers(false);
-            
+
             loggerInitialized = true;
             logger.info("AdminShopController logger initialized");
-            
+
         } catch (Exception e) {
             System.err.println("ERROR initializing logger: " + e.getMessage());
             loggerInitialized = true;
@@ -97,7 +97,7 @@ public class SignUpWindowController implements Initializable {
     @FXML
     private void login() {
         logger.info("Login button clicked - Navigating to login window");
-        
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/LogInWindow.fxml"));
             Parent root = fxmlLoader.load();
@@ -105,12 +105,12 @@ public class SignUpWindowController implements Initializable {
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.show();
-            
+
             Stage currentStage = (Stage) buttonLogIn.getScene().getWindow();
             currentStage.close();
-            
+
             logger.info("Successfully navigated to login window");
-            
+
         } catch (IOException ex) {
             logger.severe("Error navigating to login window: " + ex.getMessage());
             Logger.getLogger(SignUpWindowController.class.getName()).log(Level.SEVERE, null, ex);
@@ -123,7 +123,7 @@ public class SignUpWindowController implements Initializable {
     @FXML
     private void signup() throws passwordequalspassword {
         logger.info("SignUp button clicked - Starting user registration");
-        
+
         // Obtener datos del formulario
         String email = textFieldEmail.getText();
         String name = textFieldName.getText();
@@ -136,10 +136,10 @@ public class SignUpWindowController implements Initializable {
         String gender = null;
 
         // Registrar datos obtenidos (sin contraseñas por seguridad)
-        logger.info("Registration attempt - Username: " + username + 
-                   ", Email: " + email + ", Name: " + name + " " + surname);
-        logger.info("Gender selection - M: " + rButtonM.isSelected() + 
-                   ", W: " + rButtonW.isSelected() + ", O: " + rButtonO.isSelected());
+        logger.info("Registration attempt - Username: " + username
+                + ", Email: " + email + ", Name: " + name + " " + surname);
+        logger.info("Gender selection - M: " + rButtonM.isSelected()
+                + ", W: " + rButtonW.isSelected() + ", O: " + rButtonO.isSelected());
 
         // Determinar género seleccionado
         if (rButtonM.isSelected()) {
@@ -161,21 +161,21 @@ public class SignUpWindowController implements Initializable {
             logger.warning("Password1: [PROTECTED], Password2: [PROTECTED]");
             throw new passwordequalspassword("No son iguales las contraseñas");
         }
-        
+
         logger.info("Password validation successful");
 
         // Intentar registro
         logger.info("Attempting to sign up user: " + username);
         if (cont.signUp(gender, cardN, username, pass, email, name, telephone, surname)) {
             logger.info("SignUp successful for user: " + username);
-            
+
             // Intentar login automático
             logger.info("Attempting auto-login for new user: " + username);
             Profile profile = cont.logIn(username, pass);
-            
+
             if (profile != null) {
                 logger.info("Auto-login successful for user: " + username + " (ID: " + profile.getUserCode() + ")");
-                
+
                 try {
                     // Navegar a la ventana principal
                     logger.info("Navigating to MenuWindow for new user: " + username);
@@ -184,16 +184,16 @@ public class SignUpWindowController implements Initializable {
                     controller.MenuWindowController controllerWindow = fxmlLoader.getController();
                     controllerWindow.setUsuario(profile);
                     controllerWindow.setCont(this.cont);
-                    
+
                     Stage stage = new Stage();
                     stage.setScene(new Scene(root));
                     stage.show();
-                    
+
                     Stage currentStage = (Stage) buttonSignUp.getScene().getWindow();
                     currentStage.close();
-                    
+
                     logger.info("Successfully navigated to MenuWindow for new user: " + username);
-                    
+
                 } catch (IOException ex) {
                     logger.severe("Error navigating to MenuWindow after signup: " + ex.getMessage());
                     Logger.getLogger(SignUpWindowController.class.getName()).log(Level.SEVERE, null, ex);
@@ -209,15 +209,15 @@ public class SignUpWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         logger.info("Initializing SignUpWindowController");
-        
+
         try {
             grupOp = new ToggleGroup();
             rButtonM.setToggleGroup(grupOp);
             rButtonW.setToggleGroup(grupOp);
             rButtonO.setToggleGroup(grupOp);
-            
+
             logger.info("SignUpWindowController initialized successfully - ToggleGroup configured");
-            
+
         } catch (Exception e) {
             logger.severe("Error initializing SignUpWindowController: " + e.getMessage());
         }
