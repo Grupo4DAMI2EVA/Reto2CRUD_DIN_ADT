@@ -16,11 +16,20 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import model.*;
 
+/**
+ * Controller class for the Modify Game Admin window. Manages the administrative interface
+ * that allows administrators to edit existing videogames in the store catalog.
+ * Handles form pre-population, validation, data collection, and database update operations.
+ *
+ * @author deorbe
+ * @version 1.0
+ */
 public class ModifyGameAdminController implements Initializable {
 
     private static final Logger logger = Logger.getLogger(ShopWindowController.class.getName());
     private static boolean loggerInitialized = false;
     
+    // FXML UI Components
     @FXML
     private TextField textFieldName;
     @FXML
@@ -48,6 +57,10 @@ public class ModifyGameAdminController implements Initializable {
         initializeLogger();
     }
     
+    /**
+     * Initializes the logging system in a synchronized manner to prevent
+     * multiple initializations in multi-threaded environments.
+     */
     private static synchronized void initializeLogger() {
         if (loggerInitialized) {
             return;
@@ -88,16 +101,31 @@ public class ModifyGameAdminController implements Initializable {
         }
     }
 
+    /**
+     * Sets the Controller instance for database operations.
+     *
+     * @param cont The Controller instance for database access
+     */
     public void setCont(Controller cont) {
         logger.info("Setting controller in ModifyGameAdminController");
         this.cont = cont;
     }
 
+    /**
+     * Sets the reference to AdminShopController for table refresh operations.
+     *
+     * @param adminShopController The AdminShopController instance
+     */
     public void setAdminShopController(AdminShopController adminShopController) {
         logger.info("Setting AdminShopController reference");
         this.adminShopController = adminShopController;
     }
 
+    /**
+     * Sets the videogame to be modified and loads its data into the form.
+     *
+     * @param videogame The Videogame object to be modified
+     */
     public void setVideogame(Videogame videogame) {
         logger.info("Setting videogame to modify: " + 
                    (videogame != null ? videogame.getName() + " (ID: " + videogame.getIdVideogame() + ")" : "null"));
@@ -105,6 +133,11 @@ public class ModifyGameAdminController implements Initializable {
         loadGameData();
     }
 
+    /**
+     * Loads the current videogame data into all form fields.
+     * Pre-populates text fields, ComboBoxes, Spinners, and DatePicker
+     * with the existing game information for editing.
+     */
     private void loadGameData() {
         logger.info("Loading game data into form");
         
@@ -149,6 +182,13 @@ public class ModifyGameAdminController implements Initializable {
         }
     }
 
+    /**
+     * Handles the modify game button click event. Validates form data,
+     * updates the videogame object with new values, and saves changes to the database.
+     * Shows success/error messages and refreshes the AdminShopController table.
+     *
+     * @param event The MouseEvent triggered by clicking the modify game button
+     */
     @FXML
     private void modifyGame(MouseEvent event) {
         logger.info("Modify Game button clicked");
@@ -250,6 +290,13 @@ public class ModifyGameAdminController implements Initializable {
         }
     }
 
+    /**
+     * Initialization method called automatically by JavaFX after loading the FXML file.
+     * Sets up ComboBoxes with enum values and configures Spinners with appropriate ranges.
+     *
+     * @param url Location used to resolve relative paths for the root object
+     * @param rb Resources used to localize the root object
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         logger.info("Initializing ModifyGameAdminController");

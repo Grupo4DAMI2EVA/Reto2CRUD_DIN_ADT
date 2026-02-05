@@ -15,11 +15,20 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import model.*;
 
+/**
+ * Controller class for the Add Games Admin window. Manages the administrative interface
+ * that allows administrators to add new videogames to the store catalog.
+ * Handles form validation, data collection, and database operations for game creation.
+ *
+ * @author deorbe
+ * @version 1.0
+ */
 public class AddGamesAdminController implements Initializable {
 
     private static final Logger logger = Logger.getLogger(ShopWindowController.class.getName());
     private static boolean loggerInitialized = false;
     
+    // FXML UI Components
     @FXML
     private TextField textFieldName;
     @FXML
@@ -41,10 +50,19 @@ public class AddGamesAdminController implements Initializable {
     private Controller cont;
     private AdminShopController adminShopController;
     
+    /**
+     * Static block to initialize the logging system for AddGamesAdminController.
+     * Creates the logs directory if it does not exist and configures the FileHandler.
+     */
     static {
         initializeLogger();
     }
     
+    /**
+     * Initializes the logger system for this controller.
+     * Creates log directory and configures file handler with custom formatter
+     * that logs INFO, SEVERE and WARNING level messages.
+     */
     private static synchronized void initializeLogger() {
         if (loggerInitialized) {
             return;
@@ -85,17 +103,33 @@ public class AddGamesAdminController implements Initializable {
         }
     }
 
-    // Set controller instance
+    /**
+     * Sets the Controller instance for database operations.
+     *
+     * @param cont The Controller instance for database access
+     */
     public void setCont(Controller cont) {
         logger.info("Setting controller in AddGamesAdminController");
         this.cont = cont;
     }
 
+    /**
+     * Sets the reference to AdminShopController for table refresh operations.
+     *
+     * @param adminShopController The AdminShopController instance
+     */
     public void setAdminShopController(AdminShopController adminShopController) {
         logger.info("Setting AdminShopController reference");
         this.adminShopController = adminShopController;
     }
 
+    /**
+     * Handles the add game button click event. Collects form data, validates input,
+     * and attempts to add a new game to the database. Shows success/error messages
+     * and optionally allows adding more games.
+     *
+     * @param event The MouseEvent triggered by clicking the add game button
+     */
     @FXML
     private void addGame(MouseEvent event) {
         logger.info("Add Game button clicked");
@@ -232,6 +266,10 @@ public class AddGamesAdminController implements Initializable {
         }
     }
     
+    /**
+     * Sets up all ComboBox components and Spinners with their respective values.
+     * Populates ComboBoxes with enum values and configures Spinner ranges and editors.
+     */
     private void setupCBoxes() {
         logger.info("Setting up combo boxes and spinners");
         
@@ -259,6 +297,13 @@ public class AddGamesAdminController implements Initializable {
         }
     }
 
+    /**
+     * Initialization method called automatically by JavaFX after loading the FXML file.
+     * Sets up ComboBoxes, Spinners, and initializes the release date to current date.
+     *
+     * @param url Location used to resolve relative paths for the root object
+     * @param rb Resources used to localize the root object
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         logger.info("Initializing AddGamesAdminController");

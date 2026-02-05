@@ -15,25 +15,23 @@ import javafx.stage.*;
 import model.*;
 
 /**
- * Controller class for the Admin window.
+ * Controller class for the Admin Shop window. Manages the administrative interface
+ * where administrators can view, search, add, modify and delete video games from the store.
+ * Provides comprehensive game management functionality with filtering capabilities.
  *
- * @author Jagoba
+ * @author deorbe
+ * @version 1.0
  */
 public class AdminShopController implements Initializable {
 
     private static final Logger logger = Logger.getLogger(ShopWindowController.class.getName());
     private static boolean loggerInitialized = false;
 
+    // FXML UI Components
     @FXML
     private Label labelWelcome;
-    /**
-     * Label to display the balance of the admin.
-     */
     @FXML
     private Label labelBalance;
-    /**
-     * Table containing all games (and displaying them).
-     */
     @FXML
     private TableView<Videogame> tableViewGames;
     @FXML
@@ -52,27 +50,15 @@ public class AdminShopController implements Initializable {
     private TableColumn<Videogame, String> colCompanyName;
     @FXML
     private TableColumn<Videogame, LocalDate> colReleaseDate;
-    /**
-     * Text field used to for filtering games by name.
-     */
     @FXML
     private TextField textFieldSearch;
-    /**
-     * Text field used for filtering games by genre.
-     */
     @FXML
     private ComboBox<GameGenre> comboBoxGenre;
 
-    /**
-     * Text field used for filtering games by platform.
-     */
     @FXML
     private ComboBox<Platform> comboBoxPlatform;
     @FXML
     private Button buttonSearch;
-    /**
-     * Label displaying some information about a videogame selected by the admin.
-     */
     @FXML
     private Label labelGameInfo;
     @FXML
@@ -96,22 +82,20 @@ public class AdminShopController implements Initializable {
     private ObservableList<Videogame> gamesList;
 
     /**
-     * The admin profile.
+     * State variables.
      */
     private Profile profile;
-    /**
-     * The controller used for calling database methods.
-     */
     private Controller cont;
-    /**
-     * The currently selected videogame from the table.
-     */
     private Videogame selected;
 
     static {
         initializeLogger();
     }
 
+    /**
+     * Initializes the logging system in a synchronized manner to prevent
+     * multiple initializations in multi-threaded environments.
+     */
     private static synchronized void initializeLogger() {
         if (loggerInitialized) {
             return;
@@ -152,6 +136,14 @@ public class AdminShopController implements Initializable {
         }
     }
 
+    /**
+     * Initialization method called automatically by JavaFX after loading the FXML file.
+     * Configures the table columns, sets up ComboBoxes with enum values, initializes
+     * the games list, and sets up selection listeners for the table.
+     *
+     * @param url Location used to resolve relative paths for the root object
+     * @param rb Resources used to localize the root object
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         logger.info("Initializing AdminShopController");
@@ -179,7 +171,10 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    // AÑADIR: Método para configurar columnas
+    /**
+     * Configures all table columns with appropriate cell value factories.
+     * Sets up PropertyValueFactory for each column to display videogame properties.
+     */
     private void configureTableColumns() {
         logger.info("Configuring table columns");
 
@@ -200,7 +195,10 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    // AÑADIR: Método para configurar ComboBoxes
+    /**
+     * Configures the ComboBox components for genre and platform filtering.
+     * Populates them with all available enum values and sets default values to ALL.
+     */
     private void configureComboBoxes() {
         logger.info("Configuring ComboBoxes");
 
@@ -220,7 +218,12 @@ public class AdminShopController implements Initializable {
         }
     }
 
-    // AÑADIR: Método para manejar selección de items
+    /**
+     * Handles table row selection events. Updates the selected game reference
+     * and displays game information in the info label.
+     *
+     * @param newValue The newly selected videogame from the table, or null if selection is cleared
+     */
     private void getSelectedTableItem(Videogame newValue) {
         selected = newValue;
         if (selected != null) {
@@ -245,12 +248,19 @@ public class AdminShopController implements Initializable {
         logger.info("Welcome message set for admin: " + profile.getUsername());
     }
 
-    // AÑADIR: Este método falta y es llamado desde ModifyGameAdminController
+    /**
+     * Reloads the games list from the database. Called externally by other controllers
+     * (like ModifyGameAdminController) to refresh the table after game modifications.
+     */
     public void reloadGames() {
         logger.info("Reloading games list (called from external controller)");
         loadAllGames();
     }
 
+    /**
+     * Loads all games from the database and updates the observable list.
+     * This method refreshes the table with the complete catalog of games.
+     */
     private void loadAllGames() {
         gamesList.setAll(cont.getAllGames());
     }
@@ -267,7 +277,10 @@ public class AdminShopController implements Initializable {
     }
 
     /**
-     * Used for two things: If any filters are applied, it calls the Search method, otherwise it calls the method to reload the game list.
+     * Refreshes the games list based on current filter settings.
+     * If filters are applied (name, genre, or platform), performs a filtered search.
+     * Otherwise, loads all games. This method intelligently determines whether
+     * to apply filters or show all games based on current UI state.
      */
     private void refreshGamesList() {
         logger.info("Refreshing games list");
@@ -298,9 +311,10 @@ public class AdminShopController implements Initializable {
     }
 
     /**
-     * Opens the Add Game window, setting up the controller ahead of time.
+     * Opens the Add Game window for administrators to add new videogames to the store.
+     * Sets up the AddGamesAdminController with necessary dependencies before showing the window.
      *
-     * @param event
+     * @param event The ActionEvent triggered by the add game button
      */
     @FXML
     private void addGame(ActionEvent event) {
@@ -330,9 +344,11 @@ public class AdminShopController implements Initializable {
     }
 
     /**
-     * Calls for the method to modify the selected game.
+     * Opens the Modify Game window for editing the currently selected game.
+     * Validates that a game is selected before opening the modification window.
+     * Sets up the ModifyGameAdminController with the selected game data.
      *
-     * @param event
+     * @param event The ActionEvent triggered by the modify game button
      */
     @FXML
     private void modifyGame(ActionEvent event) {
@@ -383,9 +399,11 @@ public class AdminShopController implements Initializable {
     }
 
     /**
-     * Calls for the method to delete the selected game.
+     * Deletes the currently selected game from the store after confirmation.
+     * Validates selection, shows confirmation dialog, and removes the game from
+     * the database if the administrator confirms the action.
      *
-     * @param event
+     * @param event The ActionEvent triggered by the delete game button
      */
     @FXML
     private void deleteGame(ActionEvent event) {
@@ -448,9 +466,11 @@ public class AdminShopController implements Initializable {
     }
 
     /**
-     * Searches for videogames by calling a method, which uses the provided filters.
+     * Performs a filtered search for videogames based on current filter criteria.
+     * Uses text search, genre filter, and platform filter to find matching games.
+     * Updates the games list with search results.
      *
-     * @param event the action event triggered by the search button
+     * @param event The ActionEvent triggered by the search button
      */
     @FXML
     private void search(ActionEvent event) {
@@ -480,6 +500,12 @@ public class AdminShopController implements Initializable {
         }
     }
 
+    /**
+     * Displays a warning alert dialog with the specified title and message.
+     *
+     * @param title The title of the alert dialog
+     * @param message The message content to display
+     */
     private void showAlert(String title, String message) {
         try {
             logger.info("Showing alert: " + title + " - " + message);
@@ -656,9 +682,10 @@ public class AdminShopController implements Initializable {
     }
 
     /**
-     * Closes the curret window and opens the menu window.
+     * Closes the current admin shop window and returns to the main menu window.
+     * Sets up the MenuWindowController with the admin profile and controller reference.
      *
-     * @param event
+     * @param event The ActionEvent triggered by the exit button
      */
     @FXML
     private void exit(ActionEvent event) {
