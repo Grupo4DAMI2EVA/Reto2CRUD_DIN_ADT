@@ -12,6 +12,12 @@ import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import javafx.event.ActionEvent;
 
+/**
+ * Controller class for managing video game reviews.
+ * Handles user interface interactions for creating and submitting reviews.
+ * 
+ * @author [Your Name]
+ */
 public class ReviewController {
 
     private static final Logger logger = Logger.getLogger(ReviewController.class.getName());
@@ -48,8 +54,8 @@ public class ReviewController {
     }
 
     /**
-     * Inicializa el sistema de logging de manera sincronizada para evitar
-     * múltiples inicializaciones en entornos multi-hilo.
+     * Initializes the logger system.
+     * Creates log directory and configures file handler with custom formatter.
      */
     private static synchronized void initializeLogger() {
         if (loggerInitialized) {
@@ -91,18 +97,22 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Initializes the controller after FXML loading.
+     * Configures UI components and sets up event listeners.
+     */
     @FXML
     private void initialize() {
         logger.info("Initializing ReviewController");
         
         try {
-            // Configurar el slider
+            
             configurarSlider();
 
-            // Deshabilitar botón enviar inicialmente
+            
             actualizarEstadoBotonEnviar();
 
-            // Configurar listener para habilitar botón cuando haya texto
+            
             textAreaComentario.textProperty().addListener((observable, oldValue, newValue) -> {
                 actualizarEstadoBotonEnviar();
             });
@@ -114,6 +124,11 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Sets the user profile for the review.
+     *
+     * @param profile The user profile to set
+     */
     public void setUsuario(Profile profile) {
         logger.info("Setting user profile in ReviewController: " + 
                    (profile != null ? profile.getUsername() + " (ID: " + profile.getUserCode() + ")" : "null"));
@@ -123,16 +138,30 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Sets the main controller reference.
+     *
+     * @param cont The main controller to set
+     */
     public void setCont(Controller cont) {
         logger.info("Setting controller in ReviewController");
         this.cont = cont;
     }
 
+    /**
+     * Gets the main controller reference.
+     *
+     * @return The main controller
+     */
     public Controller getCont() {
         return cont;
     }
 
-    // Método para establecer el videojuego completo
+    /**
+     * Sets the complete videogame object for review.
+     *
+     * @param videojuego The complete videogame object
+     */
     public void setVideojuegoCompleto(Videogame videojuego) {
         logger.info("Setting complete game in ReviewController: " + 
                    (videojuego != null ? videojuego.getName() + " (ID: " + videojuego.getIdVideogame() + ")" : "null"));
@@ -144,7 +173,12 @@ public class ReviewController {
         }
     }
 
-    // Método original para compatibilidad
+    /**
+     * Sets the videogame information for review (compatibility method).
+     *
+     * @param nombre The videogame name
+     * @param idVideojuego The videogame ID
+     */
     public void setVideojuego(String nombre, int idVideojuego) {
         logger.info("Setting game (compatibility method) in ReviewController: " + nombre + " (ID: " + idVideojuego + ")");
         this.nombreVideojuego = nombre;
@@ -154,11 +188,14 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Configures the rating slider properties and behavior.
+     */
     private void configurarSlider() {
         logger.info("Configuring rating slider");
         
         try {
-            // Configurar propiedades del slider
+            
             sliderPuntuacion.setMin(0);
             sliderPuntuacion.setMax(5);
             sliderPuntuacion.setValue(2.5);
@@ -169,7 +206,7 @@ public class ReviewController {
             sliderPuntuacion.setShowTickMarks(true);
             sliderPuntuacion.setSnapToTicks(true);
 
-            // Actualizar label cuando cambia el slider
+            
             sliderPuntuacion.valueProperty().addListener((observable, oldValue, newValue) -> {
                 double valor = Math.round(newValue.doubleValue() * 2) / 2.0;
                 labelPuntuacion.setText(String.format("%.1f/5.0", valor));
@@ -182,9 +219,12 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Updates the state of the send button based on comment validity.
+     */
     private void actualizarEstadoBotonEnviar() {
         try {
-            // Habilitar botón solo si hay comentario (al menos 10 caracteres)
+            
             String comentario = textAreaComentario.getText().trim();
             boolean tieneComentarioValido = comentario.length() >= 10;
             buttonEnviar.setDisable(!tieneComentarioValido);
@@ -197,23 +237,27 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Handles the send review button action.
+     * Validates data, shows confirmation dialog, and saves review to database.
+     */
     @FXML
     private void enviarReview() {
         logger.info("Send review button clicked");
         
-        // Validar datos
+        
         if (!validarReview()) {
             return;
         }
 
-        // Obtener datos del review
+        
         double puntuacion = Math.round(sliderPuntuacion.getValue() * 2) / 2.0;
         String comentario = textAreaComentario.getText().trim();
 
         logger.info("Review data prepared - Rating: " + puntuacion + 
                    ", Comment length: " + comentario.length());
 
-        // Confirmar envío
+        
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
         confirmacion.setTitle("Confirmar Envío");
         confirmacion.setHeaderText("¿Enviar valoración?");
@@ -227,20 +271,20 @@ public class ReviewController {
             if (response == buttonTypeSi) {
                 logger.info("User confirmed review submission");
                 
-                // Guardar en la base de datos
+                
                 boolean exito = guardarReviewEnBD(puntuacion, comentario);
 
                 if (exito) {
                     logger.info("Review saved successfully");
                     
-                    // Mostrar confirmación
+                    
                     Alert exitoAlert = new Alert(Alert.AlertType.INFORMATION);
                     exitoAlert.setTitle("Valoración Enviada");
                     exitoAlert.setHeaderText("¡Gracias por tu valoración!");
                     exitoAlert.setContentText("Tu reseña ha sido publicada correctamente.");
                     exitoAlert.showAndWait();
 
-                    // Cerrar ventana
+                    
                     cerrarVentana();
                     
                 } else {
@@ -252,17 +296,22 @@ public class ReviewController {
         });
     }
 
+    /**
+     * Validates the review data before submission.
+     *
+     * @return true if review is valid, false otherwise
+     */
     private boolean validarReview() {
         logger.info("Validating review");
         
-        // Validar que el comentario no esté vacío
+        
         if (textAreaComentario.getText().trim().isEmpty()) {
             logger.warning("Validation failed: Empty comment");
             mostrarAlerta("Error", "Por favor, escribe un comentario antes de enviar.");
             return false;
         }
 
-        // Validar que el comentario tenga longitud mínima
+        
         if (textAreaComentario.getText().trim().length() < 10) {
             logger.warning("Validation failed: Comment too short - " + 
                           textAreaComentario.getText().trim().length() + " characters");
@@ -270,7 +319,7 @@ public class ReviewController {
             return false;
         }
 
-        // Validar puntuación
+        
         double puntuacion = sliderPuntuacion.getValue();
         if (puntuacion < 0 || puntuacion > 5) {
             logger.warning("Validation failed: Invalid rating - " + puntuacion);
@@ -278,14 +327,14 @@ public class ReviewController {
             return false;
         }
 
-        // Validar que se tenga el videojuego
+        
         if (videojuegoCompleto == null) {
             logger.warning("Validation failed: No game selected");
             mostrarAlerta("Error", "No se ha seleccionado un videojuego.");
             return false;
         }
 
-        // Validar que se tenga el usuario
+        
         if (profile == null) {
             logger.warning("Validation failed: No user profile");
             mostrarAlerta("Error", "No se ha identificado al usuario.");
@@ -296,12 +345,19 @@ public class ReviewController {
         return true;
     }
 
+    /**
+     * Saves the review to the database.
+     *
+     * @param puntuacion The rating score
+     * @param comentario The review comment
+     * @return true if save was successful, false otherwise
+     */
     private boolean guardarReviewEnBD(double puntuacion, String comentario) {
         logger.info("Saving review to database - Rating: " + puntuacion + 
                    ", Comment length: " + comentario.length());
         
         try {
-            // Verificar que tenemos todos los datos necesarios
+            
             if (profile == null || cont == null || videojuegoCompleto == null) {
                 logger.severe("Cannot save review: Incomplete data - Profile: " + 
                              (profile != null) + ", Controller: " + (cont != null) + 
@@ -312,7 +368,7 @@ public class ReviewController {
 
             logger.info("Getting complete user from database: " + profile.getUsername());
             
-            // Obtener el usuario completo de la base de datos
+            
             User usuario = cont.getUserByUsername(profile.getUsername());
             if (usuario == null) {
                 logger.severe("User not found in database: " + profile.getUsername());
@@ -322,7 +378,7 @@ public class ReviewController {
 
             logger.info("User retrieved - ID: " + usuario.getUserCode());
             
-            // Verificar si el usuario ya ha reseñado este videojuego
+            
             logger.info("Checking for existing review - User ID: " + usuario.getUserCode() + 
                        ", Game ID: " + videojuegoCompleto.getIdVideogame());
             
@@ -334,7 +390,7 @@ public class ReviewController {
 
             logger.info("No duplicate review found - Creating new review");
             
-            // Crear y guardar la reseña
+            
             Review review = new Review(usuario, videojuegoCompleto, puntuacion, comentario);
             boolean resultado = cont.createReview(review);
 
@@ -359,11 +415,15 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Handles the cancel button action.
+     * Shows confirmation dialog if there is unsaved data.
+     */
     @FXML
     private void cancelar() {
         logger.info("Cancel button clicked");
         
-        // Preguntar confirmación si hay texto escrito
+        
         if (!textAreaComentario.getText().trim().isEmpty()) {
             logger.info("Unsaved review exists - Asking for confirmation");
             
@@ -390,6 +450,9 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Closes the review window.
+     */
     private void cerrarVentana() {
         logger.info("Closing review window");
         
@@ -404,6 +467,12 @@ public class ReviewController {
         }
     }
 
+    /**
+     * Shows an alert dialog with the specified title and message.
+     *
+     * @param titulo The alert title
+     * @param mensaje The alert message
+     */
     private void mostrarAlerta(String titulo, String mensaje) {
         logger.info("Showing alert - Title: " + titulo + ", Message: " + mensaje);
         
@@ -418,7 +487,12 @@ public class ReviewController {
         }
     }
 
-    // Método para cargar una review existente (para editar)
+    /**
+     * Loads an existing review for editing.
+     *
+     * @param puntuacion The existing rating score
+     * @param comentario The existing review comment
+     */
     public void cargarReviewExistente(double puntuacion, String comentario) {
         logger.info("Loading existing review - Rating: " + puntuacion + 
                    ", Comment length: " + (comentario != null ? comentario.length() : 0));
@@ -436,28 +510,27 @@ public class ReviewController {
     }
     
     /**
-     * Abre el manual de usuario en formato PDF. Busca el archivo PDF en varias
-     * ubicaciones posibles y lo abre con el visor de PDF predeterminado del
-     * sistema.
+     * Opens the user manual PDF file.
+     * Searches for the PDF in multiple possible locations and opens it with the system's default PDF viewer.
      *
-     * @param event Evento de acción del menú "Help Manual"
+     * @param event The action event from the "Help Manual" menu
      */
     @FXML
     private void manualPdf(ActionEvent event) {
         logger.info("Opening user manual PDF");
 
         try {
-            // Ruta relativa al PDF del manual
+            
             String pdfFileName = "Manual de Usuario - Tienda de Videojuegos.pdf";
             String pdfPath = "pdf/" + pdfFileName;
 
-            // Obtener la ruta absoluta del archivo
+            
             java.io.File pdfFile = new java.io.File(pdfPath);
 
             if (!pdfFile.exists()) {
                 logger.warning("User manual PDF not found at: " + pdfFile.getAbsolutePath());
 
-                // Intentar buscar en diferentes ubicaciones comunes
+                
                 String[] possiblePaths = {
                     pdfPath,
                     "src/pdf/" + pdfFileName,
@@ -483,7 +556,7 @@ public class ReviewController {
                 }
             }
 
-            // Abrir el PDF con el programa predeterminado del sistema
+            
             if (java.awt.Desktop.isDesktopSupported()) {
                 java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                 if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
@@ -499,7 +572,7 @@ public class ReviewController {
         } catch (IOException ex) {
             logger.severe("Error opening user manual PDF: " + ex.getMessage());
 
-            // Mostrar instrucciones alternativas
+            
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error Opening PDF");
             alert.setHeaderText("Could not open user manual automatically");
@@ -512,28 +585,27 @@ public class ReviewController {
     }
 
     /**
-     * Abre el informe del proyecto en formato PDF. Busca el archivo PDF en
-     * varias ubicaciones posibles y lo abre con el visor de PDF predeterminado
-     * del sistema.
+     * Opens the project report PDF file.
+     * Searches for the PDF in multiple possible locations and opens it with the system's default PDF viewer.
      *
-     * @param event Evento de acción del menú "Help Report"
+     * @param event The action event from the "Help Report" menu
      */
     @FXML
     private void reportPdf(ActionEvent event) {
         logger.info("Opening project report PDF");
 
         try {
-            // Ruta relativa al PDF del informe
+            
             String pdfFileName = "Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf";
             String pdfPath = "pdf/" + pdfFileName;
 
-            // Obtener la ruta absoluta del archivo
+            
             java.io.File pdfFile = new java.io.File(pdfPath);
 
             if (!pdfFile.exists()) {
                 logger.warning("Project report PDF not found at: " + pdfFile.getAbsolutePath());
 
-                // Intentar buscar en diferentes ubicaciones comunes
+                
                 String[] possiblePaths = {
                     pdfPath,
                     "src/pdf/" + pdfFileName,
@@ -559,14 +631,14 @@ public class ReviewController {
                 }
             }
 
-            // Abrir el PDF con el programa predeterminado del sistema
+            
             if (java.awt.Desktop.isDesktopSupported()) {
                 java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                 if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
                     desktop.open(pdfFile);
                     logger.info("Successfully opened project report PDF: " + pdfFile.getName());
 
-                    // Mostrar confirmación
+                    
                     Alert info = new Alert(Alert.AlertType.INFORMATION);
                     info.setTitle("PDF Opened");
                     info.setHeaderText("Project report opened successfully");
@@ -583,7 +655,7 @@ public class ReviewController {
         } catch (IOException ex) {
             logger.severe("Error opening project report PDF: " + ex.getMessage());
 
-            // Mostrar instrucciones alternativas
+            
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error Opening PDF");
             alert.setHeaderText("Could not open project report automatically");
@@ -596,10 +668,10 @@ public class ReviewController {
     }
     
     /**
-     * Muestra una ventana de alerta con el título y mensaje especificados.
+     * Shows an alert dialog with the specified title and message.
      *
-     * @param title Título de la alerta
-     * @param message Mensaje a mostrar en la alerta
+     * @param title The alert title
+     * @param message The alert message
      */
     private void showAlert(String title, String message) {
         try {
