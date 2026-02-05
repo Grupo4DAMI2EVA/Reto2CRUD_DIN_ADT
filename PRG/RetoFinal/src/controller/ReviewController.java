@@ -16,7 +16,7 @@ import javafx.event.ActionEvent;
  * Controller class for managing video game reviews.
  * Handles user interface interactions for creating and submitting reviews.
  * 
- * @author [Your Name]
+ * @author Victor
  */
 public class ReviewController {
 
