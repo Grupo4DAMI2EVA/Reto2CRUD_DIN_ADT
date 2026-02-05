@@ -15,6 +15,12 @@ import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import javafx.event.ActionEvent;
 
+/**
+ * Controller class for managing the shopping cart functionality.
+ * Handles adding, removing, and modifying items in the cart, as well as processing purchases.
+ * 
+ * @author Victor
+ */
 public class CartController {
 
     private static final Logger logger = Logger.getLogger(ShopWindowController.class.getName());
@@ -63,8 +69,8 @@ public class CartController {
     }
 
     /**
-     * Inicializa el sistema de logging de manera sincronizada para evitar
-     * múltiples inicializaciones en entornos multi-hilo.
+     * Initializes the logger system.
+     * Creates log directory and configures file handler with custom formatter.
      */
     private static synchronized void initializeLogger() {
         if (loggerInitialized) {
@@ -106,18 +112,22 @@ public class CartController {
         }
     }
 
+    /**
+     * Initializes the controller after FXML loading.
+     * Sets up the observable lists and configures selection listeners.
+     */
     @FXML
     private void initialize() {
         logger.info("Initializing CartController");
         
         try {
-            // Inicializar las listas en initialize() que se llama automáticamente
+            
             carritoData = FXCollections.observableArrayList();
             itemsCarrito = FXCollections.observableArrayList();
             juegosCarrito = FXCollections.observableArrayList();
             listViewCarrito.setItems(carritoData);
 
-            // Configurar listener para selección
+            
             listViewCarrito.getSelectionModel().selectedItemProperty().addListener(
                     (observable, oldValue, newValue) -> mostrarDetalleItem(newValue));
             
@@ -131,11 +141,15 @@ public class CartController {
         }
     }
     
+    /**
+     * Performs additional setup after initialization.
+     * Updates button states and performs final configuration.
+     */
     public void setup() {
         logger.info("CartController setup called");
         
         try {
-            // Si necesitas hacer algo adicional después de initialize()
+            
             actualizarEstadoBotones();
             
             logger.info("CartController setup completed successfully");
@@ -145,12 +159,22 @@ public class CartController {
         }
     }
     
+    /**
+     * Sets the user profile for the cart.
+     *
+     * @param profile The user profile to set
+     */
     public void setUsuario(Profile profile) {
         logger.info("Setting user profile in CartController: " + 
                    (profile != null ? profile.getUsername() + " (ID: " + profile.getUserCode() + ")" : "null"));
         this.profile = profile;
     }
     
+    /**
+     * Sets the main controller reference and loads all games.
+     *
+     * @param cont The main controller to set
+     */
     public void setCont(Controller cont) {
         logger.info("Setting controller in CartController");
         this.cont = cont;
@@ -161,7 +185,14 @@ public class CartController {
         }
     }
     
-    // Método para agregar items al carrito
+    /**
+     * Adds an item to the shopping cart.
+     *
+     * @param usuario The username
+     * @param videojuego The videogame object
+     * @param cantidad The quantity to add
+     * @param precio The price per unit
+     */
     public void agregarItemCarrito(String usuario, Videogame videojuego, int cantidad, double precio) {
         logger.info("Adding item to cart - User: " + usuario + 
                    ", Game: " + videojuego.getName() + 
@@ -170,11 +201,11 @@ public class CartController {
                    ", Price: $" + precio);
         
         try {
-            // Verificar si el juego ya está en el carrito
+            
             for (int i = 0; i < itemsCarrito.size(); i++) {
                 CartItem item = itemsCarrito.get(i);
                 if (item.getIdVideojuego() == videojuego.getIdVideogame()) {
-                    // Si ya existe, actualizar cantidad
+                    
                     int nuevaCantidad = item.getCantidad() + cantidad;
                     item.setCantidad(nuevaCantidad);
                     
@@ -182,7 +213,7 @@ public class CartController {
                                item.getCantidad() + " to " + nuevaCantidad + 
                                " for game: " + videojuego.getName());
                     
-                    // Actualizar la vista
+                    
                     String itemActualizado = String.format("Usuario: %s | Videojuego: %s | Cantidad: %d | Precio: $%.2f",
                             usuario, videojuego.getName(), nuevaCantidad, precio);
                     carritoData.set(i, itemActualizado);
@@ -192,7 +223,7 @@ public class CartController {
                 }
             }
             
-            // Si no existe, agregar nuevo item
+            
             String item = String.format("Usuario: %s | Videojuego: %s | Cantidad: %d | Precio: $%.2f",
                     usuario, videojuego.getName(), cantidad, precio);
             carritoData.add(item);
@@ -216,7 +247,14 @@ public class CartController {
         }
     }
     
-    // Método de compatibilidad
+    /**
+     * Adds an item to the shopping cart (compatibility method).
+     *
+     * @param usuario The username
+     * @param videojuegoNombre The videogame name
+     * @param cantidad The quantity to add
+     * @param precio The price per unit
+     */
     public void agregarItemCarrito(String usuario, String videojuegoNombre, int cantidad, double precio) {
         logger.info("Adding item to cart (compatibility method) - User: " + usuario + 
                    ", Game: " + videojuegoNombre + 
@@ -237,19 +275,24 @@ public class CartController {
         }
     }
 
+    /**
+     * Displays details of the selected cart item.
+     *
+     * @param item The selected item string
+     */
     private void mostrarDetalleItem(String item) {
         if (item != null) {
             logger.info("Item selected in cart: " + item);
             
-            // Obtener el índice de la selección actual
+            
             indiceSeleccionado = listViewCarrito.getSelectionModel().getSelectedIndex();
             
-            // Verificar que el índice sea válido
+            
             if (indiceSeleccionado >= 0 && indiceSeleccionado < itemsCarrito.size()) {
                 logger.info("Valid selection - Index: " + indiceSeleccionado + 
                            ", Items in cart: " + itemsCarrito.size());
                 
-                // Extraer información del item seleccionado
+                
                 String[] partes = item.split("\\|");
                 if (partes.length >= 4) {
                     String usuario = partes[0].trim().split(":")[1].trim();
@@ -257,7 +300,7 @@ public class CartController {
                     String cantidadStr = partes[2].trim().split(":")[1].trim();
                     String precio = partes[3].trim();
 
-                    // Actualizar información mostrada
+                    
                     labelItemSeleccionado.setText(videojuego);
                     cantidadActual = Integer.parseInt(cantidadStr);
                     labelCantidadActual.setText(String.valueOf(cantidadActual));
@@ -266,7 +309,7 @@ public class CartController {
                                ", Quantity: " + cantidadActual + 
                                ", Price: " + precio);
                     
-                    // Habilitar botones
+                    
                     actualizarEstadoBotones();
                 } else {
                     logger.warning("Invalid item format in cart: " + item);
@@ -277,7 +320,7 @@ public class CartController {
                 limpiarSeleccion();
             }
         } else {
-            // Si no hay item seleccionado
+            
             logger.info("No item selected in cart");
             indiceSeleccionado = -1;
             cantidadActual = 0;
@@ -287,11 +330,15 @@ public class CartController {
         }
     }
 
+    /**
+     * Handles the increase quantity button action.
+     * Increases the quantity of the selected item by 1.
+     */
     @FXML
     private void aumentarCantidad() {
         logger.info("Increase quantity button clicked");
         
-        // Verificar que haya un item seleccionado válido
+        
         if (indiceSeleccionado >= 0 && indiceSeleccionado < itemsCarrito.size()) {
             cantidadActual++;
             logger.info("Increasing quantity to: " + cantidadActual + 
@@ -303,11 +350,15 @@ public class CartController {
         }
     }
 
+    /**
+     * Handles the decrease quantity button action.
+     * Decreases the quantity of the selected item by 1, or removes it if quantity reaches 0.
+     */
     @FXML
     private void disminuirCantidad() {
         logger.info("Decrease quantity button clicked");
         
-        // Verificar que haya un item seleccionado válido
+        
         if (indiceSeleccionado >= 0 && indiceSeleccionado < itemsCarrito.size()) {
             if (cantidadActual > 1) {
                 cantidadActual--;
@@ -317,7 +368,7 @@ public class CartController {
             } else if (cantidadActual == 1) {
                 logger.info("Quantity is 1 - Asking if user wants to remove item");
                 
-                // Si la cantidad es 1, preguntar si eliminar
+                
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Eliminar item");
                 alert.setHeaderText("¿Eliminar este item del carrito?");
@@ -342,11 +393,14 @@ public class CartController {
         }
     }
 
+    /**
+     * Updates the quantity of the selected item in the cart.
+     */
     private void actualizarItemCantidad() {
-        // Verificar que el índice sea válido
+        
         if (indiceSeleccionado >= 0 && indiceSeleccionado < itemsCarrito.size()) {
             try {
-                // Obtener el item seleccionado
+                
                 CartItem item = itemsCarrito.get(indiceSeleccionado);
                 Videogame videojuego = juegosCarrito.get(indiceSeleccionado);
                 
@@ -354,15 +408,15 @@ public class CartController {
                            ", Old quantity: " + item.getCantidad() + 
                            ", New quantity: " + cantidadActual);
                 
-                // Actualizar la cantidad en el item
+                
                 item.setCantidad(cantidadActual);
                 
-                // Actualizar la vista
+                
                 String nuevoItem = String.format("Usuario: %s | Videojuego: %s | Cantidad: %d | Precio: $%.2f",
                         profile.getUsername(), videojuego.getName(), cantidadActual, item.getPrecio());
                 carritoData.set(indiceSeleccionado, nuevoItem);
                 
-                // Actualizar la interfaz
+                
                 labelCantidadActual.setText(String.valueOf(cantidadActual));
                 actualizarTotales();
                 actualizarEstadoBotones();
@@ -374,25 +428,28 @@ public class CartController {
                 mostrarAlerta("Error", "No se pudo actualizar la cantidad del item.");
             }
         } else {
-            // Si el índice no es válido, limpiar la selección
+            
             logger.warning("Invalid index when updating quantity: " + indiceSeleccionado);
             limpiarSeleccion();
         }
     }
 
+    /**
+     * Updates the enabled/disabled state of all buttons based on cart state.
+     */
     public void actualizarEstadoBotones() {
         try {
             boolean hayItemSeleccionado = (indiceSeleccionado >= 0 && indiceSeleccionado < itemsCarrito.size());
             boolean carritoVacio = carritoData.isEmpty();
 
-            // Habilitar/deshabilitar botones + y -
+            
             buttonMas.setDisable(!hayItemSeleccionado);
             buttonMenos.setDisable(!hayItemSeleccionado || cantidadActual <= 1);
 
-            // Habilitar/deshabilitar botón eliminar
+            
             buttonEliminar.setDisable(!hayItemSeleccionado);
 
-            // Habilitar/deshabilitar botón comprar
+            
             buttonComprar.setDisable(carritoVacio);
             
             logger.info("Button states updated - Selected: " + hayItemSeleccionado + 
@@ -405,6 +462,10 @@ public class CartController {
         }
     }
 
+    /**
+     * Handles the delete item button action.
+     * Removes the selected item from the cart after confirmation.
+     */
     @FXML
     private void eliminarItem() {
         logger.info("Delete item button clicked");
@@ -429,7 +490,7 @@ public class CartController {
                     if (response == buttonTypeSi) {
                         logger.info("User confirmed item deletion");
                         
-                        // Eliminar de todas las listas
+                        
                         carritoData.remove(indiceSeleccionado);
                         if (indiceSeleccionado < itemsCarrito.size()) {
                             itemsCarrito.remove(indiceSeleccionado);
@@ -457,6 +518,9 @@ public class CartController {
         }
     }
 
+    /**
+     * Clears the current selection and resets display fields.
+     */
     private void limpiarSeleccion() {
         logger.info("Clearing cart selection");
         
@@ -475,6 +539,10 @@ public class CartController {
         }
     }
 
+    /**
+     * Handles the cancel button action.
+     * Closes the cart window.
+     */
     @FXML
     private void cancelar() {
         logger.info("Cancel button clicked - Closing cart window");
@@ -490,6 +558,9 @@ public class CartController {
         }
     }
 
+    /**
+     * Updates the total items count and total price display.
+     */
     public void actualizarTotales() {
         logger.info("Updating cart totals");
         
@@ -515,6 +586,12 @@ public class CartController {
         }
     }
 
+    /**
+     * Shows an alert dialog with the specified title and message.
+     *
+     * @param titulo The alert title
+     * @param mensaje The alert message
+     */
     private void mostrarAlerta(String titulo, String mensaje) {
         logger.info("Showing alert - Title: " + titulo + ", Message: " + mensaje);
         
@@ -529,6 +606,10 @@ public class CartController {
         }
     }
 
+    /**
+     * Handles the buy button action.
+     * Processes the purchase of all items in the cart.
+     */
     @FXML
     private void comprar() {
         logger.info("Buy button clicked - Items in cart: " + itemsCarrito.size() + 
@@ -560,12 +641,16 @@ public class CartController {
         });
     }
     
+    /**
+     * Processes the purchase of all items in the cart.
+     * Creates orders in the database and updates stock levels.
+     */
     private void procesarCompra() {
         logger.info("Starting purchase processing for user: " + 
                    (profile != null ? profile.getUsername() : "unknown"));
         
         try {
-            // 1. Obtener el usuario completo de la base de datos
+            
             logger.info("Retrieving user from database: " + profile.getUsername());
             User usuario = cont.getUserByUsername(profile.getUsername());
             if (usuario == null) {
@@ -576,13 +661,13 @@ public class CartController {
             
             logger.info("User retrieved successfully - User ID: " + usuario.getUserCode());
             
-            // 2. Validar stock antes de procesar
+            
             logger.info("Validating stock for " + itemsCarrito.size() + " items");
             if (!validarStockDisponible()) {
                 return;
             }
             
-            // 3. Procesar cada item del carrito
+            
             boolean exitoTotal = true;
             StringBuilder errores = new StringBuilder();
             int itemsProcesados = 0;
@@ -598,22 +683,22 @@ public class CartController {
                                " - Game: " + videojuego.getName() + 
                                " x" + item.getCantidad());
                     
-                    // Crear el Order para la base de datos
+                    
                     Order order = new Order(usuario, videojuego, item.getPrecio(), item.getCantidad());
                     
-                    // Guardar en la base de datos
+                    
                     logger.info("Creating order in database...");
                     boolean exito = cont.createOrder(order);
                     
                     if (exito) {
-                        // Actualizar stock del videojuego
+                        
                         int nuevoStock = videojuego.getStock() - item.getCantidad();
                         videojuego.setStock(nuevoStock);
                         
                         logger.info("Order created successfully - Updating stock from " + 
                                    videojuego.getStock() + " to " + nuevoStock);
                         
-                        // Actualizar en la base de datos
+                        
                         cont.modifyGame(videojuego);
                         
                         itemsProcesados++;
@@ -636,7 +721,7 @@ public class CartController {
             }
             
             if (exitoTotal) {
-                // Mostrar éxito
+                
                 logger.info("Purchase completed successfully - " + itemsProcesados + " items processed");
                 
                 Alert success = new Alert(Alert.AlertType.INFORMATION);
@@ -647,11 +732,11 @@ public class CartController {
                                      "Total pagado: " + labelTotalPagar.getText());
                 success.showAndWait();
                 
-                // Limpiar carrito
+                
                 logger.info("Clearing cart after successful purchase");
                 limpiarCarritoCompleto();
                 
-                // Cerrar ventana
+                
                 Stage currentStage = (Stage) buttonComprar.getScene().getWindow();
                 currentStage.close();
                 
@@ -671,6 +756,11 @@ public class CartController {
         }
     }
     
+    /**
+     * Validates that all items in the cart have sufficient stock.
+     *
+     * @return true if all items have sufficient stock, false otherwise
+     */
     private boolean validarStockDisponible() {
         logger.info("Validating stock availability");
         
@@ -703,6 +793,9 @@ public class CartController {
         return true;
     }
     
+    /**
+     * Clears all items from the shopping cart.
+     */
     private void limpiarCarritoCompleto() {
         logger.info("Clearing entire cart");
         
@@ -721,16 +814,21 @@ public class CartController {
         }
     }
 
+    /**
+     * Sets the stage for this controller.
+     *
+     * @param stage The stage to set
+     */
     public void setStage(Stage stage) {
         logger.info("Setting stage in CartController");
         this.stage = stage;
     }
     
     /**
-     * Muestra una ventana de alerta con el título y mensaje especificados.
+     * Shows an alert dialog with the specified title and message.
      *
-     * @param title Título de la alerta
-     * @param message Mensaje a mostrar en la alerta
+     * @param title The alert title
+     * @param message The alert message
      */
     private void showAlert(String title, String message) {
         try {
@@ -748,28 +846,27 @@ public class CartController {
     }
 
     /**
-     * Abre el manual de usuario en formato PDF. Busca el archivo PDF en varias
-     * ubicaciones posibles y lo abre con el visor de PDF predeterminado del
-     * sistema.
+     * Opens the user manual PDF file.
+     * Searches for the PDF in multiple possible locations and opens it with the system's default PDF viewer.
      *
-     * @param event Evento de acción del menú "Help Manual"
+     * @param event The action event from the "Help Manual" menu
      */
     @FXML
     private void manualPdf(ActionEvent event) {
         logger.info("Opening user manual PDF");
 
         try {
-            // Ruta relativa al PDF del manual
+            
             String pdfFileName = "Manual de Usuario - Tienda de Videojuegos.pdf";
             String pdfPath = "pdf/" + pdfFileName;
 
-            // Obtener la ruta absoluta del archivo
+            
             java.io.File pdfFile = new java.io.File(pdfPath);
 
             if (!pdfFile.exists()) {
                 logger.warning("User manual PDF not found at: " + pdfFile.getAbsolutePath());
 
-                // Intentar buscar en diferentes ubicaciones comunes
+                
                 String[] possiblePaths = {
                     pdfPath,
                     "src/pdf/" + pdfFileName,
@@ -795,7 +892,7 @@ public class CartController {
                 }
             }
 
-            // Abrir el PDF con el programa predeterminado del sistema
+            
             if (java.awt.Desktop.isDesktopSupported()) {
                 java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                 if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
@@ -811,7 +908,7 @@ public class CartController {
         } catch (IOException ex) {
             logger.severe("Error opening user manual PDF: " + ex.getMessage());
 
-            // Mostrar instrucciones alternativas
+            
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error Opening PDF");
             alert.setHeaderText("Could not open user manual automatically");
@@ -824,28 +921,27 @@ public class CartController {
     }
 
     /**
-     * Abre el informe del proyecto en formato PDF. Busca el archivo PDF en
-     * varias ubicaciones posibles y lo abre con el visor de PDF predeterminado
-     * del sistema.
+     * Opens the project report PDF file.
+     * Searches for the PDF in multiple possible locations and opens it with the system's default PDF viewer.
      *
-     * @param event Evento de acción del menú "Help Report"
+     * @param event The action event from the "Help Report" menu
      */
     @FXML
     private void reportPdf(ActionEvent event) {
         logger.info("Opening project report PDF");
 
         try {
-            // Ruta relativa al PDF del informe
+            
             String pdfFileName = "Proyecto-JavaFX-Sistema-de-Gestion-para-Tienda-de-Videojuegos.pdf";
             String pdfPath = "pdf/" + pdfFileName;
 
-            // Obtener la ruta absoluta del archivo
+            
             java.io.File pdfFile = new java.io.File(pdfPath);
 
             if (!pdfFile.exists()) {
                 logger.warning("Project report PDF not found at: " + pdfFile.getAbsolutePath());
 
-                // Intentar buscar en diferentes ubicaciones comunes
+                
                 String[] possiblePaths = {
                     pdfPath,
                     "src/pdf/" + pdfFileName,
@@ -871,14 +967,14 @@ public class CartController {
                 }
             }
 
-            // Abrir el PDF con el programa predeterminado del sistema
+            
             if (java.awt.Desktop.isDesktopSupported()) {
                 java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                 if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
                     desktop.open(pdfFile);
                     logger.info("Successfully opened project report PDF: " + pdfFile.getName());
 
-                    // Mostrar confirmación
+                    
                     Alert info = new Alert(Alert.AlertType.INFORMATION);
                     info.setTitle("PDF Opened");
                     info.setHeaderText("Project report opened successfully");
