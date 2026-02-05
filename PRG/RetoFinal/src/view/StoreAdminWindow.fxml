@@ -31,7 +31,8 @@
             <menus>
                 <Menu fx:id="menu" mnemonicParsing="false" text="Help">
                     <items>
-                        <MenuItem fx:id="menuHelp" mnemonicParsing="false" onAction="#helpWindow" text="Help Window" />
+                        <MenuItem fx:id="menuHelp" mnemonicParsing="false" onAction="#helpWindow" text="Manual" />
+                        <MenuItem fx:id="menuHelpReport" mnemonicParsing="false" onAction="#reportPdf" text="Report" />
                     </items>
                 </Menu>
             </menus>
