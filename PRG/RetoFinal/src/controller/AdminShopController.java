@@ -508,7 +508,7 @@ public class AdminShopController implements Initializable {
         
         try {
             // Ruta relativa al PDF del manual
-            String pdfFileName = "Manual de Usuario - Tienda de Videojuegos.pdf";
+            String pdfFileName = "Manual de Administrador - Tienda de Videojuegos.pdf";
             String pdfPath = "pdf/" + pdfFileName;
             
             // Obtener la ruta absoluta del archivo
