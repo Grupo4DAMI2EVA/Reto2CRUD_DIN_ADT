@@ -15,9 +15,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import model.*;
 
 /**
- * Controlador principal para la ventana de la tienda de videojuegos. Maneja la
- * interfaz de usuario donde los usuarios pueden buscar, ver, agregar al carrito
- * y gestionar sus juegos favoritos.
+ * Main controller for the video game store window. Handles the
+ * user interface where users can search, view, add to cart
+ * and manage their favorite games.
  *
  * @author Igor
  * @version 1.0
@@ -27,7 +27,7 @@ public class ShopWindowController implements Initializable {
     private static final Logger logger = Logger.getLogger(ShopWindowController.class.getName());
     private static boolean loggerInitialized = false;
 
-    // Elementos FXML de la interfaz
+    // FXML UI elements
     @FXML
     private Label labelWelcome;
     @FXML
@@ -101,7 +101,7 @@ public class ShopWindowController implements Initializable {
     @FXML
     private MenuItem menuHelpReport;
 
-    // Variables de estado
+    // State variables
     private Videogame selected;
     private Profile profile;
     private Controller cont;
@@ -110,17 +110,17 @@ public class ShopWindowController implements Initializable {
     private static ObservableList<CartItem> sharedCart;
 
     /**
-     * Bloque estático para inicializar el sistema de logging. Crea el
-     * directorio de logs si no existe y configura el FileHandler para escribir
-     * logs en un archivo específico.
+     * Static block to initialize the logging system. Creates the logs
+     * directory if it does not exist and configures the FileHandler to write
+     * logs to a specific file.
      */
     static {
         initializeLogger();
     }
 
     /**
-     * Inicializa el sistema de logging de manera sincronizada para evitar
-     * múltiples inicializaciones en entornos multi-hilo.
+     * Initializes the logging system in a synchronized manner to prevent
+     * multiple initializations in multi-threaded environments.
      */
     private static synchronized void initializeLogger() {
         if (loggerInitialized) {
@@ -163,13 +163,12 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Método de inicialización llamado automáticamente por JavaFX después de
-     * cargar el archivo FXML. Configura la tabla, carga los juegos, establece
-     * los listeners y prepara los componentes de la interfaz.
+     * Initialization method called automatically by JavaFX after loading
+     * the FXML file. Configures the table, loads games, sets listeners
+     * and prepares the UI components.
      *
-     * @param url Ubicación utilizada para resolver rutas relativas para el
-     * objeto raíz
-     * @param rb Recursos utilizados para localizar el objeto raíz
+     * @param url Location used to resolve relative paths for the root object
+     * @param rb Resources used to locate the root object
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -181,29 +180,29 @@ public class ShopWindowController implements Initializable {
             favoriteGameIds = FXCollections.observableArrayList();
             sharedCart = FXCollections.observableArrayList();
 
-            // Configurar las columnas de la tabla
+            // Configure table columns
             configureTableColumns();
 
-            // Cargar todos los juegos inicialmente
+            // Load all games initially
             tableViewGames.setItems(gamesList);
 
-            // Configurar listener para selección de fila
+            // Configure row selection listener
             tableViewGames.getSelectionModel().selectedItemProperty().addListener(
                     (observable, oldValue, newValue) -> getSelectedTableItem()
             );
 
-            // Configurar fábrica de filas para resaltar juegos favoritos
+            // Configure row factory to highlight favorite games
             tableViewGames.setRowFactory(tv -> new TableRow<Videogame>() {
                 @Override
                 protected void updateItem(Videogame game, boolean empty) {
                     super.updateItem(game, empty);
 
-                    // Primero resetear el estilo
+                    // First reset the style
                     setStyle("");
 
-                    // Solo aplicar estilo si no está vacío y el juego no es null
+                    // Only apply style if not empty and game is not null
                     if (!empty && game != null) {
-                        // Usar una copia local para evitar problemas de concurrencia
+                        // Use a local copy to avoid concurrency issues
                         ObservableList<Integer> favIdsCopy = FXCollections.observableArrayList(favoriteGameIds);
 
                         if (favIdsCopy.contains(game.getIdVideogame())) {
@@ -213,15 +212,15 @@ public class ShopWindowController implements Initializable {
                 }
             });
 
-            // Configurar ComboBox de géneros
+            // Configure genre ComboBox
             comboBoxGenre.getItems().setAll(GameGenre.values());
             comboBoxGenre.setValue(GameGenre.ALL);
 
-            // Configurar ComboBox de plataformas
+            // Configure platform ComboBox
             comboBoxPlatform.getItems().setAll(Platform.values());
             comboBoxPlatform.setValue(Platform.ALL);
 
-            // Cargar todos los juegos
+            // Load all games
             gamesList.setAll(cont.getAllGames());
 
             logger.info("ShopWindowController initialized successfully");
@@ -234,10 +233,10 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Establece el perfil del usuario actual en la ventana de la tienda.
-     * Actualiza la etiqueta de bienvenida con el nombre de usuario.
+     * Sets the current user profile in the store window.
+     * Updates the welcome label with the username.
      *
-     * @param profile Perfil del usuario que inició sesión
+     * @param profile Profile of the logged-in user
      */
     public void setUsuario(Profile profile) {
         logger.info("Setting user profile: " + (profile != null ? profile.getUsername() : "null"));
@@ -247,26 +246,26 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Establece el controlador principal de la aplicación.
+     * Sets the main application controller.
      *
-     * @param cont Controlador principal de la aplicación
+     * @param cont Main application controller
      */
     public void setCont(Controller cont) {
         this.cont = cont;
     }
 
     /**
-     * Obtiene el controlador principal de la aplicación.
+     * Gets the main application controller.
      *
-     * @return Controlador principal de la aplicación
+     * @return Main application controller
      */
     public Controller getCont() {
         return cont;
     }
 
     /**
-     * Configura las columnas de la tabla de videojuegos. Asocia cada columna
-     * con su propiedad correspondiente en la clase Videogame.
+     * Configures the video game table columns. Associates each column
+     * with its corresponding property in the Videogame class.
      */
     private void configureTableColumns() {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -280,15 +279,15 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Carga todos los videojuegos disponibles desde la base de datos.
+     * Loads all available video games from the database.
      */
     private void loadAllGames() {
         gamesList.setAll(cont.getAllGames());
     }
 
     /**
-     * Maneja la selección de un elemento en la tabla. Actualiza el videojuego
-     * seleccionado y muestra su información.
+     * Handles the selection of an item in the table. Updates the selected video
+     * game and displays its information.
      */
     private void getSelectedTableItem() {
         selected = tableViewGames.getSelectionModel().getSelectedItem();
@@ -299,10 +298,10 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Realiza una búsqueda de videojuegos basada en los filtros especificados.
-     * Los filtros incluyen texto de búsqueda, género y plataforma.
+     * Performs a search for video games based on the specified filters.
+     * Filters include search text, genre, and platform.
      *
-     * @param event Evento de acción del botón de búsqueda
+     * @param event Search button action event
      */
     @FXML
     private void search(ActionEvent event) {
@@ -333,11 +332,11 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Agrega el videojuego seleccionado al carrito de compras del usuario.
-     * Verifica que el usuario esté autenticado, que haya stock disponible y que
-     * el juego no esté ya en el carrito.
+     * Adds the selected video game to the user shopping cart.
+     * Verifies that the user is authenticated, that there is available stock, and
+     * that the game is not already in the cart.
      *
-     * @param event Evento de acción del botón "Agregar al carrito"
+     * @param event "Add to cart" button action event
      */
     @FXML
     private void addToCart(ActionEvent event) {
@@ -420,21 +419,20 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Obtiene el carrito de compras compartido entre ventanas. Este es un
-     * carrito estático que mantiene los items entre diferentes instancias del
-     * controlador.
+     * Gets the shared shopping cart between windows. This is a static cart that
+     * maintains items between different instances of the store window.
      *
-     * @return Lista observable con los items del carrito
+     * @return Observable list with cart items
      */
     public static ObservableList<CartItem> getSharedCart() {
         return sharedCart;
     }
 
     /**
-     * Abre la ventana del carrito de compras. Carga la interfaz del carrito y
-     * pasa los items actuales.
+     * Opens the shopping cart window. Loads the cart interface and
+     * passes the current items.
      *
-     * @param event Evento de acción del botón del carrito
+     * @param event Cart button action event
      */
     @FXML
     private void openCart(ActionEvent event) {
@@ -448,11 +446,11 @@ public class ShopWindowController implements Initializable {
             // PRIMERO llamar setup() para inicializar
             cartC.setup();
 
-            // Configurar usuario y controlador
+            // Configure user and 
             cartC.setUsuario(profile);
             cartC.setCont(cont);
 
-            // Cargar los items del carrito compartido CON VIDEOJUEGOS COMPLETOS
+            // Load shared cart items WITH COMPLETE VIDEOGAMES
             loadCartItemsToController(cartC);
 
             cartC.actualizarTotales();
@@ -474,15 +472,15 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Método auxiliar para cargar los items del carrito compartido al
-     * controlador del carrito.
+     * Auxiliary method to load the shared cart items into the cart window
+     * controller.
      *
-     * @param cartController Controlador de la ventana del carrito
+     * @param cartController Cart window controller
      */
     private void loadCartItemsToController(CartController cartController) {
         for (CartItem item : sharedCart) {
             if (item.getIdUsuario() == profile.getUserCode()) {
-                // Buscar el videojuego completo en la lista
+                // Find the complete video game in the list
                 Videogame videojuegoCompleto = null;
                 for (Videogame game : gamesList) {
                     if (game.getIdVideogame() == item.getIdVideojuego()) {
@@ -504,9 +502,9 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Refresca la lista de videojuegos aplicando los filtros actuales. Si hay
-     * filtros activos, aplica la búsqueda filtrada; de lo contrario, carga
-     * todos los juegos.
+     * Refreshes the list of video games applying the current filters. If there
+     * are active filters, it applies the filtered search; otherwise, it loads
+     * all games.
      */
     private void refreshGamesList() {
         logger.info("Refreshing games list");
@@ -537,10 +535,10 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Maneja el evento del botón de salida. Cierra la ventana actual y regresa
-     * a la ventana principal del menú.
+     * Handles the exit button event. Closes the current window and returns
+     * to the main menu window.
      *
-     * @param event Evento de acción del botón de salida
+     * @param event Exit button action event
      */
     @FXML
     private void handleExitButton(ActionEvent event) {
@@ -568,10 +566,10 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Maneja el evento del botón de reseñas. Abre una ventana para escribir una
-     * reseña sobre el videojuego seleccionado.
+     * Handles the reviews button event. Opens a window to write a
+     * review about the selected video game.
      *
-     * @param event Evento de acción del botón de reseñas
+     * @param event Reviews button action event
      */
     @FXML
     private void handleReviewButton(ActionEvent event) {
@@ -595,17 +593,17 @@ public class ShopWindowController implements Initializable {
 
             ReviewController controller = loader.getController();
 
-            // Configurar el videojuego completo
+            // Configure the complete video game
             controller.setVideojuegoCompleto(selected); // Nuevo método
 
-            // Configurar usuario y controlador
+            // Configure user and 
             if (profile != null) {
                 controller.setUsuario(profile);
                 controller.setCont(cont);
                 logger.info("Setting user for review: " + profile.getUsername() + " (ID: " + profile.getUserCode() + ")");
             }
 
-            // Crear una NUEVA ventana (Stage) modal
+            // Create a NEW window (Stage) modal
             Stage stage = new Stage();
             stage.setTitle("Review Game: " + selected.getName());
             stage.setScene(new Scene(root));
@@ -629,10 +627,10 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Alterna el estado de favorito del videojuego seleccionado. Agrega o
-     * remueve el juego de la lista de favoritos del usuario.
+     * Toggles the favorite status of the selected video game. Adds or
+     * removes the game from the user favorite list.
      *
-     * @param event Evento de acción del menú contextual de favoritos
+     * @param event Favorites context menu action event
      */
     @FXML
     private void toggleFavorite(ActionEvent event) {
@@ -686,11 +684,11 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Muestra los detalles completos del videojuego seleccionado en una ventana
-     * de diálogo. Incluye información como compañía, género, plataforma,
-     * precio, PEGI, stock y fecha de lanzamiento.
+     * Shows the complete details of the selected video game in a dialog.
+     * Includes information such as company, genre, platform, price,
+     * PEGI rating, stock, and release date.
      *
-     * @param event Evento de acción del menú contextual de detalles
+     * @param event Details context menu action event
      */
     @FXML
     private void viewGameDetails(ActionEvent event) {
@@ -725,10 +723,10 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Abre la ventana de modificación del perfil de usuario. Permite al usuario
-     * actualizar su información personal.
+     * Opens the user profile modification window. Allows the user
+     * to update their personal information.
      *
-     * @param event Evento de acción del menú "User Window"
+     * @param event "User Window" menu action event
      */
     @FXML
     private void menuUserWindow(ActionEvent event) {
@@ -740,7 +738,7 @@ public class ShopWindowController implements Initializable {
 
             ModifyWindowController controller = loader.getController();
 
-            // Pasar el perfil y controlador
+            // Pasar el perfil y 
             if (controller != null) {
                 if (profile != null) {
                     controller.setProfile(profile);
@@ -750,13 +748,13 @@ public class ShopWindowController implements Initializable {
                 }
             }
 
-            // Cerrar la ventana actual (StoreWindow)
+            // Close the current window (StoreWindow)
             Stage currentStage = (Stage) menuBar.getScene().getWindow();
             currentStage.close();
 
             logger.info("Closing ShopWindow and opening ModifyWindow");
 
-            // Abrir ModifyWindow como ventana principal (NO modal)
+            // Open ModifyWindow as main window (NO modal)
             Stage stage = new Stage();
             stage.setTitle("Modify Profile - " + profile.getUsername());
             stage.setScene(new Scene(root));
@@ -774,10 +772,10 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Regresa a la ventana principal del menú desde la tienda. Reemplaza la
-     * escena actual con la del menú principal.
+     * Returns to the main menu window from the store. Replaces the
+     * current scene with the main menu scene.
      *
-     * @param event Evento de acción del menú "Main Window"
+     * @param event "Main Window" menu action event
      */
     @FXML
     private void menuMainWIndow(ActionEvent event) {
@@ -789,7 +787,7 @@ public class ShopWindowController implements Initializable {
 
             MenuWindowController controller = loader.getController();
 
-            // Pasar el perfil y controlador
+            // Pasar el perfil y 
             if (controller != null) {
                 if (profile != null) {
                     controller.setUsuario(profile);
@@ -800,7 +798,7 @@ public class ShopWindowController implements Initializable {
                 }
             }
 
-            // Obtener la ventana actual
+            // Get the current window
             Stage currentStage = (Stage) menuBar.getScene().getWindow();
 
             // Reemplazar la escena actual
@@ -843,11 +841,11 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Abre el manual de usuario en formato PDF. Busca el archivo PDF en varias
-     * ubicaciones posibles y lo abre con el visor de PDF predeterminado del
-     * sistema.
+     * Opens the user manual in PDF format. Searches for the PDF file in various
+     * possible locations and opens it with the default PDF viewer of the
+     * system.
      *
-     * @param event Evento de acción del menú "Help Manual"
+     * @param event "Help Manual" menu action event
      */
     @FXML
     private void manualPdf(ActionEvent event) {
@@ -864,7 +862,7 @@ public class ShopWindowController implements Initializable {
             if (!pdfFile.exists()) {
                 logger.warning("User manual PDF not found at: " + pdfFile.getAbsolutePath());
 
-                // Intentar buscar en diferentes ubicaciones comunes
+                // Try to search in different common locations
                 String[] possiblePaths = {
                     pdfPath,
                     "src/pdf/" + pdfFileName,
@@ -890,7 +888,7 @@ public class ShopWindowController implements Initializable {
                 }
             }
 
-            // Abrir el PDF con el programa predeterminado del sistema
+            // Abrir el PDF con el programa predeterminado of the system.
             if (java.awt.Desktop.isDesktopSupported()) {
                 java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                 if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
@@ -919,9 +917,9 @@ public class ShopWindowController implements Initializable {
     }
 
     /**
-     * Abre el informe del proyecto en formato PDF. Busca el archivo PDF en
-     * varias ubicaciones posibles y lo abre con el visor de PDF predeterminado
-     * del sistema.
+     * Opens the project report in PDF format. Searches for the PDF file in
+     * various possible locations and opens it with the default PDF viewer
+     * of the system.
      *
      * @param event Evento de acción del menú "Help Report"
      */
@@ -940,7 +938,7 @@ public class ShopWindowController implements Initializable {
             if (!pdfFile.exists()) {
                 logger.warning("Project report PDF not found at: " + pdfFile.getAbsolutePath());
 
-                // Intentar buscar en diferentes ubicaciones comunes
+                // Try to search in different common locations
                 String[] possiblePaths = {
                     pdfPath,
                     "src/pdf/" + pdfFileName,
@@ -966,7 +964,7 @@ public class ShopWindowController implements Initializable {
                 }
             }
 
-            // Abrir el PDF con el programa predeterminado del sistema
+            // Abrir el PDF con el programa predeterminado of the system.
             if (java.awt.Desktop.isDesktopSupported()) {
                 java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
                 if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
@@ -1002,3 +1000,8 @@ public class ShopWindowController implements Initializable {
         }
     }
 }
+
+
+
+
+
